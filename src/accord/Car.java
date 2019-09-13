@@ -18,6 +18,12 @@ public class Car {
     private int ydimen = 0;
     private int speed = 0;
     
+    private PozyxSerialComm pozyx = null;
+    
+    Car(int ID, PozyxSerialComm pozyx){
+        carID = ID;
+        this.pozyx = pozyx;
+    }
     public void updateLocation(){
         
     }

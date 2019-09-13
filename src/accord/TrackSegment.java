@@ -43,7 +43,7 @@ public class TrackSegment {
     private int absoluteExitXLoc = 0;
     private int absoluteExitYLoc = 0;
     
-    private int boundaryMargin = 0;
+    private int boundaryMargin = 10;
     private int xHitBox1 = 0;
     private int yHitBox1 = 0;
     private int xHitBox2 = 0;
@@ -161,18 +161,18 @@ public class TrackSegment {
             case SEGSHAPE_90DEGTURN:
                 double dir;
                 double x = xLoc - circleCenterX;
-                double y = yLoc - circleCenterX;
+                double y = yLoc - circleCenterY;
                 if(x==0)
                     dir=90;
                 else
-                    dir = Math.atan(Math.abs(y)/Math.abs(x));
+                    dir = Math.toDegrees(Math.atan(Math.abs(y)/Math.abs(x)));
                 
                 if(x<0 && y>=0)
-                    dir+=90;
+                    dir = 180 - dir;
                 else if(x<0 && y<=0)
                     dir+=180;
                 else if(x>0 && y<=0)
-                    dir+=270;
+                    dir = 360 - dir;
                 
                 return (dir+(turn90 * 90))%360;
             default:
@@ -193,7 +193,7 @@ public class TrackSegment {
         nextSeg.setAbsoluteLocation(absoluteExitXLoc, absoluteExitYLoc);
         nextSeg.connectPrevSegment(this);
     }
-    private void connectPrevSegment(TrackSegment prev){
+    public void connectPrevSegment(TrackSegment prev){
         if(prev==null)
             return;
         prevSeg = prev;
@@ -272,9 +272,9 @@ public class TrackSegment {
                 
                 break;
             case SEGSHAPE_90DEGTURN:
-                double dist = Math.sqrt(2*radius*radius);
+                double dist = Math.sqrt(2)*radius;
                 absoluteExitXLoc = (int)(dist * Math.cos(Math.toRadians(direction+(turn90*45)))) + absoluteXLoc;
-                absoluteExitXLoc = (int)(dist * Math.sin(Math.toRadians(direction+(turn90*45)))) + absoluteYLoc;
+                absoluteExitYLoc = (int)(dist * Math.sin(Math.toRadians(direction+(turn90*45)))) + absoluteYLoc;
                 
                 circleCenterX = (double)(radius * Math.cos(Math.toRadians(90 + direction))) + absoluteXLoc;
                 circleCenterY = (double)(radius * Math.sin(Math.toRadians(90 + direction))) + absoluteYLoc;
