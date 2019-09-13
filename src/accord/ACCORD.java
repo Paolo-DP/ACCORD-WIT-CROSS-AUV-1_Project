@@ -22,7 +22,7 @@ public class ACCORD {
         sc = new Scanner(System.in);
         if(testModules)
             runTestModules();
-        setup();
+        //setup();
     }
     
     private static void setup(){
@@ -51,7 +51,8 @@ public class ACCORD {
     private static void runTestModules(){
         System.out.println("Running Module Tests...");
         //testCarDetails();
-        testSerialComm();
+        //testSerialComm();
+        testTrackSegmentClass();
     }
     
     private static void testCarDetails(){
@@ -60,7 +61,6 @@ public class ACCORD {
         dets.xloc = 69;
         System.out.println("xloc = "+dets.xloc);
     }
-    
     private static void testSerialComm(){
         System.out.println("Select Com port:");
         SerialPort[] ports = SerialPort.getCommPorts();
@@ -113,5 +113,64 @@ public class ACCORD {
             }
         } catch (Exception e) { e.printStackTrace(); }    
         comPort.closePort();
+    }
+    private static void testTrackSegmentClass(){
+        TrackSegment testSegment = null;
+        System.out.println("Testing Track Segment Class...\n");
+        double[][] testLineSegments = { //length, width, direction
+            {10, 5, 0},
+            {10, 5, 90},
+            {10, 5, 180},
+            {10, 5, 270},
+            {10, 5, 360},
+            {10, 5, 450},
+            {1000, 5, 36.8699},
+            {1000, 5, 126.8699},
+            {1000, 5, 216.8699},
+            {1000, 5, 306.8699},
+        };
+        for(int i=0; i<testLineSegments.length; i++){
+            System.out.println("Creating Line Segment with paramaters:");
+            System.out.println("Length = " + testLineSegments[i][0]);
+            System.out.println("Width = " + testLineSegments[i][1]);
+            System.out.println("Direction = " + testLineSegments[i][2]);
+            testSegment = new TrackSegment();
+            testSegment.createLineSegment((int) testLineSegments[i][0], (int) testLineSegments[i][1], testLineSegments[i][2]);
+            System.out.println("Resulting Segment astributes:");
+            System.out.print("Exit Location: ");
+            System.out.println(testSegment.getExitXLocation()+", "+testSegment.getExitYLocation());
+            System.out.println("Length: "+ testSegment.getSegLength());
+            System.out.println("Distance from point (5,5): " + testSegment.distFromCenterLine(5, 5));
+            System.out.println("(2,3) Within bounds: " + testSegment.isWithinBounds(2, 3));
+            System.out.print("\n\n");
+        }
+        
+        System.out.println("Testing Track Segment Class with start and end points...\n");
+        int[][] testStartEndLines = { //startx, starty, endx, endy, width, abs
+            {0,0,10,0,5},
+            {0,0,0,10,5},
+            {0,0,-10,0,5},
+            {0,0,0,-10,5}
+        };
+        for(int i=0; i<testStartEndLines.length; i++){
+            System.out.println("Creating Line Segment with paramaters:");
+            System.out.println("Start = " + testStartEndLines[i][0] + ", " + testStartEndLines[i][1]);
+            System.out.println("End = " + testStartEndLines[i][2] + ", " + testStartEndLines[i][3]);
+            System.out.println("Width = " + testStartEndLines[i][4]);
+            testSegment = new TrackSegment();
+            testSegment.createLineSegment(
+                    testStartEndLines[i][0],
+                    testStartEndLines[i][1],
+                    testStartEndLines[i][2],
+                    testStartEndLines[i][3],
+                    testStartEndLines[i][4],
+                    false);
+            System.out.println("Resulting Segment astributes:");
+            System.out.print("Exit Location: ");
+            System.out.println(testSegment.getExitXLocation()+", "+testSegment.getExitYLocation());
+            System.out.println("Length: "+ testSegment.getSegLength());
+            System.out.println("Distance from point (5,5): " + testSegment.distFromCenterLine(5, 5));
+            System.out.print("\n\n");
+        }
     }
 }
