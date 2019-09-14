@@ -51,4 +51,11 @@ public class Car {
                 
         return deets;
     }
+    public boolean adjustSpeed(int speed){
+        return true;
+    }
+    public boolean adjustSteering(int steer){
+        return true;
+    }
+    
 }
