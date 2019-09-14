@@ -5,9 +5,8 @@
  */
 package accord;
 
-import static accord.ACCORD.sc;
 import com.fazecast.jSerialComm.SerialPort;
-
+import java.util.Scanner;
 /**
  *
  * @author Paolo
@@ -197,6 +196,7 @@ public class ModuleUnitTests {
         System.out.println("xloc = "+dets.xloc);
     }
     public static void testSerialComm(){
+        Scanner sc = new Scanner(System.in);
         System.out.println("Select Com port:");
         SerialPort[] ports = SerialPort.getCommPorts();
         for(int i=0; i<ports.length; i++){
