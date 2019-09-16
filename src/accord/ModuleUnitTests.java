@@ -249,4 +249,51 @@ public class ModuleUnitTests {
         } catch (Exception e) { e.printStackTrace(); }    
         comPort.closePort();
     }
+    public static void testPozyxSerialComm(){
+        PozyxSerialComm poz = new PozyxSerialComm();
+        byte[] message = {
+        (byte)0x01,
+        (byte)0x00,
+        (byte)0x00,
+        (byte)0x03,
+        (byte)0x02,
+        (byte)0x7F
+        };
+        byte[] frame = {
+            (byte)0xF0,
+            (byte)0x08,
+        (byte)0x01,
+        (byte)0x00,
+        (byte)0x00,
+        (byte)0x03,
+        (byte)0x02,
+        (byte)0x7F
+        };
+        System.out.print("Input message: ");
+        for(byte b : message)
+            System.out.println(Integer.toHexString(b));
+        byte[] ack = poz.sendCarCommand(message, true);
+        if(ack != null){
+            System.out.println("Ack: ");
+            for(byte b : ack)
+                System.out.println(Integer.toHexString(b));
+        }
+        else{
+            System.out.print("No ack Recieved");
+        }
+        System.out.println("Manual serial write");
+        
+        poz.comPort.writeBytes(frame, frame.length);
+        while(poz.comPort.bytesAvailable()<4){
+            try{
+                Thread.sleep(20);
+                System.out.println("bytes available: " + poz.comPort.bytesAvailable());
+            }catch(Exception e){}
+        }
+        byte[] readBuffer = new byte[4];
+        poz.comPort.readBytes(readBuffer, 4);
+        for(byte by : readBuffer)
+            System.out.println(Integer.toHexString(by));
+        poz.closeComm();
+    }
 }

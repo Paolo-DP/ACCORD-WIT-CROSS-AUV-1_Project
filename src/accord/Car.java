@@ -5,6 +5,7 @@
  */
 package accord;
 
+import java.nio.ByteBuffer;
 /**
  *
  * @author Paolo
@@ -25,6 +26,9 @@ public class Car {
         this.pozyx = pozyx;
     }
     public void updateLocation(){
+        
+    }
+    public void updateOrientation(){
         
     }
     public int getXLocation(){
@@ -52,10 +56,13 @@ public class Car {
         return deets;
     }
     public boolean adjustSpeed(int speed){
+        byte[] message = ByteBuffer.allocate(2).putShort((short)carID).array();
         return true;
     }
     public boolean adjustSteering(int steer){
         return true;
     }
-    
+    public void setPozyxComm(PozyxSerialComm pozyx){
+        this.pozyx = pozyx;
+    }
 }

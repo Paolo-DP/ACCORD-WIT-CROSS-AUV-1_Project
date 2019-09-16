@@ -2,13 +2,15 @@
 #include <Pozyx_definitions.h>
 #include <Wire.h>
 
+boolean const degug = true;
+
 uint16_t master_id = 0x6000;                            // set this to the ID of the remote device
 bool remote = false;
 int numAnchors = 0;
 
-byte const headerByte = 0xF0;
-int const headerLength = 2;
-int const minFrameLength = 3;
+byte const headerBytes[] = {0xF0};
+int const headerLength = sizeof(headerBytes) + 1; //header leading bytes + length byte
+int const minFrameLength = headerLength + 1; //full header plus message type byte
 byte RXBuffer[255];
 
 void setup() {
@@ -20,29 +22,32 @@ void setup() {
     delay(100);
     abort();
   }
-
 }
 
 void loop() {
-  if(checkForHeader()){
+  if(messageIncoming()){
     processMessage();
   }
   
 }
 
-boolean checkForHeader(){
-  //Serial.println("Checking Header");
-  if(!Serial.available())
+boolean messageIncoming(){
+  if(Serial.available()<headerLength-1){
     return false;
-  else{
-  int headerChk = Serial.read();
-    return headerChk == headerByte;
   }
+  byte b;
+  for(int i=0; i<headerLength-1; i++){
+    b = Serial.read();
+    if(b!=headerBytes[i]){
+      //Serial.println("invalid header");
+      return false;
+    }
+  }
+  return true;
 }
 
 
 void processMessage(){
-  //Serial.println("Message processing...");
   //delay(100);
   int frameLength = 0;
   int timeOut=50;
@@ -53,13 +58,15 @@ void processMessage(){
   if(frameLength<minFrameLength)
     return;
   timeOut=50;
-  while(Serial.available()<frameLength-minFrameLength && timeOut>0){
+  while(Serial.available()<frameLength-headerLength && timeOut>0){
     timeOut--;
   }
   Serial.readBytes(RXBuffer, frameLength-headerLength);
-  int frameType = RXBuffer[0];
+  byte frameType = RXBuffer[0];
   uint8_t * dataBuffer;
   int dataLength;
+  sendAck(frameType);
+  
   switch(frameType){
     case 1: //send message to Pozyx Device
       uint16_t destID;
@@ -69,7 +76,6 @@ void processMessage(){
       int status;
       status = Pozyx.writeTXBufferData(dataBuffer, dataLength);
       status = Pozyx.sendTXBufferData(destID);
-      
       break;
       
     case 129: //add new Anchor Device
@@ -102,6 +108,13 @@ void processMessage(){
     default:
       break;
   }
+  
+}
+void sendAck(int type){
+  Serial.write(headerBytes, headerLength-1);
+  Serial.write(headerLength+2);
+  Serial.write(0xFF);
+  Serial.write((byte)type);
 }
 
 coordinates_t getPosition(uint16_t deviceID){
@@ -109,4 +122,3 @@ coordinates_t getPosition(uint16_t deviceID){
 
   return position;
 }
-

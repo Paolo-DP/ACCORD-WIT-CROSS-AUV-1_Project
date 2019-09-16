@@ -13,8 +13,8 @@ public class CarDetails {
     public int carID = 0;
     public int xloc = 0;
     public int yloc = 0;
-    public int orient = 0;
+    public double orient = 0;
     public int xdimen = 0;
     public int ydimen = 0;
-    public int speed = 0;
+    public double speed = 0;
 }

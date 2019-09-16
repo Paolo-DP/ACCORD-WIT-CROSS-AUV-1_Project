@@ -51,7 +51,7 @@ public class ACCORD {
     private static void runTestModules(){
         System.out.println("Running Module Tests...");
         //ModuleUnitTests.testLinearTrackSegment();
-        ModuleUnitTests.testSimpleOvalTrack();
-        
+        //ModuleUnitTests.testSimpleOvalTrack();
+        ModuleUnitTests.testPozyxSerialComm();
     }
 }
