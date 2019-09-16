@@ -14,6 +14,7 @@ import java.util.Arrays;
 public class PozyxSerialComm {
     
     public static final int baudRate = 115200;
+    private static final int ARDUINO_RESET_WAIT = 3000;
     private static final int ackWaitAttempts = 10;
     private static final byte[] frameHeader = {(byte)0xF0};
     public SerialPort comPort;
@@ -36,11 +37,11 @@ public class PozyxSerialComm {
         comPort.openPort();
         comPort.setBaudRate(baudRate);
         comPort.setComPortTimeouts(SerialPort.TIMEOUT_READ_SEMI_BLOCKING | SerialPort.TIMEOUT_WRITE_BLOCKING, 500, 0);
-        while(!comPort.isOpen()){
-            try{
-                Thread.sleep(20);
-            }catch(Exception e){}
-        }
+        
+        try{
+            Thread.sleep(ARDUINO_RESET_WAIT); //wait for Arduino to Reset
+        }catch(Exception e){}
+        
     }
     
     public void addAnchor(int deviceID){
