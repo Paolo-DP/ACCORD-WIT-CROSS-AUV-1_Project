@@ -14,7 +14,7 @@ public class Car {
     private int carID = 0;
     private int xloc = 0;
     private int yloc = 0;
-    private int orient = 0;
+    private double orient = 0;
     private int xdimen = 0;
     private int ydimen = 0;
     private int speed = 0;
@@ -26,7 +26,13 @@ public class Car {
         this.pozyx = pozyx;
     }
     public void updateLocation(){
-        
+        Coordinates coor = pozyx.getCoordinates(carID);
+        if(coor!=null && coor.ID==carID){
+            xloc = (int)coor.x;
+            yloc = (int)coor.y;
+            orient = coor.eulerAngles[0];
+            
+        }
     }
     public void updateOrientation(){
         
@@ -37,7 +43,7 @@ public class Car {
     public int getYLocation(){
         return yloc;
     }
-    public int getOrientation(){
+    public double getOrientation(){
         return orient;
     }
     public int getSpeed(){
@@ -60,6 +66,7 @@ public class Car {
         return true;
     }
     public boolean adjustSteering(int steer){
+        
         return true;
     }
     public void setPozyxComm(PozyxSerialComm pozyx){

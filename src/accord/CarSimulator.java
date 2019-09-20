@@ -5,10 +5,37 @@
  */
 package accord;
 
+import java.util.ArrayList;
+
 /**
  *
  * @author Paolo
  */
 public class CarSimulator {
+    private int minDistanceToCorrect = 10;
+    ArrayList <Car> carList = new ArrayList<Car>();
+    Track track = null;
     
+    public void addCar(Car c){
+        carList.add(c);
+    }
+    public void setTrack(Track t){
+        track = t;
+    }
+    public void simulate(){
+        if(track!=null && carList.size()>0){
+            for(int i=0; i<carList.size(); i++){
+                Car c = carList.get(i);
+
+                c.updateLocation();
+                int distCLine = track.distfromCenterLine(c);
+                if(Math.abs(distCLine)>minDistanceToCorrect){
+                    int steer = 127;
+                    if(distCLine>0);
+                        steer *= -1;
+                    c.adjustSteering(steer);
+                }
+            }
+        }
+    }
 }

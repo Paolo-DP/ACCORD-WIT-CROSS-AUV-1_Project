@@ -72,7 +72,7 @@ public class ModuleUnitTests {
         }
     }
     public static void testSimpleOvalTrack(){
-        Track tr = createSimpleOvalTrack(1500, 500, 100, false);
+        Track tr = createSimpleOvalTrack(1500, 500, 100, false,0,0);
         int[][] testdata = {
             //xLoc, yLoc, expected Direction, expected dist from cetnerline
             //straight 1
@@ -106,11 +106,12 @@ public class ModuleUnitTests {
                 
         }
     }
-    public static Track createSimpleOvalTrack(int length, int width, int roadWidth, boolean troubleshoot){
+    public static Track createSimpleOvalTrack(int length, int width, int roadWidth, boolean troubleshoot, int xOffset, int yOffset){
         Track tr = new Track();
         
         TrackSegment seg = new TrackSegment();
         seg.createLineSegment(length-width, roadWidth, 0);
+        seg.setAbsoluteLocation(xOffset, yOffset);
         if(troubleshoot){
             System.out.println("Segment 1");
             System.out.println("Entry Point: (" + 
@@ -295,5 +296,27 @@ public class ModuleUnitTests {
         for(byte by : readBuffer)
             System.out.println(Integer.toHexString(by));
         poz.closeComm();
+    }
+    public static void testCarSimulationOval(){
+        Track tr = createSimpleOvalTrack(2000, 1000, 150, true, 700, 100);
+        PozyxSerialComm pozyx = new PozyxSerialComm();
+        CarSimulator carSim = new CarSimulator();
+        carSim.setTrack(tr);
+        int[] anchors = {0x6e3c, 0x6e38, 0x6735, 0x6717};
+        int[] anchorsX = {0, 0, 2370, 2370};
+        int[] anchorsY = {0, 1230, 0, 1230};
+        int[] anchorsZ = {0,0,0,0};
+        
+        for(int i=0; i<anchors.length; i++){
+            pozyx.addAnchor(anchors[i], anchorsX[i], anchorsY[i], anchorsZ[i]);
+        }
+        pozyx.addTag(0x6743);
+        pozyx.finalizeDeviceList();
+        Car c = new Car(0x6743, pozyx);
+        carSim.addCar(c);
+        while(true){
+            carSim.simulate();
+        }
+        
     }
 }
