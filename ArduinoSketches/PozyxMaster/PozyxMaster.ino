@@ -131,7 +131,7 @@ void processMessage(){
         coordinatesFrame[headerLength-1] = minFrameLength + 18;
         coordinatesFrame[headerLength] = 3;
         getCoordinatesDataBytes(coordinatesFrame+minFrameLength, tagIndex);
-        Serial.write(coordinatesFrame, headerLength + 18);
+        Serial.write(coordinatesFrame, minFrameLength + 18);
       }
       
       break;
@@ -158,6 +158,7 @@ void processMessage(){
       break;
     case 130:
       tags[lastTag] = ((uint16_t)RXBuffer[1])<<8 + (uint16_t)RXBuffer[2];
+      lastTag++;
       break;
     case 131:
       finalizeDeviceList();
@@ -212,6 +213,7 @@ void finalizeDeviceList(){
       Pozyx.setSelectionOfAnchors(POZYX_ANCHOR_SEL_AUTO, numAnchors, tags[n]);
     }
   }
+  devicesReady = true;
 }
 
 int indexOfTag(uint16_t tagID){
