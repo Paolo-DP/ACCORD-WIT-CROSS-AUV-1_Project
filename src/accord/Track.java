@@ -66,8 +66,11 @@ public class Track {
     public int distfromCenterLine(Car c){
         int xLoc = c.getXLocation();
         int yLoc = c.getYLocation();
-        
-        return this.getCurrentSegment(xLoc, yLoc).distFromCenterLine(xLoc, yLoc);
+        TrackSegment seg = getCurrentSegment(xLoc, yLoc);
+        if(seg!= null)
+            return seg.distFromCenterLine(xLoc, yLoc);
+        else
+            return Integer.MAX_VALUE;
     }
     public int distfromCenterLine(int xLoc, int yLoc){
         TrackSegment seg = getCurrentSegment(xLoc, yLoc);

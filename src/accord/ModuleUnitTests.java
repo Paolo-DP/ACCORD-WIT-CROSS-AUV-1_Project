@@ -310,13 +310,39 @@ public class ModuleUnitTests {
         for(int i=0; i<anchors.length; i++){
             pozyx.addAnchor(anchors[i], anchorsX[i], anchorsY[i], anchorsZ[i]);
         }
-        pozyx.addTag(0x6743);
-        pozyx.finalizeDeviceList();
-        Car c = new Car(0x6743, pozyx);
+        
+        Car c = new Car(0x6a40, pozyx);
         carSim.addCar(c);
+        
+        pozyx.addTag(c.getID());
+        pozyx.finalizeDeviceList();
         while(true){
+            c.adjustSpeed(0x3f);
             carSim.simulate();
+            System.out.println("X = " + c.getXLocation());
+            System.out.println("Y = " + c.getYLocation());
+            System.out.println();
         }
         
+    }
+    public static void testCarCommand(){
+        PozyxSerialComm poz = new PozyxSerialComm();
+        byte[] frame1 = {(byte)0xF0, (byte)0x08, (byte)0x01, (byte)0x00, (byte)0x00, (byte)0x03, (byte)0x02, (byte)0x6F};
+        byte[] frame2 = {(byte)0xF0, (byte)0x08, (byte)0x01, (byte)0x00, (byte)0x00, (byte)0x03, (byte)0x02, (byte)0x00};
+        
+        byte[] message1 = {(byte)0x67, (byte)0x43, (byte)0x03, (byte)0x02, (byte)0x6F};
+        byte[] message2 = {(byte)0x67, (byte)0x43, (byte)0x03, (byte)0x02, (byte)0x00};
+        Car c = new Car(0x6743, poz);
+        try{
+            //poz.sendBytes(frame1);
+            //poz.sendCarCommand(message1, true);
+            c.adjustSpeed(127);
+            c.adjustSteering(127);
+            Thread.sleep(1000);
+            //poz.sendBytes(frame2);
+            //poz.sendCarCommand(message2, true);
+            c.adjustSpeed(0);
+            c.adjustSteering(0);
+        }catch(Exception e){};
     }
 }

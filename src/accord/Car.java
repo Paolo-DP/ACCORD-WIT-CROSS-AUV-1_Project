@@ -19,6 +19,11 @@ public class Car {
     private int ydimen = 0;
     private int speed = 0;
     
+    private static final byte carIDLen = 2;
+    private static final byte minMessageLen = 2;
+    private static final byte SET_SPEED = 2;
+    private static final byte SET_STEERING = 4;
+    
     private PozyxSerialComm pozyx = null;
     
     Car(int ID, PozyxSerialComm pozyx){
@@ -27,15 +32,21 @@ public class Car {
     }
     public void updateLocation(){
         Coordinates coor = pozyx.getCoordinates(carID);
-        if(coor!=null && coor.ID==carID){
+        if(coor!=null){
+            
             xloc = (int)coor.x;
             yloc = (int)coor.y;
             orient = coor.eulerAngles[0];
             
         }
+        else
+            System.out.println("Update Error");
     }
     public void updateOrientation(){
         
+    }
+    public int getID(){
+        return carID;
     }
     public int getXLocation(){
         return xloc;
@@ -61,13 +72,26 @@ public class Car {
                 
         return deets;
     }
+    
     public boolean adjustSpeed(int speed){
-        byte[] message = ByteBuffer.allocate(2).putShort((short)carID).array();
-        return true;
+        byte[] message = new byte[carIDLen + minMessageLen +1];
+        byte[] id = ByteBuffer.allocate(carIDLen).putShort((byte)carID).array();
+        System.arraycopy(id, 0, message, 0, id.length);
+        message[carIDLen] = minMessageLen+1;
+        message[carIDLen+1] = SET_SPEED;
+        message[carIDLen+2] = (byte)speed;
+        byte[] ack = pozyx.sendCarCommand(message, true);
+        return(ack!=null);
     }
     public boolean adjustSteering(int steer){
-        
-        return true;
+        byte[] message = new byte[carIDLen + minMessageLen +1];
+        byte[] id = ByteBuffer.allocate(carIDLen).putShort((byte)carID).array();
+        System.arraycopy(id, 0, message, 0, id.length);
+        message[carIDLen] = minMessageLen+1;
+        message[carIDLen+1] = SET_STEERING;
+        message[carIDLen+2] = (byte)steer;
+        byte[] ack = pozyx.sendCarCommand(message, true);
+        return(ack!=null);
     }
     public void setPozyxComm(PozyxSerialComm pozyx){
         this.pozyx = pozyx;

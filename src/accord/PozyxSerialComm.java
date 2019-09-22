@@ -61,14 +61,14 @@ public class PozyxSerialComm {
         System.arraycopy(frameHeader, 0, frame, 0, frameHeader.length);
         frame[frameHeader.length] = (byte)frame.length;
         frame[frameHeaderLen] = (byte)ADD_ANCHOR;
-        byte[] id = ByteBuffer.allocate(2).putInt(deviceID).array();
+        byte[] id = ByteBuffer.allocate(2).putShort((short)deviceID).array();
         byte[] x = ByteBuffer.allocate(4).putInt(xLoc).array();
         byte[] y = ByteBuffer.allocate(4).putInt(yLoc).array();
         byte[] z = ByteBuffer.allocate(4).putInt(zLoc).array();
         System.arraycopy(id, 0, frame, minFrameLength, id.length);
-        System.arraycopy(x, 0, frame, minFrameLength+2, x.length);
-        System.arraycopy(y, 0, frame, minFrameLength+6, y.length);
-        System.arraycopy(z, 0, frame, minFrameLength+10, z.length);
+        System.arraycopy(x, 0, frame, minFrameLength+id.length, x.length);
+        System.arraycopy(y, 0, frame, minFrameLength+id.length + x.length, y.length);
+        System.arraycopy(z, 0, frame, minFrameLength + id.length + x.length + y.length, z.length);
         if(comPort.isOpen()){
             comPort.writeBytes(frame, frame.length);
         }
@@ -78,7 +78,7 @@ public class PozyxSerialComm {
         System.arraycopy(frameHeader, 0, frame, 0, frameHeader.length);
         frame[frameHeader.length] = (byte)frame.length;
         frame[frameHeaderLen] = (byte)ADD_TAG;
-        byte[] id = ByteBuffer.allocate(2).putInt(deviceID).array();
+        byte[] id = ByteBuffer.allocate(2).putShort((short)deviceID).array();
         System.arraycopy(id, 0, frame, minFrameLength, id.length);
         if(comPort.isOpen()){
             comPort.writeBytes(frame, frame.length);
@@ -94,11 +94,11 @@ public class PozyxSerialComm {
     }
     
     public byte[] sendCarCommand(byte[] message, boolean waitAck){
-        byte[] frame = new byte[frameHeader.length + message.length + 1];
+        byte[] frame = new byte[minFrameLength + message.length];
         System.arraycopy(frameHeader, 0, frame, 0, frameHeader.length);
-        System.arraycopy(message, 0, frame, frameHeader.length+1, message.length);
+        System.arraycopy(message, 0, frame, minFrameLength, message.length);
         frame[frameHeader.length] = (byte)frame.length;
-        
+        frame[minFrameLength-1] = SEND_CAR_COMMAND;
         if(comPort.isOpen()){
             try{
                 int success = comPort.writeBytes(frame, frame.length);
@@ -129,7 +129,7 @@ public class PozyxSerialComm {
         System.arraycopy(frameHeader, 0, frame, 0, frameHeader.length);
         frame[frameHeader.length] = (byte)frame.length;
         frame[minFrameLength-1] = 2;
-        byte[] carIDb = ByteBuffer.allocate(2).putInt(carID).array();
+        byte[] carIDb = ByteBuffer.allocate(2).putShort((short)carID).array();
         System.arraycopy(carIDb, 0, frame, minFrameLength, carIDb.length);
         
         if(comPort.isOpen()){
@@ -169,7 +169,7 @@ public class PozyxSerialComm {
     }
     public boolean sendBytes(byte[] sendme){
         boolean success = true;
-        
+        comPort.writeBytes(sendme, sendme.length);
         return success;
     }
     public void closeComm(){
@@ -188,18 +188,18 @@ public class PozyxSerialComm {
             }
             frameLength = comPort.readBytes(headchk, frameHeader.length);
             if(Arrays.equals(headchk, frameHeader)){
-                System.out.println("Frame Recieved");
-                System.out.println("length: " + frameLength);
+                //System.out.println("Frame Recieved");
+                //System.out.println("length: " + frameLength);
                 comPort.readBytes(headchk,1);
                 frameLength = (int)headchk[0] - frameHeaderLen;
                 break;
             }
             else{
-                System.out.println("NO Frame Recieved");
-                System.out.println("length: " + frameLength);
-                System.out.println("Byte buffer" + comPort.bytesAvailable());
-                for(byte b : headchk)
-                    System.out.println(Integer.toHexString(b));
+                //System.out.println("NO Frame Recieved");
+                //System.out.println("length: " + frameLength);
+                //System.out.println("Byte buffer" + comPort.bytesAvailable());
+                //for(byte b : headchk)
+                //    System.out.println(Integer.toHexString(b));
             }
         }
         return frameLength;

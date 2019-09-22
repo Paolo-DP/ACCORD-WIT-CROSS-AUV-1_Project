@@ -29,12 +29,16 @@ public class CarSimulator {
 
                 c.updateLocation();
                 int distCLine = track.distfromCenterLine(c);
+                int steer=0;
                 if(Math.abs(distCLine)>minDistanceToCorrect){
-                    int steer = 127;
+                    steer = 127;
                     if(distCLine>0);
                         steer *= -1;
-                    c.adjustSteering(steer);
+                    
                 }
+                else
+                    steer=0;
+                c.adjustSteering(steer);
             }
         }
     }
