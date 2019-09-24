@@ -13,6 +13,7 @@ import java.util.Arrays;
  * @author Paolo
  */
 public class PozyxSerialComm {
+    private boolean verboseOutput = false;
     
     public static final int baudRate = 115200;
     private static final int ARDUINO_RESET_WAIT = 3000;
@@ -26,7 +27,7 @@ public class PozyxSerialComm {
     
     private final int SEND_CAR_COMMAND = 1;
     private final int COORDINATES_MESSAGE = 3;
-    private final int COORDINATES_DATA_LENGTH = 20;
+    private final int COORDINATES_DATA_LENGTH = 22;
     private final int ADD_ANCHOR = 129;
     private final int ADD_TAG = 130;
     private final int FINALIZE_DEVICE_LIST = 131;
@@ -141,8 +142,8 @@ public class PozyxSerialComm {
                         if(dataLen==COORDINATES_DATA_LENGTH+1){
                             byte[] message = getMessage(dataLen);
                             if(message[0] == COORDINATES_MESSAGE){
-                                coor.ID = ByteBuffer.wrap(
-                                        Arrays.copyOfRange(message, 1, 2)).getInt();
+                                //coor.ID = ByteBuffer.wrap(
+                                //        Arrays.copyOfRange(message, 1, 2)).getShort();
                                 coor.x = ByteBuffer.wrap(
                                         Arrays.copyOfRange(message, 3, 6)).getDouble();
                                 coor.y = ByteBuffer.wrap(
@@ -160,12 +161,22 @@ public class PozyxSerialComm {
                     }
                     return coor;
                 }
-                else
+                else{
+                    if(verboseOutput)
+                        System.out.println("PoxyzSerialComm: COORDINATES ERROR - "
+                                + "No Ack Recieved\t"
+                                + "Car ID: "+Integer.toHexString(carID));
                     return null;
+                }
             }catch(Exception e){e.printStackTrace(); return null;}
         }
-        else
+        else{
+            if(verboseOutput)
+                System.out.println("PoxyzSerialComm: COORDINATES ERROR - "
+                        + "ComPort not Open\t"
+                        + "Car ID: "+Integer.toHexString(carID));
             return null;
+        }
     }
     public boolean sendBytes(byte[] sendme){
         boolean success = true;
@@ -206,11 +217,12 @@ public class PozyxSerialComm {
     }
     private boolean ACKRecieved(byte message){
         int framelen = incomingFrame();
-        if(framelen!=minFrameLength+1)
+        if(framelen<=0)
             return false;
         else{
-            comPort.readBytes(RXBuffer, minFrameLength-frameHeaderLen + 1);
-            if(RXBuffer[0]==0xFF && RXBuffer[2]==message)
+            comPort.readBytes(RXBuffer, framelen);
+            //System.out.println(Integer.toHexString(RXBuffer[0]) + Integer.toHexString(RXBuffer[1]));
+            if(RXBuffer[0]==(byte)0xFF && RXBuffer[1]==message)
                 return true;
             else
                 return false;
@@ -224,5 +236,9 @@ public class PozyxSerialComm {
         }
         else
             return null;
+    }
+    
+    public void setVerboseOutput(boolean output){
+        verboseOutput = output;
     }
 }

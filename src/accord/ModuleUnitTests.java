@@ -297,6 +297,30 @@ public class ModuleUnitTests {
             System.out.println(Integer.toHexString(by));
         poz.closeComm();
     }
+    public static void testPozyxLocalization(){
+        PozyxSerialComm pozyx = new PozyxSerialComm();
+        pozyx.setVerboseOutput(true);
+        int[] tags = {0x6a19};
+        int[] anchorIDs = {0x6717, 0x6e3c, 0x6735, 0x6e38};
+        int[] anchorX = {0, 300, 0, 300};
+        int[] anchorY = {0, 0, 200, 200};
+        int[] anchorZ = {0, 0, 0, 0};
+        for(int i=0; i<anchorIDs.length; i++){
+            pozyx.addAnchor(anchorIDs[i], anchorX[i], anchorY[i], anchorZ[i]);
+        }
+        for(int i=0; i<tags.length; i++){
+            pozyx.addTag(tags[i]);
+        }
+        pozyx.finalizeDeviceList();
+        Coordinates coor;
+        while(true){
+            coor = pozyx.getCoordinates(tags[0]);
+            if(coor!=null){
+                System.out.println("Time: " + coor.timeStamp);
+                System.out.println("X: "+coor.x+"\t Y: "+coor.y+"\n");
+            }
+        }
+    }
     public static void testCarSimulationOval(){
         Track tr = createSimpleOvalTrack(2000, 1000, 150, true, 700, 100);
         PozyxSerialComm pozyx = new PozyxSerialComm();
