@@ -26,11 +26,13 @@ public class PozyxSerialComm {
     private byte[] RXBuffer = new byte[256];
     
     private final int SEND_CAR_COMMAND = 1;
+    private final int COORDINATES_GET = 2;
     private final int COORDINATES_MESSAGE = 3;
     private final int COORDINATES_DATA_LENGTH = 22;
     private final int ADD_ANCHOR = 129;
     private final int ADD_TAG = 130;
     private final int FINALIZE_DEVICE_LIST = 131;
+    
     
     PozyxSerialComm(){
         Scanner sc = new Scanner(System.in);
@@ -129,7 +131,7 @@ public class PozyxSerialComm {
         byte[] frame = new byte[minFrameLength+2];
         System.arraycopy(frameHeader, 0, frame, 0, frameHeader.length);
         frame[frameHeader.length] = (byte)frame.length;
-        frame[minFrameLength-1] = 2;
+        frame[minFrameLength-1] = COORDINATES_GET;
         byte[] carIDb = ByteBuffer.allocate(2).putShort((short)carID).array();
         System.arraycopy(carIDb, 0, frame, minFrameLength, carIDb.length);
         
@@ -186,7 +188,7 @@ public class PozyxSerialComm {
     public void closeComm(){
         comPort.closePort();
     }
-    private int incomingFrame(){
+    public int incomingFrame(){
         //comPort.openPort();
         byte[] headchk = new byte[frameHeader.length];
         int frameLength = -1;
@@ -197,6 +199,7 @@ public class PozyxSerialComm {
                 }catch(InterruptedException e){}
                 continue;
             }
+            /*
             frameLength = comPort.readBytes(headchk, frameHeader.length);
             if(Arrays.equals(headchk, frameHeader)){
                 //System.out.println("Frame Recieved");
@@ -211,24 +214,56 @@ public class PozyxSerialComm {
                 //System.out.println("Byte buffer" + comPort.bytesAvailable());
                 //for(byte b : headchk)
                 //    System.out.println(Integer.toHexString(b));
+            }*/
+            while(comPort.bytesAvailable()>frameHeader.length){
+                for(int n = 0; n<frameHeader.length; n++){
+                    comPort.readBytes(RXBuffer, 1);
+                    if(RXBuffer[0] != frameHeader[n])
+                        break;
+                    else if(n==frameHeader.length-1){
+                        comPort.readBytes(RXBuffer, 1);
+                        frameLength = (int)RXBuffer[0] - frameHeaderLen;
+                        break;
+                    }
+                }
             }
+            if(frameLength>=0)
+                break;
+        }
+        if(verboseOutput){
+            if(frameLength==-1)
+                System.out.println("PozyxSerialComm: No frame detected");
         }
         return frameLength;
     }
-    private boolean ACKRecieved(byte message){
+    public boolean ACKRecieved(byte message){
         int framelen = incomingFrame();
-        if(framelen<=0)
+        if(framelen!=2){
+            if(verboseOutput)
+                System.out.println("PozyxSerialComm: Ack Error - Incorrect message length");
             return false;
+        }
         else{
             comPort.readBytes(RXBuffer, framelen);
             //System.out.println(Integer.toHexString(RXBuffer[0]) + Integer.toHexString(RXBuffer[1]));
-            if(RXBuffer[0]==(byte)0xFF && RXBuffer[1]==message)
+            if(RXBuffer[0]==(byte)0xFF && RXBuffer[1]==message){
+                if(verboseOutput){
+                    System.out.println("PozyxSerialComm: Ack Recived for message "
+                            + "0x" + Integer.toHexString(message));
+                }
                 return true;
-            else
+            }
+            else{
+                if(verboseOutput){
+                    System.out.print("PozyxSerialComm: Ack Error. incorrect message");
+                    System.out.println("\tByte 0 = 0x" + Integer.toHexString(RXBuffer[0])
+                            + "\tByte 1 = 0x" + Integer.toHexString(RXBuffer[1]));
+                }
                 return false;
+            }
         }
     }
-    private byte[] getMessage(int length){
+    public byte[] getMessage(int length){
         if(comPort.isOpen()){
             byte[] message = new byte[length];
             comPort.readBytes(message, length);

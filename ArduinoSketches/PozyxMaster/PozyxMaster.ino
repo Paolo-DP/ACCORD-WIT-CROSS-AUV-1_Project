@@ -140,7 +140,7 @@ void processMessage(){
         coordinatesFrame[headerLength-1] = minFrameLength + 20;
         coordinatesFrame[headerLength] = 3;
         getCoordinatesDataBytes(coordinatesFrame+minFrameLength, tagIndex);
-        Serial.write(coordinatesFrame, minFrameLength + 18);
+        Serial.write(coordinatesFrame, minFrameLength + 20);
       }      
       break;
     case 129: //add new Anchor Device
@@ -184,6 +184,9 @@ void processMessage(){
       break;
     case 160:
       printAnchors();
+      break;
+    case 161:
+      printTags();
       break;
     case 162:
       printTagData(((uint16_t)RXBuffer[1])<<8 | (uint16_t)RXBuffer[2]);
@@ -273,6 +276,16 @@ void printAnchors(){
     Serial.println(")");
   }
 }
+void printTags(){
+  Serial.print("Number of Tags: ");
+  Serial.println(lastTag);
+  for(int i=0; i<4; i++){
+    Serial.print("Tag ");
+    Serial.print(i);
+    Serial.print(": 0x");
+    Serial.println(tags[i],HEX);
+  }
+}
 void printTagData(uint16_t id){
   int tagIndex = indexOfTag(id);
   if(tagIndex!=-1){
@@ -284,6 +297,10 @@ void printTagData(uint16_t id){
     Serial.println(tags_y[tagIndex]);
     Serial.print("Z: ");
     Serial.println(tags_z[tagIndex]);
+    Serial.print("Angle: ");
+    Serial.println(tags_angle[tagIndex]);
+    Serial.print("TimeStamp: ");
+    Serial.println(updateTimeStamp[tagIndex], DEC);
   }
   else
     Serial.println("ERROR Tag not Registered");

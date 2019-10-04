@@ -12,6 +12,14 @@ import java.util.Scanner;
  * @author Paolo
  */
 public class ModuleUnitTests {
+    int[] tags = {0x6a19};
+    int[] anchorIDs = {0x6717, 0x6e3c, 0x6735, 0x6e38};
+    int[] anchorX = {0, 300, 0, 300};
+    int[] anchorY = {0, 0, 200, 200};
+    int[] anchorZ = {0, 0, 0, 0};
+    
+    
+    //Track and Track Segment Tests
     public static void testLinearTrackSegment(){
         TrackSegment testSegment = null;
         System.out.println("Testing Track Segment Class...\n");
@@ -196,6 +204,7 @@ public class ModuleUnitTests {
         dets.xloc = 69;
         System.out.println("xloc = "+dets.xloc);
     }
+    //PozyxSerialComm Tests
     public static void testSerialComm(){
         Scanner sc = new Scanner(System.in);
         System.out.println("Select Com port:");
@@ -297,6 +306,27 @@ public class ModuleUnitTests {
             System.out.println(Integer.toHexString(by));
         poz.closeComm();
     }
+    public static void testPozyxIncommingFrame(){
+        PozyxSerialComm pozyx =  new PozyxSerialComm();
+        byte[][] sendme = {
+            {(byte)0xf0, 10},
+            {0,0,0,0,0,0, (byte)0xf0, 5}
+        };
+        int[] expected = {
+            8,
+            3
+        };
+        for(int i=0; i<sendme.length; i++){
+            System.out.print("Sending Bytes: ");
+            for(int b=0; b<sendme[i].length; b++){
+                System.out.print(Integer.toHexString(sendme[i][b]) + " ");
+            }
+            System.out.println();
+            pozyx.sendBytes(sendme[i]);
+            int incomef = pozyx.incomingFrame();
+            System.out.println("Expected: " + expected[i] + "\tResult: " + incomef);
+        }
+    }
     public static void testPozyxLocalization(){
         PozyxSerialComm pozyx = new PozyxSerialComm();
         pozyx.setVerboseOutput(true);
@@ -321,6 +351,7 @@ public class ModuleUnitTests {
             }
         }
     }
+    //Car Simulation Tests
     public static void testCarSimulationOval(){
         Track tr = createSimpleOvalTrack(2000, 1000, 150, true, 700, 100);
         PozyxSerialComm pozyx = new PozyxSerialComm();
@@ -368,5 +399,31 @@ public class ModuleUnitTests {
             c.adjustSpeed(0);
             c.adjustSteering(0);
         }catch(Exception e){};
+    }
+    public static void testCoordinatesPolling(){
+        int[] anchors = {0x6e38, 0x6e3c, 0x6717, 0x6735};
+        int[] anchorsX = {0, 3900, 0, 3900};
+        int[] anchorsY = {0, 0, 3300, 3300};
+        int[] anchorsZ = {0,0,0,0};
+        int carID = 0x6a4f;
+        PozyxSerialComm pozyx = new PozyxSerialComm();
+        pozyx.setVerboseOutput(false);
+        for(int i=0; i<anchors.length; i++){
+            pozyx.addAnchor(anchors[i], anchorsX[i], anchorsY[i], anchorsZ[i]);
+        }
+        pozyx.addTag(carID);
+        pozyx.finalizeDeviceList();
+        Coordinates coor;
+        while(true){
+            coor = pozyx.getCoordinates(carID);
+            if(coor==null){
+                System.out.println("Coor return null");
+                continue;
+            }
+            System.out.print("Car ID: 0x" + Integer.toHexString(coor.ID)+ 
+                    "\tTime Stamp: " + coor.timeStamp);
+            System.out.println("\t(" + coor.x + ", " + coor.y + ")");
+        }
+        
     }
 }

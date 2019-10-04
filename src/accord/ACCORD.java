@@ -53,7 +53,9 @@ public class ACCORD {
         //ModuleUnitTests.testLinearTrackSegment();
         //ModuleUnitTests.testSimpleOvalTrack();
         //ModuleUnitTests.testPozyxSerialComm();
-        ModuleUnitTests.testPozyxLocalization();
+        //ModuleUnitTests.testPozyxIncommingFrame();
+        //ModuleUnitTests.testPozyxLocalization();
+        ModuleUnitTests.testCoordinatesPolling();
         //ModuleUnitTests.testCarSimulationOval();
         //ModuleUnitTests.testCarCommand();
     }
