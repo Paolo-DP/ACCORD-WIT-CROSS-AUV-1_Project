@@ -199,7 +199,7 @@ public class PozyxSerialComm {
                 }catch(InterruptedException e){}
                 continue;
             }
-            /*
+            /*` 
             frameLength = comPort.readBytes(headchk, frameHeader.length);
             if(Arrays.equals(headchk, frameHeader)){
                 //System.out.println("Frame Recieved");
