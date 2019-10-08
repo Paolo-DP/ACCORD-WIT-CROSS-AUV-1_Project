@@ -18,6 +18,7 @@ public class PozyxSerialComm {
     public static final int baudRate = 115200;
     private static final int ARDUINO_RESET_WAIT = 3000;
     private static final int ackWaitAttempts = 10;
+    private static final int WAIT_FOR_BYTES_DELAY = 10;
     private static final int waitForDataAttempts = 20;
     private static final byte[] frameHeader = {(byte)0xF0};
     private static final int frameHeaderLen = frameHeader.length + 1;
@@ -25,13 +26,15 @@ public class PozyxSerialComm {
     public SerialPort comPort;
     private byte[] RXBuffer = new byte[256];
     
-    private final int SEND_CAR_COMMAND = 1;
-    private final int COORDINATES_GET = 2;
-    private final int COORDINATES_MESSAGE = 3;
-    private final int COORDINATES_DATA_LENGTH = 22;
-    private final int ADD_ANCHOR = 129;
-    private final int ADD_TAG = 130;
-    private final int FINALIZE_DEVICE_LIST = 131;
+    public static final byte SEND_CAR_COMMAND = (byte)1;
+    public static final byte COORDINATES_GET = (byte)2;
+    public static final byte COORDINATES_MESSAGE = (byte)3;
+    public static final byte COORDINATES_DATA_LENGTH = (byte) 20;
+    public static final byte ADD_ANCHOR = (byte)129;
+    public static final byte ADD_TAG = (byte)130;
+    public static final byte FINALIZE_DEVICE_LIST = (byte)131;
+    
+    public static final byte ACK = (byte)255;
     
     
     PozyxSerialComm(){
@@ -59,7 +62,7 @@ public class PozyxSerialComm {
         
     }
     
-    public void addAnchor(int deviceID, int xLoc, int yLoc, int zLoc){
+    public boolean addAnchor(int deviceID, int xLoc, int yLoc, int zLoc){
         byte[] frame = new byte[minFrameLength + 14];
         System.arraycopy(frameHeader, 0, frame, 0, frameHeader.length);
         frame[frameHeader.length] = (byte)frame.length;
@@ -75,8 +78,9 @@ public class PozyxSerialComm {
         if(comPort.isOpen()){
             comPort.writeBytes(frame, frame.length);
         }
+        return ACKRecieved(ADD_ANCHOR);
     }
-    public void addTag(int deviceID){
+    public boolean addTag(int deviceID){
         byte[] frame = new byte[minFrameLength + 2];
         System.arraycopy(frameHeader, 0, frame, 0, frameHeader.length);
         frame[frameHeader.length] = (byte)frame.length;
@@ -86,14 +90,16 @@ public class PozyxSerialComm {
         if(comPort.isOpen()){
             comPort.writeBytes(frame, frame.length);
         }
+        return ACKRecieved(ADD_TAG);
     }
-    public void finalizeDeviceList(){
+    public boolean finalizeDeviceList(){
         byte[] frame = new byte[minFrameLength];
         System.arraycopy(frameHeader, 0, frame, 0, frameHeader.length);
         frame[frameHeaderLen-1] = (byte)frame.length;
         frame[frameHeaderLen] = (byte)FINALIZE_DEVICE_LIST;
         if(comPort.isOpen())
             comPort.writeBytes(frame, frame.length);
+        return ACKRecieved(FINALIZE_DEVICE_LIST);
     }
     
     public byte[] sendCarCommand(byte[] message, boolean waitAck){
@@ -144,18 +150,22 @@ public class PozyxSerialComm {
                         if(dataLen==COORDINATES_DATA_LENGTH+1){
                             byte[] message = getMessage(dataLen);
                             if(message[0] == COORDINATES_MESSAGE){
-                                //coor.ID = ByteBuffer.wrap(
-                                //        Arrays.copyOfRange(message, 1, 2)).getShort();
+                                coor.ID = ByteBuffer.wrap(
+                                        Arrays.copyOfRange(message, 1, 3)).getShort();
                                 coor.x = ByteBuffer.wrap(
-                                        Arrays.copyOfRange(message, 3, 6)).getDouble();
+                                        Arrays.copyOfRange(message, 3, 7)).getInt();
                                 coor.y = ByteBuffer.wrap(
-                                        Arrays.copyOfRange(message, 7, 10)).getDouble();
+                                        Arrays.copyOfRange(message, 7, 11)).getInt();
                                 coor.z = ByteBuffer.wrap(
-                                        Arrays.copyOfRange(message, 11, 14)).getDouble();
+                                        Arrays.copyOfRange(message, 11, 15)).getInt();
                                 coor.eulerAngles[0] = ByteBuffer.wrap(
-                                        Arrays.copyOfRange(message, 15, 16)).getDouble();
+                                        Arrays.copyOfRange(message, 15, 17)).getShort();
                                 coor.timeStamp = ByteBuffer.wrap(
-                                        Arrays.copyOfRange(message, 17, 20)).getDouble();
+                                        Arrays.copyOfRange(message, 17, 21)).getInt();
+                                if(verboseOutput){
+                                    System.out.println("PozyxSerialComm - getCoordinates(): SUCCESS");
+                                }
+                                return coor;
                             }
                         }
                         else
@@ -180,6 +190,7 @@ public class PozyxSerialComm {
             return null;
         }
     }
+    
     public boolean sendBytes(byte[] sendme){
         boolean success = true;
         comPort.writeBytes(sendme, sendme.length);
@@ -195,7 +206,7 @@ public class PozyxSerialComm {
         for(int i = 0; i<ackWaitAttempts; i++){
             if(comPort.bytesAvailable()<frameHeader.length){
                 try{
-                    Thread.sleep(20);
+                    Thread.sleep(WAIT_FOR_BYTES_DELAY);
                 }catch(InterruptedException e){}
                 continue;
             }
@@ -215,7 +226,7 @@ public class PozyxSerialComm {
                 //for(byte b : headchk)
                 //    System.out.println(Integer.toHexString(b));
             }*/
-            while(comPort.bytesAvailable()>frameHeader.length){
+            while(comPort.bytesAvailable()>=frameHeader.length){
                 for(int n = 0; n<frameHeader.length; n++){
                     comPort.readBytes(RXBuffer, 1);
                     if(RXBuffer[0] != frameHeader[n])
@@ -223,7 +234,11 @@ public class PozyxSerialComm {
                     else if(n==frameHeader.length-1){
                         comPort.readBytes(RXBuffer, 1);
                         frameLength = (int)RXBuffer[0] - frameHeaderLen;
-                        break;
+                        if(verboseOutput){
+                            System.out.println("PozyxSerialComm - IncommingFrame: "
+                                    + "Message Recieved with Length = " + frameLength);
+                        }
+                        return frameLength;
                     }
                 }
             }
@@ -237,31 +252,46 @@ public class PozyxSerialComm {
         return frameLength;
     }
     public boolean ACKRecieved(byte message){
-        int framelen = incomingFrame();
-        if(framelen!=2){
-            if(verboseOutput)
-                System.out.println("PozyxSerialComm: Ack Error - Incorrect message length");
-            return false;
-        }
-        else{
-            comPort.readBytes(RXBuffer, framelen);
-            //System.out.println(Integer.toHexString(RXBuffer[0]) + Integer.toHexString(RXBuffer[1]));
-            if(RXBuffer[0]==(byte)0xFF && RXBuffer[1]==message){
-                if(verboseOutput){
-                    System.out.println("PozyxSerialComm: Ack Recived for message "
-                            + "0x" + Integer.toHexString(message));
+        int framelen=-1;
+        for(int i=0; i<ackWaitAttempts; i++){
+            while(framelen<0 || comPort.bytesAvailable()>frameHeader.length){
+                framelen= incomingFrame();
+
+                if(framelen!=2){
+                    if(verboseOutput)
+                        System.out.println("PozyxSerialComm-Ack Error: Incorrect message length");
+                    return false;
                 }
-                return true;
-            }
-            else{
-                if(verboseOutput){
-                    System.out.print("PozyxSerialComm: Ack Error. incorrect message");
-                    System.out.println("\tByte 0 = 0x" + Integer.toHexString(RXBuffer[0])
-                            + "\tByte 1 = 0x" + Integer.toHexString(RXBuffer[1]));
+                else{
+                    comPort.readBytes(RXBuffer, framelen);
+                    //System.out.println(Integer.toHexString(RXBuffer[0]) + Integer.toHexString(RXBuffer[1]));
+                    if(RXBuffer[0]==ACK && RXBuffer[1]==message){
+                        if(verboseOutput){
+                            System.out.println("PozyxSerialComm - ACKRecieved(): Ack Recived for message "
+                                    + "0x" + Integer.toHexString(RXBuffer[1]));
+                        }
+                        return true;
+                    }
+                    else{
+                        if(verboseOutput){
+                            System.out.print("PozyxSerialComm: Ack Error. incorrect message");
+                            System.out.print("\tmessage = 0x" + Integer.toHexString(message));
+                            System.out.println("\tByte 0 = 0x" + Integer.toHexString(RXBuffer[0])
+                                    + "\tByte 1 = 0x" + Integer.toHexString(RXBuffer[1]));
+                        }
+                    }
                 }
-                return false;
             }
+            if(verboseOutput){
+                System.out.println("PozyxSerialComm - ACKRecieved(): No ack Recieved. RX Empty"
+                                + "\tmessage = 0x" + Integer.toHexString(message));
+            }
+            framelen = -1;
+            try{
+                Thread.sleep(WAIT_FOR_BYTES_DELAY);
+            }catch(InterruptedException e){}
         }
+        return false;
     }
     public byte[] getMessage(int length){
         if(comPort.isOpen()){

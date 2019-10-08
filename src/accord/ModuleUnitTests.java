@@ -327,6 +327,42 @@ public class ModuleUnitTests {
             System.out.println("Expected: " + expected[i] + "\tResult: " + incomef);
         }
     }
+    public static void testPozyxAck(){
+        PozyxSerialComm pozyx =  new PozyxSerialComm();
+        pozyx.setVerboseOutput(true);
+        byte[][] sendme = {
+            {(byte)0xf0, (byte)0x04, (byte)0xff, (byte)PozyxSerialComm.ADD_ANCHOR},
+            {(byte)0xf0, (byte)0x04, (byte)0xff, (byte)PozyxSerialComm.ADD_TAG},
+            {(byte)0xf0, (byte)0x04, (byte)0xff, (byte)PozyxSerialComm.FINALIZE_DEVICE_LIST},
+            {(byte)0xf0, (byte)0x04, (byte)0xff, (byte)PozyxSerialComm.COORDINATES_GET},
+            {(byte)0xf0, (byte)0x04, (byte)0xff, (byte)PozyxSerialComm.COORDINATES_MESSAGE},
+            
+        };
+        int[] message_type = {
+            (byte)PozyxSerialComm.ADD_ANCHOR,
+            (byte)PozyxSerialComm.ADD_TAG,
+            (byte)PozyxSerialComm.FINALIZE_DEVICE_LIST,
+            (byte)PozyxSerialComm.COORDINATES_GET,
+            (byte)PozyxSerialComm.COORDINATES_MESSAGE,
+        };
+        boolean[] expected = {
+            true,
+            true,
+            true,
+            true,
+            true
+        };
+        for(int i=0; i<sendme.length; i++){
+            System.out.print("Sending Bytes: ");
+            for(int b=0; b<sendme[i].length; b++){
+                System.out.print(Integer.toHexString(sendme[i][b]) + " ");
+            }
+            System.out.println();
+            pozyx.sendBytes(sendme[i]);
+            boolean ackRec = pozyx.ACKRecieved((byte)message_type[i]);
+            System.out.println("Expected: " + expected[i] + "\tResult: " + Boolean.toString(ackRec));
+        }
+    }
     public static void testPozyxLocalization(){
         PozyxSerialComm pozyx = new PozyxSerialComm();
         pozyx.setVerboseOutput(true);
@@ -341,15 +377,15 @@ public class ModuleUnitTests {
         for(int i=0; i<tags.length; i++){
             pozyx.addTag(tags[i]);
         }
-        pozyx.finalizeDeviceList();
+        //pozyx.finalizeDeviceList();
         Coordinates coor;
-        while(true){
+        //while(true){
             coor = pozyx.getCoordinates(tags[0]);
             if(coor!=null){
                 System.out.println("Time: " + coor.timeStamp);
                 System.out.println("X: "+coor.x+"\t Y: "+coor.y+"\n");
             }
-        }
+        //}
     }
     //Car Simulation Tests
     public static void testCarSimulationOval(){
