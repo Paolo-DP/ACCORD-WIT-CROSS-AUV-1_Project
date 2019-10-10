@@ -3,7 +3,7 @@
 #include <Wire.h>
 
 boolean const manualSetup = true;
-boolean const degug = true;
+boolean const debug = true;
 boolean devicesReady = false;
 uint8_t currentTag = 0;
 
@@ -22,15 +22,15 @@ uint8_t height = 0;
 
 const short numTags = 8;
 uint8_t lastTag = 0;
-uint16_t tags[numTags] = {1, 2, 0, 0, 0, 0, 0, 0};
-int32_t tags_x[numTags] = {1, 2, 0, 0, 0, 0, 0, 0};
-int32_t tags_y[numTags] = {1, 2, 0, 0, 0, 0, 0, 0};
-int32_t tags_z[numTags] = {1, 2, 0, 0, 0, 0, 0, 0};
-int16_t tags_angle[numTags] = {1, 2, 0, 0, 0, 0, 0, 0};
-int16_t tags_angle_calib[numTags] = {1, 2, 0, 0, 0, 0, 0, 0};
-int32_t updateTimeStamp[8] = {1, 2, 0, 0, 0, 0, 0, 0};
+uint16_t tags[numTags] = {1, 2, 3, 4, 5, 6, 7, 8};
+int32_t tags_x[numTags] = {1, 2, 3, 4, 5, 6, 7, 8};
+int32_t tags_y[numTags] = {1, 2, 3, 4, 5, 6, 7, 8};
+int32_t tags_z[numTags] = {1, 2, 3, 4, 5, 6, 7, 8};
+int16_t tags_angle[numTags] = {1, 2, 3, 4, 5, 6, 7, 8};
+int16_t tags_angle_calib[numTags] = {1, 2, 3, 4, 5, 6, 7, 8};
+int32_t updateTimeStamp[8] = {1, 2, 3, 4, 5, 6, 7, 8};
 
-byte const headerBytes[] = {0xF0};
+byte const headerBytes[] = {0xF0, 0xF0, 0xF0};
 int const headerLength = sizeof(headerBytes) + 1; //header leading bytes + length byte
 int const minFrameLength = headerLength + 1; //full header plus message type byte
 byte RXBuffer[255];
@@ -72,9 +72,9 @@ boolean updatePosition(short tagIndex){
     return true;
   }
   else{
-    if(status1 != POZYX_SUCCESS)
+    if(status1 != POZYX_SUCCESS && debug)
       Serial.println("Remote Positioning Error");
-    if(status2 != POZYX_SUCCESS)
+    if(status2 != POZYX_SUCCESS && debug)
       Serial.println("Sensor Data Error");
     return false;
   }
@@ -305,4 +305,3 @@ void printTagData(uint16_t id){
   else
     Serial.println("ERROR Tag not Registered");
 }
-

@@ -20,7 +20,7 @@ public class PozyxSerialComm {
     private static final int ackWaitAttempts = 10;
     private static final int WAIT_FOR_BYTES_DELAY = 10;
     private static final int waitForDataAttempts = 20;
-    private static final byte[] frameHeader = {(byte)0xF0};
+    private static final byte[] frameHeader = {(byte)0xF0, (byte)0xF0, (byte)0xF0};
     private static final int frameHeaderLen = frameHeader.length + 1;
     private static final int minFrameLength = frameHeaderLen + 1; //including message type
     public SerialPort comPort;
