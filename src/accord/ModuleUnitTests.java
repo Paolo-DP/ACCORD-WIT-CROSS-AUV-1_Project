@@ -12,11 +12,11 @@ import java.util.Scanner;
  * @author Paolo
  */
 public class ModuleUnitTests {
-    int[] tags = {0x6a19};
-    int[] anchorIDs = {0x6717, 0x6e3c, 0x6735, 0x6e38};
-    int[] anchorX = {0, 300, 0, 300};
-    int[] anchorY = {0, 0, 200, 200};
-    int[] anchorZ = {0, 0, 0, 0};
+    private static int[] tags = {0x6a19};
+    private static int[] anchorIDs = {0x6717, 0x6e3c, 0x6735, 0x6e38};
+    private static int[] anchorX = {0, 0, 2200, 2200};
+    private static int[] anchorY = {0, 1500, 0, 1500};
+    private static int[] anchorZ = {0, 0, 0, 0};
     
     
     //Track and Track Segment Tests
@@ -367,17 +367,13 @@ public class ModuleUnitTests {
         PozyxSerialComm pozyx = new PozyxSerialComm();
         pozyx.setVerboseOutput(true);
         int[] tags = {0x6a19};
-        int[] anchorIDs = {0x6717, 0x6e3c, 0x6735, 0x6e38};
-        int[] anchorX = {0, 300, 0, 300};
-        int[] anchorY = {0, 0, 200, 200};
-        int[] anchorZ = {0, 0, 0, 0};
         for(int i=0; i<anchorIDs.length; i++){
             pozyx.addAnchor(anchorIDs[i], anchorX[i], anchorY[i], anchorZ[i]);
         }
         for(int i=0; i<tags.length; i++){
             pozyx.addTag(tags[i]);
         }
-        //pozyx.finalizeDeviceList();
+        pozyx.finalizeDeviceList();
         Coordinates coor;
         //while(true){
             coor = pozyx.getCoordinates(tags[0]);
@@ -437,15 +433,12 @@ public class ModuleUnitTests {
         }catch(Exception e){};
     }
     public static void testCoordinatesPolling(){
-        int[] anchors = {0x6e38, 0x6e3c, 0x6717, 0x6735};
-        int[] anchorsX = {0, 3900, 0, 3900};
-        int[] anchorsY = {0, 0, 3300, 3300};
-        int[] anchorsZ = {0,0,0,0};
+        
         int carID = 0x6a4f;
         PozyxSerialComm pozyx = new PozyxSerialComm();
         pozyx.setVerboseOutput(false);
-        for(int i=0; i<anchors.length; i++){
-            pozyx.addAnchor(anchors[i], anchorsX[i], anchorsY[i], anchorsZ[i]);
+        for(int i=0; i<anchorIDs.length; i++){
+            pozyx.addAnchor(anchorIDs[i], anchorX[i], anchorY[i], anchorZ[i]);
         }
         pozyx.addTag(carID);
         pozyx.finalizeDeviceList();

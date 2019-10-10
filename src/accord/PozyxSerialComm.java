@@ -20,6 +20,10 @@ public class PozyxSerialComm {
     private static final int ackWaitAttempts = 10;
     private static final int WAIT_FOR_BYTES_DELAY = 10;
     private static final int waitForDataAttempts = 20;
+    private static final int MAX_FRAME_LENGTH = 32;
+    private static final int POZYX_POSITIONING_DELAY = 20;
+    private static final int WAIT_TO_FLUSH_DELAY = ((32 * 8 * 1000) / baudRate) + POZYX_POSITIONING_DELAY;
+            
     private static final byte[] frameHeader = {(byte)0xF0, (byte)0xF0, (byte)0xF0};
     private static final int frameHeaderLen = frameHeader.length + 1;
     private static final int minFrameLength = frameHeaderLen + 1; //including message type
@@ -99,6 +103,9 @@ public class PozyxSerialComm {
         frame[frameHeaderLen] = (byte)FINALIZE_DEVICE_LIST;
         if(comPort.isOpen())
             comPort.writeBytes(frame, frame.length);
+        try{
+            Thread.sleep(1000);
+        }catch(Exception e){};
         return ACKRecieved(FINALIZE_DEVICE_LIST);
     }
     
@@ -143,6 +150,7 @@ public class PozyxSerialComm {
         
         if(comPort.isOpen()){
             try{
+                flushRX();
                 int success = comPort.writeBytes(frame, frame.length);
                 if(ACKRecieved(frame[minFrameLength-1])){
                     for(int i=0; i<waitForDataAttempts; i++){
@@ -198,6 +206,15 @@ public class PozyxSerialComm {
     }
     public void closeComm(){
         comPort.closePort();
+    }
+    public void flushRX(){
+        try{
+            if(comPort!=null && comPort.isOpen()){
+                Thread.sleep(WAIT_TO_FLUSH_DELAY);
+                if(comPort.bytesAvailable()>0)
+                    comPort.readBytes(RXBuffer, comPort.bytesAvailable());
+            }
+        }catch(Exception e){};
     }
     public int incomingFrame(){
         //comPort.openPort();
