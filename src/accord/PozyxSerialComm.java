@@ -150,7 +150,7 @@ public class PozyxSerialComm {
         
         if(comPort.isOpen()){
             try{
-                flushRX();
+                flushRX(false);
                 int success = comPort.writeBytes(frame, frame.length);
                 if(ACKRecieved(frame[minFrameLength-1])){
                     for(int i=0; i<waitForDataAttempts; i++){
@@ -207,10 +207,11 @@ public class PozyxSerialComm {
     public void closeComm(){
         comPort.closePort();
     }
-    public void flushRX(){
+    public void flushRX(boolean immediately){
         try{
             if(comPort!=null && comPort.isOpen()){
-                Thread.sleep(WAIT_TO_FLUSH_DELAY);
+                if(!immediately)
+                    Thread.sleep(WAIT_TO_FLUSH_DELAY);
                 if(comPort.bytesAvailable()>0)
                     comPort.readBytes(RXBuffer, comPort.bytesAvailable());
             }

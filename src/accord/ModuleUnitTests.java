@@ -14,8 +14,8 @@ import java.util.Scanner;
 public class ModuleUnitTests {
     private static int[] tags = {0x6a19};
     private static int[] anchorIDs = {0x6717, 0x6e3c, 0x6735, 0x6e38};
-    private static int[] anchorX = {0, 0, 2200, 2200};
-    private static int[] anchorY = {0, 1500, 0, 1500};
+    private static int[] anchorX = {0, 0, 3370, 3300};
+    private static int[] anchorY = {3300, 0, 0, 3370};
     private static int[] anchorZ = {0, 0, 0, 0};
     
     
@@ -385,56 +385,63 @@ public class ModuleUnitTests {
     }
     //Car Simulation Tests
     public static void testCarSimulationOval(){
-        Track tr = createSimpleOvalTrack(2000, 1000, 150, true, 700, 100);
+        Track tr = createSimpleOvalTrack(3000, 2000, 150, false, 500, 150);
         PozyxSerialComm pozyx = new PozyxSerialComm();
         CarSimulator carSim = new CarSimulator();
         carSim.setTrack(tr);
-        int[] anchors = {0x6e3c, 0x6e38, 0x6735, 0x6717};
-        int[] anchorsX = {0, 0, 2370, 2370};
-        int[] anchorsY = {0, 1230, 0, 1230};
-        int[] anchorsZ = {0,0,0,0};
         
-        for(int i=0; i<anchors.length; i++){
-            pozyx.addAnchor(anchors[i], anchorsX[i], anchorsY[i], anchorsZ[i]);
+        for(int i=0; i<anchorIDs.length; i++){
+            pozyx.addAnchor(anchorIDs[i], anchorX[i], anchorY[i], anchorZ[i]);
         }
         
-        Car c = new Car(0x6a40, pozyx);
+        /*Car c = new Car(0x6a3f, pozyx);
+        c.adjustSpeed(0x3f);
         carSim.addCar(c);
-        
+        pozyx.addTag(c.getID());*/
+        Car c = new Car(0x6A3F, pozyx);
+        //c.adjustSpeed(0x3f);
+        carSim.addCar(c);
+        pozyx.addTag(c.getID());
+        /*c = new Car(0x6a40, pozyx);
+        c.adjustSpeed(0x3f);
+        carSim.addCar(c);
+        pozyx.addTag(c.getID());
+        */
         pozyx.addTag(c.getID());
         pozyx.finalizeDeviceList();
         while(true){
-            c.adjustSpeed(0x3f);
+            
             carSim.simulate();
-            System.out.println("X = " + c.getXLocation());
-            System.out.println("Y = " + c.getYLocation());
-            System.out.println();
+            System.out.print("X = " + c.getXLocation());
+            System.out.print("\tY = " + c.getYLocation());
+            System.out.println("\tSteer: " + c.getSteeringPower());
         }
         
     }
     public static void testCarCommand(){
         PozyxSerialComm poz = new PozyxSerialComm();
-        byte[] frame1 = {(byte)0xF0, (byte)0x08, (byte)0x01, (byte)0x00, (byte)0x00, (byte)0x03, (byte)0x02, (byte)0x6F};
-        byte[] frame2 = {(byte)0xF0, (byte)0x08, (byte)0x01, (byte)0x00, (byte)0x00, (byte)0x03, (byte)0x02, (byte)0x00};
+        byte[] frame1 = {(byte)0xF0, (byte)0xF0, (byte)0xF0, (byte)0x0A, (byte)0x01, (byte)0x00, (byte)0x00, (byte)0x03, (byte)0x02, (byte)0x3F};
+        byte[] frame2 = {(byte)0xF0, (byte)0xF0, (byte)0xF0, (byte)0x0A, (byte)0x01, (byte)0x00, (byte)0x00, (byte)0x03, (byte)0x02, (byte)0x00};
         
-        byte[] message1 = {(byte)0x67, (byte)0x43, (byte)0x03, (byte)0x02, (byte)0x6F};
-        byte[] message2 = {(byte)0x67, (byte)0x43, (byte)0x03, (byte)0x02, (byte)0x00};
-        Car c = new Car(0x6743, poz);
+        byte[] message1 = {(byte)0x6A, (byte)0x3F, (byte)0x03, (byte)0x02, (byte)0x80};
+        byte[] message2 = {(byte)0x6A, (byte)0x3F, (byte)0x03, (byte)0x02, (byte)0x00};
+        Car c = new Car(0x6A3F, poz);
         try{
+            System.out.println("GO");
             //poz.sendBytes(frame1);
             //poz.sendCarCommand(message1, true);
-            c.adjustSpeed(127);
-            c.adjustSteering(127);
+            c.adjustSpeed(100);
+            //c.adjustSteering(100);
             Thread.sleep(1000);
             //poz.sendBytes(frame2);
             //poz.sendCarCommand(message2, true);
             c.adjustSpeed(0);
-            c.adjustSteering(0);
+            //c.adjustSteering(0);
         }catch(Exception e){};
     }
     public static void testCoordinatesPolling(){
         
-        int carID = 0x6a4f;
+        int carID = 0x6a5e;
         PozyxSerialComm pozyx = new PozyxSerialComm();
         pozyx.setVerboseOutput(false);
         for(int i=0; i<anchorIDs.length; i++){

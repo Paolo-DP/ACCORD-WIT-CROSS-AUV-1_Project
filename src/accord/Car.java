@@ -19,6 +19,9 @@ public class Car {
     private int ydimen = 0;
     private int speed = 0;
     
+    private int steering_power = 0;
+    private int throttle_power = 0;
+    
     private static final byte carIDLen = 2;
     private static final byte minMessageLen = 2;
     private static final byte SET_SPEED = 2;
@@ -60,6 +63,12 @@ public class Car {
     public int getSpeed(){
         return speed;
     }
+    public int getSteeringPower(){
+        return steering_power;
+    }
+    public int getThrottlePower(){
+        return throttle_power;
+    }
     public CarDetails getFullDetails(){
         CarDetails deets = new CarDetails();
         deets.carID = carID;
@@ -74,8 +83,9 @@ public class Car {
     }
     
     public boolean adjustSpeed(int speed){
+        throttle_power = speed;
         byte[] message = new byte[carIDLen + minMessageLen +1];
-        byte[] id = ByteBuffer.allocate(carIDLen).putShort((byte)carID).array();
+        byte[] id = ByteBuffer.allocate(carIDLen).putShort((short)carID).array();
         System.arraycopy(id, 0, message, 0, id.length);
         message[carIDLen] = minMessageLen+1;
         message[carIDLen+1] = SET_SPEED;
@@ -84,8 +94,9 @@ public class Car {
         return(ack!=null);
     }
     public boolean adjustSteering(int steer){
+        steering_power = steer;
         byte[] message = new byte[carIDLen + minMessageLen +1];
-        byte[] id = ByteBuffer.allocate(carIDLen).putShort((byte)carID).array();
+        byte[] id = ByteBuffer.allocate(carIDLen).putShort((short)carID).array();
         System.arraycopy(id, 0, message, 0, id.length);
         message[carIDLen] = minMessageLen+1;
         message[carIDLen+1] = SET_STEERING;
