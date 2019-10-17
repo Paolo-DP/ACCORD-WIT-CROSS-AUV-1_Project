@@ -42,4 +42,9 @@ public class CarSimulator {
             }
         }
     }
+    private int computeNextSteering(Car c){
+        int steer = c.getSteeringPower();
+        
+        return steer;
+    }
 }
