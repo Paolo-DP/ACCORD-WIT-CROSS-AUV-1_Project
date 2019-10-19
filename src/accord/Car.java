@@ -22,6 +22,9 @@ public class Car {
     private int steering_power = 0;
     private int throttle_power = 0;
     
+    public static final int THROTTLE_INCREMENT_STEP = 10;
+    public static final int STEERING_INCREMENT_STEP = 10;
+    
     private static final byte carIDLen = 2;
     private static final byte minMessageLen = 2;
     private static final byte SET_SPEED = 2;
@@ -103,6 +106,18 @@ public class Car {
         message[carIDLen+2] = (byte)steer;
         byte[] ack = pozyx.sendCarCommand(message, true);
         return(ack!=null);
+    }
+    public boolean throttleIncrement(){
+        return adjustSpeed(throttle_power + THROTTLE_INCREMENT_STEP);
+    }
+    public boolean throttleDecrement(){
+        return adjustSpeed(throttle_power - THROTTLE_INCREMENT_STEP);
+    }
+    public boolean steeringIncrement(){
+        return adjustSpeed(steering_power + STEERING_INCREMENT_STEP);
+    }
+    public boolean steeringDecrement(){
+        return adjustSpeed(steering_power - STEERING_INCREMENT_STEP);
     }
     public void setPozyxComm(PozyxSerialComm pozyx){
         this.pozyx = pozyx;
