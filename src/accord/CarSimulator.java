@@ -13,6 +13,7 @@ import java.util.ArrayList;
  */
 public class CarSimulator {
     private int minDistanceToCorrect = 10;
+    private boolean verboseOutput = false;
     ArrayList <Car> carList = new ArrayList<Car>();
     Track track = null;
     
@@ -43,16 +44,23 @@ public class CarSimulator {
                 else
                     steer=0;
                 c.adjustSteering(computeNextSteering(c));
-                c.adjustSpeed(computeNextThrottle(c));
+                //c.adjustSpeed(computeNextThrottle(c));
             }
         }
     }
     private int computeNextSteering(Car c){
         int steer = 0;
         int distCLine = track.distfromCenterLine(c);
+        System.out.println(distCLine);
+        if(distCLine == Integer.MAX_VALUE){
+            if(verboseOutput)
+                System.out.println("CarSimulator: ID " + Integer.toHexString(c.getID())
+                    + " Out of Bounds");
+            return 0;
+        }
         if(Math.abs(distCLine)>minDistanceToCorrect){
             steer = 127;
-            if(distCLine>0);
+            if(distCLine>0)
                 steer *= -1;
         }
         else
@@ -83,5 +91,9 @@ public class CarSimulator {
     private double checkRear(Car c){
         double timeToCollision = -1;
         return timeToCollision;
+    }
+    
+    public void setVerboseOutput(boolean v){
+        verboseOutput = v;
     }
 }

@@ -13,9 +13,9 @@ import java.util.Scanner;
  */
 public class ModuleUnitTests {
     private static int[] tags = {0x6a19};
-    private static int[] anchorIDs = {0x6717, 0x6e3c, 0x6735, 0x6e38};
-    private static int[] anchorX = {0, 0, 3370, 3300};
-    private static int[] anchorY = {3300, 0, 0, 3370};
+    private static int[] anchorIDs = {0x6e38, 0x6717, 0x6735, 0x6e3C};
+    private static int[] anchorX = {0, 1700, 200, 1600};
+    private static int[] anchorY = {0, 0, 1600, 1600};
     private static int[] anchorZ = {0, 0, 0, 0};
     
     
@@ -384,6 +384,33 @@ public class ModuleUnitTests {
         //}
     }
     //Car Simulation Tests
+    public static void testCarSimulationLine(){
+        Track tr = new Track();
+        TrackSegment seg = new TrackSegment();
+        seg.createLineSegment(1700, 1000, 0);
+        seg.setAbsoluteLocation(0, 800);
+        tr.addTrackSegment(seg);
+        tr.complete();
+        CarSimulator carSim = new CarSimulator();
+        carSim.setTrack(tr);
+        PozyxSerialComm pozyx = new PozyxSerialComm();
+        for(int i=0; i<anchorIDs.length; i++){
+            pozyx.addAnchor(anchorIDs[i], anchorX[i], anchorY[i], anchorZ[i]);
+        }
+        
+        Car c = new Car(0x6a40, pozyx);
+        carSim.addCar(c);
+        pozyx.addTag(c.getID());
+        pozyx.finalizeDeviceList();
+        while(true){
+            
+            carSim.simulate();
+            System.out.print("X = " + c.getXLocation());
+            System.out.print("\tY = " + c.getYLocation());
+            System.out.println("\tSteer: " + c.getSteeringPower());
+        }
+        
+    }
     public static void testCarSimulationOval(){
         Track tr = createSimpleOvalTrack(3000, 2000, 150, false, 500, 150);
         PozyxSerialComm pozyx = new PozyxSerialComm();
