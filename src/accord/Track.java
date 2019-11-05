@@ -99,4 +99,45 @@ public class Track {
             segments.get(i).setBoundaryMargin(margin);
         }
     }
+    
+    public TrackSegment getSegment(int index){
+        if(index < segments.size())
+            return segments.get(index);
+        else
+            return null;
+    }
+    public int getNSegments(){
+        return segments.size();
+    }
+    public int[][] getTrackBounds(){
+        int [][] bounds = {{0,0},{0,0}};
+        int x,y;
+        TrackSegment seg;
+        for(int i=0; i<segments.size(); i++){
+            seg = segments.get(i);
+            x = seg.getXLocation();
+            y = seg.getYLocation();
+            if(x < bounds[0][0])
+                bounds[0][0] = x;
+            if(y < bounds[0][1])
+                bounds[0][1] = y;
+            if(x > bounds[1][0])
+                bounds[1][0] = x;
+            if(y > bounds[1][1])
+                bounds[1][1] = y;
+            
+            x = seg.getExitXLocation();
+            y = seg.getExitYLocation();
+            if(x < bounds[0][0])
+                bounds[0][0] = x;
+            if(y < bounds[0][1])
+                bounds[0][1] = y;
+            if(x > bounds[1][0])
+                bounds[1][0] = x;
+            if(y > bounds[1][1])
+                bounds[1][1] = y;
+            
+        }
+        return bounds;
+    }
 }

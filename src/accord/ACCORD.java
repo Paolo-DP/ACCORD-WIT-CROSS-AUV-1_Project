@@ -20,8 +20,9 @@ public class ACCORD {
 
     public static void main(String[] args) {
         sc = new Scanner(System.in);
-        if(testModules)
-            runTestModules();
+        //Visualizer vs = new Visualizer();
+        runTestModules();
+        
         //setup();
     }
     
@@ -57,8 +58,9 @@ public class ACCORD {
         //ModuleUnitTests.testPozyxAck();
         //ModuleUnitTests.testPozyxLocalization();
         //ModuleUnitTests.testCoordinatesPolling();
-        ModuleUnitTests.testCarSimulationLine();
+        //ModuleUnitTests.testCarSimulationLine();
         //ModuleUnitTests.testCarSimulationOval();
         //ModuleUnitTests.testCarCommand();
+        ModuleUnitTests.testVisualizer();
     }
 }

@@ -489,4 +489,16 @@ public class ModuleUnitTests {
         }
         
     }
+    
+    public static void testVisualizer(){
+        Track tr = createSimpleOvalTrack(1000, 500, 100, false, 300, 300);
+        int[][] bounds = tr.getTrackBounds();
+        System.out.println("Oval Track Bounds: ("+bounds[0][0]+","
+                + bounds[0][1] + "), ("
+                + bounds[1][0] + ","
+                + bounds[1][1] + ")");
+        Visualizer vs = new Visualizer();
+        vs.setVerboseOutput(true);
+        vs.setTrack(tr);
+    }
 }

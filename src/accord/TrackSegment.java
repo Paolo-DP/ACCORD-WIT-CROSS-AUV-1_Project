@@ -12,11 +12,11 @@ import java.util.*;
  * @author Paolo
  */
 public class TrackSegment {
-    private static final String SEGSHAPE_CIRCULAR = "CIRCULAR";
-    private static final String SEGSHAPE_LINEAR = "LINEAR";
-    private static final String SEGSHAPE_90DEGTURN = "90TURN";
-    private static final String LEFTTURN = "LEFT TURN";
-    private static final String RIGHTTURN = "RIGHT TURN";
+    public static final String SEGSHAPE_CIRCULAR = "CIRCULAR";
+    public static final String SEGSHAPE_LINEAR = "LINEAR";
+    public static final String SEGSHAPE_90DEGTURN = "90TURN";
+    public static final String LEFTTURN = "LEFT TURN";
+    public static final String RIGHTTURN = "RIGHT TURN";
     
     private TrackSegment nextSeg = null;
     private TrackSegment prevSeg = null;
@@ -26,7 +26,7 @@ public class TrackSegment {
     private double width = 0;
     private double length = 0;
     private double radius = 0;
-    private int curveDirection = 0;
+    private int curveDirection = 0; //1 if left turn, -1 right turn
     private int turn90 = 0;
     private double circleCenterX = 0;
     private double circleCenterY = 0;
@@ -226,6 +226,25 @@ public class TrackSegment {
     public int getSegLength(){
         return (int)length;
     }
+    public double getSegDirection(){
+        return direction;
+    }
+    public int getCurveDirection(){
+        return curveDirection;
+    }
+    public double getCircleCenterX(){
+        return circleCenterX;
+    }
+    public double getCircleCenterY(){
+        return circleCenterY;
+    }
+    public double getRadius(){
+        return radius;
+    }
+    public String getSegShape(){
+        return segShape;
+    }
+    
     
     private int distFromCenterLineLinear(int xLoc, int yLoc){
         int x = xLoc-absoluteXLoc;
