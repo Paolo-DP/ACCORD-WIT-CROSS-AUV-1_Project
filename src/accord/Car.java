@@ -86,26 +86,32 @@ public class Car {
     }
     
     public boolean adjustSpeed(int speed){
-        throttle_power = speed;
-        byte[] message = new byte[carIDLen + minMessageLen +1];
-        byte[] id = ByteBuffer.allocate(carIDLen).putShort((short)carID).array();
-        System.arraycopy(id, 0, message, 0, id.length);
-        message[carIDLen] = minMessageLen+1;
-        message[carIDLen+1] = SET_SPEED;
-        message[carIDLen+2] = (byte)speed;
-        byte[] ack = pozyx.sendCarCommand(message, true);
-        return(ack!=null);
+        if(throttle_power!=speed){
+            throttle_power = speed;
+            byte[] message = new byte[carIDLen + minMessageLen +1];
+            byte[] id = ByteBuffer.allocate(carIDLen).putShort((short)carID).array();
+            System.arraycopy(id, 0, message, 0, id.length);
+            message[carIDLen] = minMessageLen+1;
+            message[carIDLen+1] = SET_SPEED;
+            message[carIDLen+2] = (byte)speed;
+            byte[] ack = pozyx.sendCarCommand(message, true);
+            return(ack!=null);
+        }
+        return true;
     }
     public boolean adjustSteering(int steer){
-        steering_power = steer;
-        byte[] message = new byte[carIDLen + minMessageLen +1];
-        byte[] id = ByteBuffer.allocate(carIDLen).putShort((short)carID).array();
-        System.arraycopy(id, 0, message, 0, id.length);
-        message[carIDLen] = minMessageLen+1;
-        message[carIDLen+1] = SET_STEERING;
-        message[carIDLen+2] = (byte)steer;
-        byte[] ack = pozyx.sendCarCommand(message, true);
-        return(ack!=null);
+        if(steering_power != steer){
+            steering_power = steer;
+            byte[] message = new byte[carIDLen + minMessageLen +1];
+            byte[] id = ByteBuffer.allocate(carIDLen).putShort((short)carID).array();
+            System.arraycopy(id, 0, message, 0, id.length);
+            message[carIDLen] = minMessageLen+1;
+            message[carIDLen+1] = SET_STEERING;
+            message[carIDLen+2] = (byte)steer;
+            byte[] ack = pozyx.sendCarCommand(message, true);
+            return(ack!=null);
+        }
+        return true;
     }
     public boolean throttleIncrement(){
         return adjustSpeed(throttle_power + THROTTLE_INCREMENT_STEP);

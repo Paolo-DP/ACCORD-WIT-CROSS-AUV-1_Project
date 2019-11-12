@@ -13,9 +13,9 @@ import java.util.Scanner;
  */
 public class ModuleUnitTests {
     private static int[] tags = {0x6a19};
-    private static int[] anchorIDs = {0x6e38, 0x6717, 0x6735, 0x6e3C};
-    private static int[] anchorX = {0, 1700, 200, 1600};
-    private static int[] anchorY = {0, 0, 1600, 1600};
+    private static int[] anchorIDs = {0x6e38, 0x6735, 0x6e3c, 0x6717}; 
+    private static int[] anchorX = {0, 4000, 0, 4000};
+    private static int[] anchorY = {0, 0, 4300, 4300};
     private static int[] anchorZ = {0, 0, 0, 0};
     
     
@@ -387,8 +387,8 @@ public class ModuleUnitTests {
     public static void testCarSimulationLine(){
         Track tr = new Track();
         TrackSegment seg = new TrackSegment();
-        seg.createLineSegment(1700, 1000, 0);
-        seg.setAbsoluteLocation(0, 800);
+        seg.createLineSegment(3000, 4000, 0);
+        seg.setAbsoluteLocation(0, 2000);
         tr.addTrackSegment(seg);
         tr.complete();
         CarSimulator carSim = new CarSimulator();
@@ -398,10 +398,11 @@ public class ModuleUnitTests {
             pozyx.addAnchor(anchorIDs[i], anchorX[i], anchorY[i], anchorZ[i]);
         }
         
-        Car c = new Car(0x6a40, pozyx);
+        Car c = new Car(0x6a5e, pozyx);
         carSim.addCar(c);
         pozyx.addTag(c.getID());
         pozyx.finalizeDeviceList();
+        c.adjustSpeed(10);
         while(true){
             
             carSim.simulate();
