@@ -22,6 +22,8 @@ public class Car {
     private int steering_power = 0;
     private int throttle_power = 0;
     
+    public boolean outOfBounds = false;
+    
     public static final int THROTTLE_INCREMENT_STEP = 10;
     public static final int STEERING_INCREMENT_STEP = 10;
     
@@ -85,15 +87,18 @@ public class Car {
         return deets;
     }
     
-    public boolean adjustSpeed(int speed){
-        if(throttle_power!=speed){
-            throttle_power = speed;
+    public boolean adjustThrottle(int throttle){
+        if(throttle_power!=throttle){
+            throttle_power = throttle;
             byte[] message = new byte[carIDLen + minMessageLen +1];
             byte[] id = ByteBuffer.allocate(carIDLen).putShort((short)carID).array();
             System.arraycopy(id, 0, message, 0, id.length);
             message[carIDLen] = minMessageLen+1;
             message[carIDLen+1] = SET_SPEED;
-            message[carIDLen+2] = (byte)speed;
+            if(outOfBounds)
+                message[carIDLen+2] = 0;
+            else
+                message[carIDLen+2] = (byte)throttle_power;
             byte[] ack = pozyx.sendCarCommand(message, true);
             return(ack!=null);
         }
@@ -114,16 +119,16 @@ public class Car {
         return true;
     }
     public boolean throttleIncrement(){
-        return adjustSpeed(throttle_power + THROTTLE_INCREMENT_STEP);
+        return adjustThrottle(throttle_power + THROTTLE_INCREMENT_STEP);
     }
     public boolean throttleDecrement(){
-        return adjustSpeed(throttle_power - THROTTLE_INCREMENT_STEP);
+        return adjustThrottle(throttle_power - THROTTLE_INCREMENT_STEP);
     }
     public boolean steeringIncrement(){
-        return adjustSpeed(steering_power + STEERING_INCREMENT_STEP);
+        return adjustThrottle(steering_power + STEERING_INCREMENT_STEP);
     }
     public boolean steeringDecrement(){
-        return adjustSpeed(steering_power - STEERING_INCREMENT_STEP);
+        return adjustThrottle(steering_power - STEERING_INCREMENT_STEP);
     }
     public void setPozyxComm(PozyxSerialComm pozyx){
         this.pozyx = pozyx;

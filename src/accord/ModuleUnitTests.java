@@ -13,8 +13,8 @@ import java.util.Scanner;
  */
 public class ModuleUnitTests {
     private static int[] tags = {0x6a19};
-    private static int[] anchorIDs = {0x6e38, 0x6735, 0x6e3c, 0x6717}; 
-    private static int[] anchorX = {0, 4000, 0, 4000};
+    private static int[] anchorIDs = {0x6e3c, 0x6735, 0x6717, 0x6e38}; 
+    private static int[] anchorX = {0, 5700, 0, 5500};
     private static int[] anchorY = {0, 0, 4300, 4300};
     private static int[] anchorZ = {0, 0, 0, 0};
     
@@ -402,12 +402,14 @@ public class ModuleUnitTests {
         carSim.addCar(c);
         pozyx.addTag(c.getID());
         pozyx.finalizeDeviceList();
-        c.adjustSpeed(10);
+        c.adjustThrottle(3);
         while(true){
             
             carSim.simulate();
             System.out.print("X = " + c.getXLocation());
             System.out.print("\tY = " + c.getYLocation());
+            System.out.print("\tOut of Bounds: " + c.outOfBounds);
+            System.out.print("\tThrottle: " + c.getThrottlePower());
             System.out.println("\tSteer: " + c.getSteeringPower());
         }
         
@@ -458,12 +460,12 @@ public class ModuleUnitTests {
             System.out.println("GO");
             //poz.sendBytes(frame1);
             //poz.sendCarCommand(message1, true);
-            c.adjustSpeed(100);
+            c.adjustThrottle(100);
             //c.adjustSteering(100);
             Thread.sleep(1000);
             //poz.sendBytes(frame2);
             //poz.sendCarCommand(message2, true);
-            c.adjustSpeed(0);
+            c.adjustThrottle(0);
             //c.adjustSteering(0);
         }catch(Exception e){};
     }

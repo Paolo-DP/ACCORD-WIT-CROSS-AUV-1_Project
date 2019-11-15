@@ -34,7 +34,7 @@ public class CarSimulator {
                 Car c = carList.get(i);
                 c.updateLocation();
                 int distCLine = track.distfromCenterLine(c);
-                int steer=0;
+                int steer;
                 if(Math.abs(distCLine)>minDistanceToCorrect){
                     steer = 127;
                     if(distCLine>0);
@@ -44,7 +44,7 @@ public class CarSimulator {
                 else
                     steer=0;
                 c.adjustSteering(computeNextSteering(c));
-                //c.adjustSpeed(computeNextThrottle(c));
+                c.adjustThrottle(computeNextThrottle(c));
             }
         }
     }
@@ -53,11 +53,15 @@ public class CarSimulator {
         int distCLine = track.distfromCenterLine(c);
         System.out.println(distCLine);
         if(distCLine == Integer.MAX_VALUE){
+            c.outOfBounds = true;
             if(verboseOutput)
                 System.out.println("CarSimulator: ID " + Integer.toHexString(c.getID())
                     + " Out of Bounds");
+            
             return 0;
         }
+        else
+            c.outOfBounds = false;
         if(Math.abs(distCLine)>minDistanceToCorrect){
             steer = 127;
             if(distCLine>0)
@@ -68,21 +72,23 @@ public class CarSimulator {
         return steer;
     }
     private int computeNextThrottle(Car c){
-        int throttle = c.getThrottlePower();
-        double frontCollision = checkFront(c);
-        if(frontCollision == -1){
-            return throttle;
-        }
-        double RearCollision = checkRear(c);
-        if(RearCollision == -1){
-            return throttle;
-        }
-        if(frontCollision <= MIN_TIME_TO_COLLISION)
-            throttle -= Car.THROTTLE_INCREMENT_STEP;
-        else if(frontCollision >= MAX_TIME_TO_COLLISION)
-            throttle += Car.THROTTLE_INCREMENT_STEP;
         
-        return throttle;
+            int throttle = c.getThrottlePower();
+            double frontCollision = checkFront(c);
+            if(frontCollision == -1){
+                return throttle;
+            }
+            double RearCollision = checkRear(c);
+            if(RearCollision == -1){
+                return throttle;
+            }
+            if(frontCollision <= MIN_TIME_TO_COLLISION)
+                throttle -= Car.THROTTLE_INCREMENT_STEP;
+            else if(frontCollision >= MAX_TIME_TO_COLLISION)
+                throttle += Car.THROTTLE_INCREMENT_STEP;
+
+            return throttle;
+        
     }
     private double checkFront(Car c){
         double timeToCollision = -1;
