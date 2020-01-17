@@ -12,14 +12,17 @@ import java.util.*;
  * @author Paolo
  */
 public class TrackSegment {
+    public String segmentID = "Track Segment";
+    public boolean isEnteringIntersection = false;
+    
     public static final String SEGSHAPE_CIRCULAR = "CIRCULAR";
     public static final String SEGSHAPE_LINEAR = "LINEAR";
     public static final String SEGSHAPE_90DEGTURN = "90TURN";
     public static final String LEFTTURN = "LEFT TURN";
     public static final String RIGHTTURN = "RIGHT TURN";
     
-    private TrackSegment nextSeg = null;
-    private TrackSegment prevSeg = null;
+    private TrackSegment[] nextSeg = new TrackSegment[3];
+    private TrackSegment[] prevSeg = new TrackSegment[3];
     
     private String segShape = "LINEAR";
     private double direction = 0;
@@ -189,26 +192,56 @@ public class TrackSegment {
     public void connectNextSegment(TrackSegment next){
         if(next==null)
             return;
-        nextSeg = next;
-        nextSeg.setAbsoluteLocation(absoluteExitXLoc, absoluteExitYLoc);
-        nextSeg.connectPrevSegment(this);
+        nextSeg[0] = next;
+        nextSeg[0].setAbsoluteLocation(absoluteExitXLoc, absoluteExitYLoc);
+        nextSeg[0].connectPrevSegment(this);
     }
     public void connectPrevSegment(TrackSegment prev){
         if(prev==null)
             return;
-        prevSeg = prev;
+        prevSeg[0] = prev;
     }
     public void connectSegments(TrackSegment prev, TrackSegment next){
-        prevSeg = prev;
+        prevSeg[0] = prev;
         if(prev!=null)
-            setAbsoluteLocation(prevSeg.getExitXLocation(), prevSeg.getExitYLocation());
+            setAbsoluteLocation(prevSeg[0].getExitXLocation(), prevSeg[0].getExitYLocation());
         connectNextSegment(next);
     }
+    
+    public void connectSegments(
+            TrackSegment prevStraight, 
+            TrackSegment prevTurnLeft, 
+            TrackSegment prevTurnRight,
+            TrackSegment nextStraight, 
+            TrackSegment nextTurnLeft, 
+            TrackSegment nextTurnRight)
+    {
+        prevSeg[0] = prevStraight;
+        prevSeg[1] = prevTurnLeft; 
+        prevSeg[2] = prevTurnRight;
+        nextSeg[0] = nextStraight;
+        nextSeg[1] = nextTurnLeft; 
+        nextSeg[2] = nextTurnRight;
+        for(int i=0; i<3; i++){
+            if(prevSeg[i]!=null){
+                setAbsoluteLocation(prevSeg[i].absoluteExitXLoc, prevSeg[0].getExitYLocation());
+                return;
+            }
+        }
+        
+    }
+    
     public TrackSegment getNextSeg(){
-        return nextSeg;
+        return nextSeg[0];
+    }
+    public TrackSegment getNextSeg(int turn){
+        return nextSeg[turn];
     }
     public TrackSegment getPrevSeg(){
-        return prevSeg;
+        return prevSeg[0];
+    }
+    public TrackSegment getPrevSeg(int turn){
+        return prevSeg[turn];
     }
     
     public int getXLocation(){

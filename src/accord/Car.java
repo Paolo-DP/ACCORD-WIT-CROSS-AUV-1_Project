@@ -44,7 +44,7 @@ public class Car {
             
             xloc = (int)coor.x;
             yloc = (int)coor.y;
-            orient = coor.eulerAngles[0];
+            orient = coor.eulerAngles[0]*(360/5012);
             
         }
         else

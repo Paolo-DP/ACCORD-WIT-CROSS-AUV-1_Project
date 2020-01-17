@@ -23,6 +23,9 @@ public class Track {
             segments.get(segments.size()-1).connectNextSegment(seg);
         segments.add(seg);
     }
+    public void addIntersection(TrackSegment[] intersectionSegs){
+        
+    }
     public boolean complete(){
         if(segments.isEmpty())
             return false;
