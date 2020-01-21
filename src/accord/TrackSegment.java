@@ -20,6 +20,7 @@ public class TrackSegment {
     public static final String SEGSHAPE_90DEGTURN = "90TURN";
     public static final String LEFTTURN = "LEFT TURN";
     public static final String RIGHTTURN = "RIGHT TURN";
+    public static final String STRAIGHT = "STRAIGHT";
     
     private TrackSegment[] nextSeg = new TrackSegment[3];
     private TrackSegment[] prevSeg = new TrackSegment[3];
