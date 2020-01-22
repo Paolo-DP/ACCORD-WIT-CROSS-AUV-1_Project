@@ -24,21 +24,27 @@
 package accord;
 
 import reservation.manager.*;
+import tiles.Intersection;
+import simulator.SimulationConstants;
 /**
  *
  * @author Paolo
  */
 public class IntersectionSegment {
     private int dimensionSize = 0;
+    private int resolution = 64;
+    public int timeBaseNs = 10 * 1000000;
     
     ReservationManager resMan = new ReservationManager();
     TrackSegment[] entrance = null;
     TrackSegment[] exit = null;
     /* 
         index [0][*] starting at 0 degrees (West entrance]
-        intex [*][0] starts from left to right
+        intex 1, straight, left, right
     */
-    TrackSegment[][] intersectSegs = new TrackSegment[4][3]; 
+    TrackSegment[][] intersectSegs = new TrackSegment[4][3];
+    
+    Intersection sect;
     
     public static final String LEFTTURN = "LEFT TURN";
     public static final String RIGHTTURN = "RIGHT TURN";
@@ -57,11 +63,12 @@ public class IntersectionSegment {
             currDirection+=90;
             currDirection%=360;
         }
-            
+        sect = new Intersection(dimensionSize, resolution);
+        
     }
     
     public void connectSegments(TrackSegment[] entrances, TrackSegment[] exits){
-
+    
     }
     public boolean isApproachingIntersection(TrackSegment segToCheck){
         for(int i=0; i<entrance.length; i++){
