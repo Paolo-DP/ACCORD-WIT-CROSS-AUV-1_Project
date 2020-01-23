@@ -87,6 +87,11 @@ public class Car {
         return deets;
     }
     
+    
+    private void calculateSpeed(){
+        
+    }
+    
     public boolean adjustThrottle(int throttle){
         if(throttle_power!=throttle){
             throttle_power = throttle;
