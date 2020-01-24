@@ -12,10 +12,10 @@ import java.util.Scanner;
  * @author Paolo
  */
 public class ModuleUnitTests {
-    private static int[] tags = {0x6a19};
-    private static int[] anchorIDs = {0x6e3c, 0x6735, 0x6717, 0x6e38}; 
-    private static int[] anchorX = {0, 5700, 0, 5500};
-    private static int[] anchorY = {0, 0, 4300, 4300};
+    private static int[] tags = {0x6a5e, 0x6743};
+    private static int[] anchorIDs = {0x6717, 0x6e38, 0x6735, 0x6e3c}; 
+    private static int[] anchorX = {0, 3500, 0, 3500};
+    private static int[] anchorY = {0, 0, 3000, 3000};
     private static int[] anchorZ = {0, 0, 0, 0};
     
     
@@ -387,27 +387,33 @@ public class ModuleUnitTests {
     public static void testCarSimulationLine(){
         Track tr = new Track();
         TrackSegment seg = new TrackSegment();
-        seg.createLineSegment(3000, 4000, 0);
-        seg.setAbsoluteLocation(0, 2000);
+        seg.createLineSegment(3500, 3000, 0);
+        seg.setAbsoluteLocation(0, 1500);
         tr.addTrackSegment(seg);
         tr.complete();
         CarSimulator carSim = new CarSimulator();
         carSim.setTrack(tr);
-        PozyxSerialComm pozyx = new PozyxSerialComm();
+        /*PozyxSerialComm pozyx = new PozyxSerialComm();
         for(int i=0; i<anchorIDs.length; i++){
-            pozyx.addAnchor(anchorIDs[i], anchorX[i], anchorY[i], anchorZ[i]);
+         /   pozyx.addAnchor(anchorIDs[i], anchorX[i], anchorY[i], anchorZ[i]);
         }
-        
-        Car c = new Car(0x6a5e, pozyx);
-        carSim.addCar(c);
         pozyx.addTag(c.getID());
         pozyx.finalizeDeviceList();
-        c.adjustThrottle(3);
+        */
+        PozyxSerialComm pozyx = setUpPozyxDevices(tags);
+        
+        Car c = new Car(tags[0], pozyx);
+        //Car c2 = new Car(tags[1], pozyx);
+        carSim.addCar(c);
+        //carSim.addCar(c2);
+        c.alignXAxis();
+        //c.adjustThrottle(3);
         while(true){
             
             carSim.simulate();
             System.out.print("X = " + c.getXLocation());
             System.out.print("\tY = " + c.getYLocation());
+            System.out.print("Orient: " + c.getOrientation());
             System.out.print("\tOut of Bounds: " + c.outOfBounds);
             System.out.print("\tThrottle: " + c.getThrottlePower());
             System.out.println("\tSteer: " + c.getSteeringPower());
@@ -469,9 +475,20 @@ public class ModuleUnitTests {
             //c.adjustSteering(0);
         }catch(Exception e){};
     }
+    public static void testCarLocationPolling(){
+        int[] tags = {0x6a3f};
+        PozyxSerialComm pozyx = setUpPozyxDevices(tags);
+        Car c = new Car(tags[0], pozyx);
+        c.alignXAxis();
+        while(true){
+            c.updateLocation();
+            System.out.print("Car ID: 0x" + Integer.toHexString(c.getID()));
+            System.out.println("\t(" + c.getXLocation() + ", " + c.getYLocation() + ")\t Angle: " + c.getOrientation());
+        }
+    }
     public static void testCoordinatesPolling(){
         
-        int carID = 0x6a5e;
+        int carID = 0x6a3f;
         PozyxSerialComm pozyx = new PozyxSerialComm();
         pozyx.setVerboseOutput(false);
         for(int i=0; i<anchorIDs.length; i++){
@@ -488,9 +505,21 @@ public class ModuleUnitTests {
             }
             System.out.print("Car ID: 0x" + Integer.toHexString(coor.ID)+ 
                     "\tTime Stamp: " + coor.timeStamp);
-            System.out.println("\t(" + coor.x + ", " + coor.y + ")");
+            System.out.println("\t(" + coor.x + ", " + coor.y + ")\t Angle: " + coor.eulerAngles[0]);
         }
         
+    }
+    
+    public static PozyxSerialComm setUpPozyxDevices(int[] tags){
+        PozyxSerialComm pozyx = new PozyxSerialComm();
+        pozyx.setVerboseOutput(false);
+        for(int i=0; i<anchorIDs.length; i++){
+            pozyx.addAnchor(anchorIDs[i], anchorX[i], anchorY[i], anchorZ[i]);
+        }
+        for(int i=0; i<tags.length; i++)
+            pozyx.addTag(tags[i]);
+        pozyx.finalizeDeviceList();
+        return pozyx;
     }
     
     public static void testVisualizer(){

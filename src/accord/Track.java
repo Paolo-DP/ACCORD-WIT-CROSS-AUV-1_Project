@@ -86,7 +86,14 @@ public class Track {
         int xLoc = c.getXLocation();
         int yLoc = c.getYLocation();
         double carDir = c.getOrientation();
-        return this.getCurrentSegment(xLoc, yLoc).idealDirection(xLoc, yLoc) - carDir;
+        TrackSegment currSeg = getCurrentSegment(xLoc, yLoc);
+        if(currSeg == null)
+            return 0;
+        double segDir = currSeg.idealDirection(xLoc, yLoc);
+        double deviat = Math.abs(carDir-segDir);
+        if(deviat>180)
+            deviat = -(360-deviat);
+        return deviat;
     }
     public double idealDirection(int xLoc, int yLoc){
         TrackSegment seg = getCurrentSegment(xLoc, yLoc);

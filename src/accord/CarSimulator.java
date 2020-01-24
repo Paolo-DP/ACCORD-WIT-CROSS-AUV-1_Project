@@ -12,8 +12,8 @@ import java.util.ArrayList;
  * @author Paolo
  */
 public class CarSimulator {
-    private int minDistanceToCorrect = 10;
-    private double minAngleToCorrect = 15;
+    private int minDistanceToCorrect = 100;
+    private double minAngleToCorrect = 10;
     private boolean verboseOutput = false;
     ArrayList <Car> carList = new ArrayList<Car>();
     Track track = null;
@@ -22,6 +22,7 @@ public class CarSimulator {
     private static final double MAX_TIME_TO_COLLISION = 3000;
     public void addCar(Car c){
         carList.add(c);
+        
     }
     public void setCarList(ArrayList<Car> cList){
         carList = cList;
@@ -67,11 +68,11 @@ public class CarSimulator {
         else
             c.outOfBounds = false;
         if(Math.abs(distCLine)>minDistanceToCorrect){
-            steer = 127;
-            if(distCLine>0)
-                steer *= -1;
+            //steer = 127;
+            //if(distCLine>0)
+            //    steer *= -1;
         }
-        else if(Math.abs(correctOrient) > minAngleToCorrect){
+        if(Math.abs(correctOrient) > minAngleToCorrect){
             steer = 127;
             if(correctOrient<0)
                 steer *= -1;

@@ -55,7 +55,7 @@ public class Car {
             
             xloc = ((int)coor.x + xloc)/2;
             yloc = ((int)coor.y + yloc)/2;
-            orient = coor.eulerAngles[0]*(360/5012);
+            orient = ((5759-coor.eulerAngles[0])*360)/5759;
             
             adjustHistory();
             xLocHistory[0] =  xloc;
@@ -92,7 +92,7 @@ public class Car {
     }
     public double getOrientation(){
         if(orient<xAxisCalib)
-            return 360 - orient;
+            return 360 - (xAxisCalib-orient);
         else
             return orient - xAxisCalib;
     }
@@ -137,10 +137,10 @@ public class Car {
     }
     private void adjustHistory(){
         for(int i=historyLength-1; i>0; i--){
-        xLocHistory[i] =  xLocHistory[i-1];
-        yLocHistory[i] =  yLocHistory[i-1];
-        orientHistory[i] =  orientHistory[i-1];
-        timeStampHist[i] =  timeStampHist[i-1];
+            xLocHistory[i] =  xLocHistory[i-1];
+            yLocHistory[i] =  yLocHistory[i-1];
+            orientHistory[i] =  orientHistory[i-1];
+            timeStampHist[i] =  timeStampHist[i-1];
         }
                 
     }
