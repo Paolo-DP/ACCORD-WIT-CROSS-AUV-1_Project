@@ -71,6 +71,11 @@ public class CarSimulator {
             if(distCLine>0)
                 steer *= -1;
         }
+        else if(Math.abs(correctOrient) > minAngleToCorrect){
+            steer = 127;
+            if(correctOrient<0)
+                steer *= -1;
+        }
         else
             steer=0;
         return steer;

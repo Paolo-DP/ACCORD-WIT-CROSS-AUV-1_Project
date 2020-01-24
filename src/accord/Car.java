@@ -6,6 +6,7 @@
 package accord;
 
 import java.nio.ByteBuffer;
+import vehicle.VehicleProperty;
 /**
  *
  * @author Paolo
@@ -18,6 +19,8 @@ public class Car {
     private int xdimen = 0;
     private int ydimen = 0;
     private int speed = 0;
+    
+    private double xAxisCalib = 0;
     
     private int steering_power = 0;
     private int throttle_power = 0;
@@ -34,6 +37,14 @@ public class Car {
     
     private PozyxSerialComm pozyx = null;
     
+    private int historyLength = 3;
+    private int[] xLocHistory = new int[historyLength];
+    private int[] yLocHistory = new int[historyLength];
+    private double[] orientHistory = new double[historyLength];
+    private double[] timeStampHist = new double[historyLength];
+    
+    public boolean verbose = false;
+    
     Car(int ID, PozyxSerialComm pozyx){
         carID = ID;
         this.pozyx = pozyx;
@@ -42,13 +53,30 @@ public class Car {
         Coordinates coor = pozyx.getCoordinates(carID);
         if(coor!=null){
             
-            xloc = (int)coor.x;
-            yloc = (int)coor.y;
+            xloc = ((int)coor.x + xloc)/2;
+            yloc = ((int)coor.y + yloc)/2;
             orient = coor.eulerAngles[0]*(360/5012);
             
+            adjustHistory();
+            xLocHistory[0] =  xloc;
+            yLocHistory[0] =  yloc;
+            orientHistory[0] =  orient;
+            timeStampHist[0] =  coor.timeStamp;            
         }
-        else
-            System.out.println("Update Error");
+        else if(verbose)
+            System.out.println("Car " + carID + ": Update Error\n");
+    }
+    public boolean alignXAxis(){
+        if(pozyx!=null){
+            updateLocation();
+            xAxisCalib = orient;
+            return true;
+        }
+        else {
+            if(verbose)
+                System.out.println("Car " + carID + ": alignXAxis() - pozyx NULL Error");
+            return false;
+        }
     }
     public void updateOrientation(){
         
@@ -63,7 +91,10 @@ public class Car {
         return yloc;
     }
     public double getOrientation(){
-        return orient;
+        if(orient<xAxisCalib)
+            return 360 - orient;
+        else
+            return orient - xAxisCalib;
     }
     public int getSpeed(){
         return speed;
@@ -86,10 +117,32 @@ public class Car {
                 
         return deets;
     }
+    public VehicleProperty getVehicleProperty(){
+        VehicleProperty vp = new VehicleProperty(
+                xdimen,
+                ydimen,
+                xdimen*.9,
+                100,
+                10,
+                Math.toRadians(15)
+        );
+        return vp;
+    }
     
     
     private void calculateSpeed(){
-        
+        int xspeed = ((xLocHistory[0] + xLocHistory[xLocHistory.length-1])*1000) / (int)(timeStampHist[0] - timeStampHist[timeStampHist.length-1]);
+        int yspeed = ((yLocHistory[0] + yLocHistory[yLocHistory.length-1])*1000) / (int)(timeStampHist[0] - timeStampHist[timeStampHist.length-1]);
+        speed = (int)Math.sqrt((xspeed*xspeed) + (yspeed*yspeed));
+    }
+    private void adjustHistory(){
+        for(int i=historyLength-1; i>0; i--){
+        xLocHistory[i] =  xLocHistory[i-1];
+        yLocHistory[i] =  yLocHistory[i-1];
+        orientHistory[i] =  orientHistory[i-1];
+        timeStampHist[i] =  timeStampHist[i-1];
+        }
+                
     }
     
     public boolean adjustThrottle(int throttle){
