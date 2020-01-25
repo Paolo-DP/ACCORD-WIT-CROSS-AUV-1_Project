@@ -37,7 +37,7 @@ public class Car {
     
     private PozyxSerialComm pozyx = null;
     
-    private int historyLength = 3;
+    private final int historyLength = 3;
     private int[] xLocHistory = new int[historyLength];
     private int[] yLocHistory = new int[historyLength];
     private double[] orientHistory = new double[historyLength];
@@ -49,7 +49,7 @@ public class Car {
         carID = ID;
         this.pozyx = pozyx;
     }
-    public void updateLocation(){
+    public boolean updateLocation(){
         Coordinates coor = pozyx.getCoordinates(carID);
         if(coor!=null){
             
@@ -61,10 +61,15 @@ public class Car {
             xLocHistory[0] =  xloc;
             yLocHistory[0] =  yloc;
             orientHistory[0] =  orient;
-            timeStampHist[0] =  coor.timeStamp;            
+            timeStampHist[0] =  coor.timeStamp;
+            calculateSpeed();
+            return true;
         }
-        else if(verbose)
-            System.out.println("Car " + carID + ": Update Error\n");
+        else {
+            if(verbose)
+                System.out.println("Car " + carID + ": Update Error\n");
+            return false;
+        }
     }
     public boolean alignXAxis(){
         if(pozyx!=null){
@@ -79,7 +84,7 @@ public class Car {
         }
     }
     public void updateOrientation(){
-        
+        updateLocation();
     }
     public int getID(){
         return carID;
@@ -190,5 +195,25 @@ public class Car {
     }
     public void setPozyxComm(PozyxSerialComm pozyx){
         this.pozyx = pozyx;
+    }
+    
+    /**
+     * Manually set all car attributes. Disregards pozyx data.
+     * @param id Car ID
+     * @param x x location
+     * @param y y location
+     * @param orien orientation in degrees
+     * @param xdim x dimension, typically length of car
+     * @param ydim y dimension, typically width of car
+     * @param speed speed in mm/s
+     */
+    public void setAttributesManual(int id, int x, int y, double orien, int xdim, int ydim, int speed){
+        carID = id;
+        xloc = x;
+        yloc = y;
+        orient = orien;
+        xdimen = xdim;
+        ydimen = ydim;
+        this.speed = speed;
     }
 }
