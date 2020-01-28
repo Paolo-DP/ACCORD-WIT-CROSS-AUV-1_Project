@@ -53,10 +53,11 @@ public class CarSimulator {
         }
     }
     private int computeNextSteering(Car c){
-        int steer = 0;
+        int steer_dist = 0;
+        int steer_orient = 0;
         int distCLine = track.distfromCenterLine(c);
         double correctOrient = track.directionDeviation(c);
-        System.out.println(distCLine);
+        //System.out.println(distCLine);
         if(distCLine == Integer.MAX_VALUE){
             c.outOfBounds = true;
             if(verboseOutput)
@@ -68,18 +69,17 @@ public class CarSimulator {
         else
             c.outOfBounds = false;
         if(Math.abs(distCLine)>minDistanceToCorrect){
-            //steer = 127;
-            //if(distCLine>0)
-            //    steer *= -1;
+            steer_dist = 127;
+            if(distCLine>0)
+                steer_dist *= -1;            
         }
         if(Math.abs(correctOrient) > minAngleToCorrect){
-            steer = 127;
+            steer_orient = 127;
             if(correctOrient<0)
-                steer *= -1;
+                steer_orient *= -1;
         }
-        else
-            steer=0;
-        return steer;
+        
+        return (steer_dist + steer_orient)%128;
     }
     private int computeNextThrottle(Car c){
         

@@ -136,6 +136,8 @@ public class Car {
     
     
     private void calculateSpeed(){
+        if(timeStampHist[0] - timeStampHist[timeStampHist.length-1] == 0)
+            return;
         int xspeed = ((xLocHistory[0] + xLocHistory[xLocHistory.length-1])*1000) / (int)(timeStampHist[0] - timeStampHist[timeStampHist.length-1]);
         int yspeed = ((yLocHistory[0] + yLocHistory[yLocHistory.length-1])*1000) / (int)(timeStampHist[0] - timeStampHist[timeStampHist.length-1]);
         speed = (int)Math.sqrt((xspeed*xspeed) + (yspeed*yspeed));

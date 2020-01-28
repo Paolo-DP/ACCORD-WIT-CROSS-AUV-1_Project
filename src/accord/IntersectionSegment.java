@@ -23,14 +23,16 @@
  */
 package accord;
 
+import java.time.LocalTime;
 import reservation.manager.*;
 import tiles.Intersection;
 import simulator.SimulationConstants;
+import vehicle.VehicleProperty;
 /**
  *
  * @author Paolo
  */
-public class IntersectionSegment {
+public class IntersectionSegment implements SimulationConstants{
     private int dimensionSize = 0;
     private int resolution = 64;
     public int timeBaseNs = 10 * 1000000;
@@ -46,9 +48,9 @@ public class IntersectionSegment {
     
     Intersection sect;
     
-    public static final String LEFTTURN = "LEFT TURN";
-    public static final String RIGHTTURN = "RIGHT TURN";
-    public static final String STRAIGHT = "STRAIGHT";
+    public static final String strLEFTTURN = "LEFT TURN";
+    public static final String strRIGHTTURN = "RIGHT TURN";
+    public static final String strSTRAIGHT = "STRAIGHT";
     
     IntersectionSegment(int size_mm){
         dimensionSize = size_mm;
@@ -78,8 +80,13 @@ public class IntersectionSegment {
         return false;
     }
     public boolean reserve(Car car, TrackSegment entrance, String turn){
-        boolean res = false;
-        
-        return res;
+        VehicleProperty vp = car.getVehicleProperty();
+        int heading = NORTH;
+        int direction = STRAIGHT;
+        resMan.reserve(sect, LocalTime.now(), vp, car.getSpeed(), 0, heading, direction, car.getID(), timeBaseNs);
+        return true;
+    }
+    public boolean releaseReservation(Car car){
+        return resMan.remove(car.getID());
     }
 }
