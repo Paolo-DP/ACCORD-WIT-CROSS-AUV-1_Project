@@ -12,13 +12,13 @@ import java.util.Scanner;
  * @author Paolo
  */
 public class ModuleUnitTests {
-    private static int[] tags = {0x6a5e};
-    private static int[] anchorIDs = {0x6e38, 0x6735, 0x6717, 0x6e3c}; 
-    private static int[] anchorX = {0, 6600, 0, 6600};
-    private static int[] anchorY = {0, 0, 3000, 3000};
+    private static int[] tags = {0x6a1a};
+    private static int[] anchorIDs = {0x6e38, 0x6717, 0x6735, 0x6e3c}; 
+    private static int[] anchorX = {0, 7800, 0, 7800};
+    private static int[] anchorY = {0, 0, 3600, 3600};
     private static int[] anchorZ = {0, 0, 0, 0};
     
-    
+        
     //Track and Track Segment Tests
     public static void testLinearTrackSegment(){
         TrackSegment testSegment = null;
@@ -387,8 +387,8 @@ public class ModuleUnitTests {
     public static void testCarSimulationLine(){
         Track tr = new Track();
         TrackSegment seg = new TrackSegment();
-        seg.createLineSegment(6600, 3000, 0);
-        seg.setAbsoluteLocation(0, 1500);
+        seg.createLineSegment(7800, 600, 0);
+        seg.setAbsoluteLocation(0, 1800);
         tr.addTrackSegment(seg);
         tr.complete();
         CarSimulator carSim = new CarSimulator();
@@ -401,24 +401,26 @@ public class ModuleUnitTests {
         pozyx.finalizeDeviceList();
         */
         PozyxSerialComm pozyx = setUpPozyxDevices(tags);
+        Car[] cars = new Car[tags.length];
         
-        Car c = new Car(tags[0], pozyx);
-        //Car c2 = new Car(tags[1], pozyx);
-        carSim.addCar(c);
-        //carSim.addCar(c2);
-        c.alignXAxis();
-        c.adjustThrottle(1);
-        while(true){
-            
-            carSim.simulate();
-            System.out.print("X = " + c.getXLocation());
-            System.out.print("\tY = " + c.getYLocation());
-            System.out.print("Orient: " + c.getOrientation());
-            System.out.print("\tOut of Bounds: " + c.outOfBounds);
-            System.out.print("\tThrottle: " + c.getThrottlePower());
-            System.out.println("\tSteer: " + c.getSteeringPower());
+        for(int i=0; i<cars.length; i++){
+            cars[i] = new Car(tags[i], pozyx);
+            carSim.addCar(cars[i]);
+            cars[i].alignXAxis();
         }
+        while(true){
+            for(int i=0; i<cars.length; i++){
+                carSim.simulate();
+                System.out.print("ID: " + Integer.toHexString(cars[i].getID()));
+                System.out.print("\tX = " + cars[i].getXLocation());
+                System.out.print("\tY = " + cars[i].getYLocation());
+                System.out.print("\tOrient: " + cars[i].getOrientation());
+                System.out.print("\tOut of Bounds: " + cars[i].outOfBounds);
+                System.out.print("\tThrottle: " + cars[i].getThrottlePower());
+                System.out.println("\tSteer: " + cars[i].getSteeringPower());
         
+            }
+        }
     }
     public static void testCarSimulationOval(){
         Track tr = createSimpleOvalTrack(6000, 2500, 1000, true, 750, 250);

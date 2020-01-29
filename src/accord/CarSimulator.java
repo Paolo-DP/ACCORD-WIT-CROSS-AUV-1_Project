@@ -12,7 +12,7 @@ import java.util.ArrayList;
  * @author Paolo
  */
 public class CarSimulator {
-    private int minDistanceToCorrect = 100;
+    private int minDistanceToCorrect = 50;
     private double minAngleToCorrect = 10;
     private boolean verboseOutput = false;
     ArrayList <Car> carList = new ArrayList<Car>();
@@ -82,23 +82,26 @@ public class CarSimulator {
         return (steer_dist + steer_orient)%128;
     }
     private int computeNextThrottle(Car c){
-        
-            int throttle = c.getThrottlePower();
-            double frontCollision = checkFront(c);
-            if(frontCollision == -1){
-                return throttle;
-            }
-            double RearCollision = checkRear(c);
-            if(RearCollision == -1){
-                return throttle;
-            }
-            if(frontCollision <= MIN_TIME_TO_COLLISION)
-                throttle -= Car.THROTTLE_INCREMENT_STEP;
-            else if(frontCollision >= MAX_TIME_TO_COLLISION)
-                throttle += Car.THROTTLE_INCREMENT_STEP;
+        int throttle = c.getThrottlePower();
+        double frontCollision = checkFront(c);
+        double RearCollision = checkRear(c);
+        if(c.outOfBounds)
+            return 0;
+        else
+            return throttle+Car.THROTTLE_INCREMENT_STEP;
+        /*else if(frontCollision == -1){
+            return throttle += Car.THROTTLE_INCREMENT_STEP;
+        }
+        else if(RearCollision == -1){
+            return throttle+= Car.THROTTLE_INCREMENT_STEP;
+        }
+        if(frontCollision <= MIN_TIME_TO_COLLISION)
+            throttle -= Car.THROTTLE_INCREMENT_STEP;
+        else if(frontCollision >= MAX_TIME_TO_COLLISION)
+            throttle += Car.THROTTLE_INCREMENT_STEP;
 
-            return throttle;
-        
+        return throttle;
+        */
     }
     private double checkFront(Car c){
         double timeToCollision = -1;

@@ -27,8 +27,9 @@ public class Car {
     
     public boolean outOfBounds = false;
     
-    public static final int THROTTLE_INCREMENT_STEP = 10;
+    public static final int THROTTLE_INCREMENT_STEP = 1;
     public static final int STEERING_INCREMENT_STEP = 10;
+    public int speedLimit=1;
     
     private static final byte carIDLen = 2;
     private static final byte minMessageLen = 2;
@@ -52,6 +53,7 @@ public class Car {
     public boolean updateLocation(){
         Coordinates coor = pozyx.getCoordinates(carID);
         if(coor!=null){
+            if(coor.x>=0  && coor.y>=0){
             
             xloc = ((int)coor.x + xloc)/2;
             yloc = ((int)coor.y + yloc)/2;
@@ -64,6 +66,9 @@ public class Car {
             timeStampHist[0] =  coor.timeStamp;
             calculateSpeed();
             return true;
+            }
+            else
+                return false;
         }
         else {
             if(verbose)
@@ -154,7 +159,10 @@ public class Car {
     
     public boolean adjustThrottle(int throttle){
         if(throttle_power!=throttle){
-            throttle_power = throttle;
+            if(throttle > speedLimit)
+                throttle_power = speedLimit;
+            else
+                throttle_power = throttle;
             byte[] message = new byte[carIDLen + minMessageLen +1];
             byte[] id = ByteBuffer.allocate(carIDLen).putShort((short)carID).array();
             System.arraycopy(id, 0, message, 0, id.length);
