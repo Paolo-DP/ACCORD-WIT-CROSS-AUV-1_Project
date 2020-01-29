@@ -13,7 +13,7 @@ import java.util.Scanner;
  */
 public class ModuleUnitTests {
     private static int[] tags = {0x6a1a};
-    private static int[] anchorIDs = {0x6e38, 0x6717, 0x6735, 0x6e3c}; 
+    private static int[] anchorIDs = {0x6735, 0x6e38, 0x6e3c, 0x6717}; 
     private static int[] anchorX = {0, 7800, 0, 7800};
     private static int[] anchorY = {0, 0, 3600, 3600};
     private static int[] anchorZ = {0, 0, 0, 0};

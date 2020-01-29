@@ -53,8 +53,8 @@ public class Car {
     public boolean updateLocation(){
         Coordinates coor = pozyx.getCoordinates(carID);
         if(coor!=null){
-            if(coor.x>=0  && coor.y>=0){
-            
+            //if(coor.x>=0  && coor.y>=0){
+            if(true){
             xloc = ((int)coor.x + xloc)/2;
             yloc = ((int)coor.y + yloc)/2;
             orient = ((5759-coor.eulerAngles[0])*360)/5759;
