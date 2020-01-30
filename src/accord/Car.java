@@ -35,10 +35,13 @@ public class Car {
     private static final byte minMessageLen = 2;
     private static final byte SET_SPEED = 2;
     private static final byte SET_STEERING = 4;
-    
+    private static final int REDUNDANT_MSG_RESEND = 10;
+    private static final String POZYX_ONLINE = "Pozyx Tag online";
+    private static final String POZYX_OFFLINE = "Pozyx Tag OFFLINE";
+    private String pozyxStatus = POZYX_OFFLINE;
     private PozyxSerialComm pozyx = null;
     
-    private final int historyLength = 3;
+    private final int historyLength = 5;
     private int[] xLocHistory = new int[historyLength];
     private int[] yLocHistory = new int[historyLength];
     private double[] orientHistory = new double[historyLength];
@@ -53,6 +56,7 @@ public class Car {
     public boolean updateLocation(){
         Coordinates coor = pozyx.getCoordinates(carID);
         if(coor!=null){
+            pozyxStatus = POZYX_ONLINE;
             //if(coor.x>=0  && coor.y>=0){
             if(true){
             xloc = ((int)coor.x + xloc)/2;
@@ -71,6 +75,7 @@ public class Car {
                 return false;
         }
         else {
+            pozyxStatus = POZYX_OFFLINE;
             if(verbose)
                 System.out.println("Car " + carID + ": Update Error\n");
             return false;
@@ -156,9 +161,9 @@ public class Car {
         }
                 
     }
-    
+    private int redundant_throttle = 0;
     public boolean adjustThrottle(int throttle){
-        if(throttle_power!=throttle){
+        if(throttle_power!=throttle || redundant_throttle==REDUNDANT_MSG_RESEND){
             if(throttle > speedLimit)
                 throttle_power = speedLimit;
             else
@@ -173,12 +178,17 @@ public class Car {
             else
                 message[carIDLen+2] = (byte)throttle_power;
             byte[] ack = pozyx.sendCarCommand(message, true);
+            redundant_throttle=0;
             return(ack!=null);
+        }
+        else{
+            redundant_throttle++;
         }
         return true;
     }
+    private int redundant_steer=0;
     public boolean adjustSteering(int steer){
-        if(steering_power != steer){
+        if(steering_power != steer || redundant_steer==REDUNDANT_MSG_RESEND){
             steering_power = steer;
             byte[] message = new byte[carIDLen + minMessageLen +1];
             byte[] id = ByteBuffer.allocate(carIDLen).putShort((short)carID).array();
@@ -187,8 +197,11 @@ public class Car {
             message[carIDLen+1] = SET_STEERING;
             message[carIDLen+2] = (byte)steer;
             byte[] ack = pozyx.sendCarCommand(message, true);
+            redundant_steer=0;
             return(ack!=null);
         }
+        else
+            redundant_steer++;
         return true;
     }
     public boolean throttleIncrement(){
@@ -205,6 +218,12 @@ public class Car {
     }
     public void setPozyxComm(PozyxSerialComm pozyx){
         this.pozyx = pozyx;
+    }
+    public String getPozyxStatus(){
+        return pozyxStatus;
+    }
+    public boolean isPozyxOnline(){
+        return pozyxStatus==POZYX_ONLINE;
     }
     
     /**

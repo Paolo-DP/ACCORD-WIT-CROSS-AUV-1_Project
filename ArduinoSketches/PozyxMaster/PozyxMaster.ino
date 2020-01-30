@@ -35,6 +35,8 @@ int const headerLength = sizeof(headerBytes) + 1; //header leading bytes + lengt
 int const minFrameLength = headerLength + 1; //full header plus message type byte
 byte RXBuffer[255];
 
+int remoteAckWaitms = 1;
+
 void setup() {
   Serial.begin(115200);
   while(!Serial);
@@ -125,6 +127,7 @@ void processMessage(){
       status = Pozyx.writeTXBufferData(dataBuffer, dataLength);
       status = Pozyx.sendTXBufferData(destID);
       sendAck(frameType);
+      //sendRemoteAckResponse(destID);
       break;
       
     case 2: //retrieve coordinate data of a specific Tag
@@ -231,11 +234,7 @@ void finalizeDeviceList(){
   
     for(int n = 0; n < lastTag; n++){
       Pozyx.clearDevices(tags[n]);
-      //Serial.print("Tag: ");
-      //Serial.println(tags[n], HEX);
       for(int i = 0; i < lastAnchor; i++){
-        //Serial.print("Anchor: ");
-        //Serial.println(anchors[i], HEX);
         device_coordinates_t anchor;
         anchor.network_id = anchors[i];
         anchor.flag = 0x1;
@@ -260,6 +259,37 @@ int indexOfTag(uint16_t tagID){
       return i;
   }
   return -1;
+}
+boolean remoteAckRec(uint16_t remoteID){
+  delay(remoteAckWaitms);
+  while(Pozyx.waitForFlag(POZYX_INT_STATUS_RX_DATA,100)){
+    uint8_t length=0;
+    uint16_t TXer = 0;
+    uint16_t buffer[32];
+    delay(remoteAckWaitms);
+    Pozyx.getLastDataLength(&length);
+    Pozyx.getLastNetworkId(&TXer);
+    Pozyx.readRXBufferData((uint8_t *) buffer, length);
+    if(TXer == remoteID)
+      return true;
+    continue;
+  }
+  return false;
+}
+void sendRemoteAckResponse(uint16_t remoteID){
+  byte response;
+  if(remoteAckRec(remoteID))
+    response = 0xff;
+  else
+    response = 0;
+  byte id0 = remoteID>>8;
+  byte id1 = remoteID & 0x00ff;
+  Serial.write(headerBytes, headerLength-1);
+  Serial.write(minFrameLength+3);
+  Serial.write(0xF0);
+  Serial.write(id0);
+  Serial.write(id1);
+  Serial.write(response);
 }
 void printAnchors(){
   Serial.print("Number of Anchors: ");

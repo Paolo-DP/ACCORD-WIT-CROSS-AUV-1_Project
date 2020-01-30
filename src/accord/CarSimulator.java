@@ -24,6 +24,24 @@ public class CarSimulator {
         carList.add(c);
         
     }
+    public void allignXAxis(){
+        for(int i=0; i<carList.size(); i++){
+            carList.get(i).alignXAxis();
+        }
+    }
+    public boolean allignXAxis(int index){
+        if(index<carList.size() && index > 0)
+            return carList.get(index).alignXAxis();
+        else
+            return false;
+    }
+    public boolean allignXAxis(Car c){
+        int index = carList.indexOf(c);
+        if(index >= 0)
+            return carList.get(index).alignXAxis();
+        else
+            return false;
+    }
     public void setCarList(ArrayList<Car> cList){
         carList = cList;
     }

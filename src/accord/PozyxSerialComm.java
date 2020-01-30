@@ -138,7 +138,7 @@ public class PozyxSerialComm {
         }
         else
             return null;
-        }    
+    }    
     public Coordinates getCoordinates(int carID){        
         Coordinates coor = new Coordinates();
         byte[] frame = new byte[minFrameLength+2];
