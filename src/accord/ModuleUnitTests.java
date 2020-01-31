@@ -12,10 +12,10 @@ import java.util.Scanner;
  * @author Paolo
  */
 public class ModuleUnitTests {
-    private static int[] tags = {0x6a1a};
-    private static int[] anchorIDs = {0x6735, 0x6e38, 0x6e3c, 0x6717}; 
-    private static int[] anchorX = {0, 7800, 0, 7800};
-    private static int[] anchorY = {0, 0, 3600, 3600};
+    private static int[] tags = {0x6a5e, 0x6a1a, 0x6a4f, 0x6a3f};
+    private static int[] anchorIDs = {0x6717, 0x6735, 0x6e3c, 0x6e38}; 
+    private static int[] anchorX = {0, 8400, 0, 8400};
+    private static int[] anchorY = {0, 0, 3000, 3000};
     private static int[] anchorZ = {0, 0, 0, 0};
     
         
@@ -387,8 +387,8 @@ public class ModuleUnitTests {
     public static void testCarSimulationLine(){
         Track tr = new Track();
         TrackSegment seg = new TrackSegment();
-        seg.createLineSegment(7800, 600, 0);
-        seg.setAbsoluteLocation(0, 1800);
+        seg.createLineSegment(8000, 600, 0);
+        seg.setAbsoluteLocation(200, 1500);
         tr.addTrackSegment(seg);
         tr.complete();
         CarSimulator carSim = new CarSimulator();
@@ -403,11 +403,16 @@ public class ModuleUnitTests {
         PozyxSerialComm pozyx = setUpPozyxDevices(tags);
         Car[] cars = new Car[tags.length];
         
+        
         for(int i=0; i<cars.length; i++){
             cars[i] = new Car(tags[i], pozyx);
             carSim.addCar(cars[i]);
-            cars[i].alignXAxis();
+            //cars[i].alignXAxis();
         }
+        Scanner sc = new Scanner(System.in);
+        System.out.println("Allign all cars with X Axis and hit enter...");
+        sc.nextLine();
+        carSim.allignXAxis();
         while(true){
             for(int i=0; i<cars.length; i++){
                 carSim.simulate();
@@ -477,14 +482,33 @@ public class ModuleUnitTests {
         }catch(Exception e){};
     }
     public static void testCarLocationPolling(){
-        int[] tags = {0x6a3f};
         PozyxSerialComm pozyx = setUpPozyxDevices(tags);
-        Car c = new Car(tags[0], pozyx);
-        c.alignXAxis();
+        Car[] cars = new Car[tags.length];
+        
+        
+        for(int i=0; i<cars.length; i++){
+            cars[i] = new Car(tags[i], pozyx);
+            
+            //cars[i].alignXAxis();
+        }
+        Scanner sc = new Scanner(System.in);
+        System.out.println("Allign all cars with X Axis and hit enter...");
+        sc.nextLine();
+        cars[0].alignXAxis();
         while(true){
-            c.updateLocation();
-            System.out.print("Car ID: 0x" + Integer.toHexString(c.getID()));
-            System.out.println("\t(" + c.getXLocation() + ", " + c.getYLocation() + ")\t Angle: " + c.getOrientation());
+            for(int i=0; i<cars.length; i++){
+                cars[i].updateLocation();
+                //if(i>0)
+                //    continue;
+                System.out.print("ID: " + Integer.toHexString(cars[i].getID()));
+                System.out.print("\tX = " + cars[i].getXLocation());
+                System.out.print("\tY = " + cars[i].getYLocation());
+                System.out.print("\tOrient: " + cars[i].getOrientation());
+                System.out.print("\tOut of Bounds: " + cars[i].outOfBounds);
+                System.out.print("\tThrottle: " + cars[i].getThrottlePower());
+                System.out.println("\tSteer: " + cars[i].getSteeringPower());
+        
+            }
         }
     }
     public static void testCoordinatesPolling(){

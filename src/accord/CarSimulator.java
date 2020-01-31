@@ -13,7 +13,7 @@ import java.util.ArrayList;
  */
 public class CarSimulator {
     private int minDistanceToCorrect = 50;
-    private double minAngleToCorrect = 10;
+    private double minAngleToCorrect = 5;
     private boolean verboseOutput = false;
     ArrayList <Car> carList = new ArrayList<Car>();
     Track track = null;

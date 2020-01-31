@@ -57,21 +57,23 @@ public class Car {
         Coordinates coor = pozyx.getCoordinates(carID);
         if(coor!=null){
             pozyxStatus = POZYX_ONLINE;
-            //if(coor.x>=0  && coor.y>=0){
-            if(true){
-            xloc = ((int)coor.x + xloc)/2;
-            yloc = ((int)coor.y + yloc)/2;
-            orient = ((5759-coor.eulerAngles[0])*360)/5759;
-            
-            adjustHistory();
-            xLocHistory[0] =  xloc;
-            yLocHistory[0] =  yloc;
-            orientHistory[0] =  orient;
-            timeStampHist[0] =  coor.timeStamp;
-            calculateSpeed();
-            return true;
+            if(coor.x>=0  && coor.y>=0){
+            //if(true){
+                xloc = ((int)coor.x + xloc)/2;
+                yloc = ((int)coor.y + yloc)/2;
+                orient = ((5759-coor.eulerAngles[0])*360)/5759;
+
+                adjustHistory();
+                xLocHistory[0] =  xloc;
+                yLocHistory[0] =  yloc;
+                orientHistory[0] =  orient;
+                timeStampHist[0] =  coor.timeStamp;
+                calculateSpeed();
+                return true;
             }
             else
+                adjustSteering(0);
+                throttleDecrement();
                 return false;
         }
         else {
@@ -169,7 +171,7 @@ public class Car {
             else
                 throttle_power = throttle;
             byte[] message = new byte[carIDLen + minMessageLen +1];
-            byte[] id = ByteBuffer.allocate(carIDLen).putShort((short)carID).array();
+            byte[] id = ByteBuffer.allocate(carIDLen).putShort((short)(carID)).array();
             System.arraycopy(id, 0, message, 0, id.length);
             message[carIDLen] = minMessageLen+1;
             message[carIDLen+1] = SET_SPEED;
@@ -191,7 +193,7 @@ public class Car {
         if(steering_power != steer || redundant_steer==REDUNDANT_MSG_RESEND){
             steering_power = steer;
             byte[] message = new byte[carIDLen + minMessageLen +1];
-            byte[] id = ByteBuffer.allocate(carIDLen).putShort((short)carID).array();
+            byte[] id = ByteBuffer.allocate(carIDLen).putShort((short)(carID)).array();
             System.arraycopy(id, 0, message, 0, id.length);
             message[carIDLen] = minMessageLen+1;
             message[carIDLen+1] = SET_STEERING;

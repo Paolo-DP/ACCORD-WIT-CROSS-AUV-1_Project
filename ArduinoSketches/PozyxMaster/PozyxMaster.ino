@@ -9,6 +9,7 @@ uint8_t currentTag = 0;
 
 uint16_t master_id = 0x6000;                            // set this to the ID of the remote device
 bool remote = false;
+bool requestRemoteAck = false;
 
 const int numAnchors = 4;
 uint8_t lastAnchor = 0;
@@ -127,7 +128,8 @@ void processMessage(){
       status = Pozyx.writeTXBufferData(dataBuffer, dataLength);
       status = Pozyx.sendTXBufferData(destID);
       sendAck(frameType);
-      //sendRemoteAckResponse(destID);
+      if(requestRemoteAck)
+        sendRemoteAckResponse(destID);
       break;
       
     case 2: //retrieve coordinate data of a specific Tag
