@@ -28,6 +28,7 @@ public class PozyxSerialComm {
     private static final int frameHeaderLen = frameHeader.length + 1;
     private static final int minFrameLength = frameHeaderLen + 1; //including message type
     public SerialPort comPort;
+    public SerialPort comPortBLE;
     private byte[] RXBuffer = new byte[256];
     
     public static final byte SEND_CAR_COMMAND = (byte)1;
@@ -43,7 +44,7 @@ public class PozyxSerialComm {
     
     PozyxSerialComm(){
         Scanner sc = new Scanner(System.in);
-        System.out.println("Select Com port:");
+        System.out.println("Select POZYX Com port:");
         SerialPort[] ports = SerialPort.getCommPorts();
         for(int i=0; i<ports.length; i++){
             System.out.println(i+". " + ports[i].getSystemPortName());
@@ -55,15 +56,41 @@ public class PozyxSerialComm {
             selectport=sc.nextInt();
         }while(selectport<0 && selectport>=ports.length);
         
+        int selectBlePort = 0;
+        System.out.println("Select BLE Com Port:");
+        do{
+            System.out.print(">");
+            selectBlePort=sc.nextInt();
+        }while(selectport<0 && selectport>=ports.length);
+        
         comPort = ports[selectport];
         comPort.openPort();
         comPort.setBaudRate(baudRate);
         comPort.setComPortTimeouts(SerialPort.TIMEOUT_READ_SEMI_BLOCKING | SerialPort.TIMEOUT_WRITE_BLOCKING, 500, 0);
         
+        comPortBLE = ports[selectBlePort];
+        comPortBLE.openPort();
+        comPortBLE.setBaudRate(baudRate);
+        comPortBLE.setComPortTimeouts(SerialPort.TIMEOUT_READ_SEMI_BLOCKING | SerialPort.TIMEOUT_WRITE_BLOCKING, 500, 0);
+        
         try{
             Thread.sleep(ARDUINO_RESET_WAIT); //wait for Arduino to Reset
         }catch(Exception e){}
         
+    }
+    public boolean setSerialPortPozyx(SerialPort port){
+        comPort = port;
+        boolean open = comPort.openPort();
+        comPort.setBaudRate(baudRate);
+        comPort.setComPortTimeouts(SerialPort.TIMEOUT_READ_SEMI_BLOCKING | SerialPort.TIMEOUT_WRITE_BLOCKING, 500, 0);
+        return open;
+    }
+    public boolean setSerialPortBLE(SerialPort port){
+        comPortBLE = port;
+        boolean open = comPortBLE.openPort();
+        comPortBLE.setBaudRate(baudRate);
+        comPortBLE.setComPortTimeouts(SerialPort.TIMEOUT_READ_SEMI_BLOCKING | SerialPort.TIMEOUT_WRITE_BLOCKING, 500, 0);
+        return open;
     }
     
     public boolean addAnchor(int deviceID, int xLoc, int yLoc, int zLoc){
@@ -115,9 +142,9 @@ public class PozyxSerialComm {
         System.arraycopy(message, 0, frame, minFrameLength, message.length);
         frame[frameHeader.length] = (byte)frame.length;
         frame[minFrameLength-1] = SEND_CAR_COMMAND;
-        if(comPort.isOpen()){
+        if(comPortBLE.isOpen()){
             try{
-                int success = comPort.writeBytes(frame, frame.length);
+                int success = comPortBLE.writeBytes(frame, frame.length);
                 //comPort.closePort();
                 if(success==-1)
                     return null;
@@ -127,7 +154,7 @@ public class PozyxSerialComm {
                         return null;
                     
                     byte[] ack = new byte[ackLen];
-                    comPort.readBytes(ack, ackLen);
+                    comPortBLE.readBytes(ack, ackLen);
                     return ack;
                 }
                 return null;
