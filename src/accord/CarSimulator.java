@@ -12,7 +12,7 @@ import java.util.ArrayList;
  * @author Paolo
  */
 public class CarSimulator {
-    private int minDistanceToCorrect = 50;
+    private int minDistanceToCorrect = 100;
     private double minAngleToCorrect = 5;
     private boolean verboseOutput = false;
     ArrayList <Car> carList = new ArrayList<Car>();
@@ -53,7 +53,7 @@ public class CarSimulator {
             for(int i=0; i<carList.size(); i++){
                 Car c = carList.get(i);
                 c.updateLocation();
-                int distCLine = track.distfromCenterLine(c);
+                //int distCLine = track.distfromCenterLine(c);
                 /*
                 int steer;
                 if(Math.abs(distCLine)>minDistanceToCorrect){

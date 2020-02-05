@@ -29,12 +29,13 @@ public class Car {
     
     public static final int THROTTLE_INCREMENT_STEP = 1;
     public static final int STEERING_INCREMENT_STEP = 10;
-    public int speedLimit=1;
+    public int speedLimit=10;
     
     private static final byte carIDLen = 2;
     private static final byte minMessageLen = 2;
     private static final byte SET_SPEED = 2;
     private static final byte SET_STEERING = 4;
+    private static final byte SET_ORIENT = 7;
     private static final int REDUNDANT_MSG_RESEND = 10;
     private static final String POZYX_ONLINE = "Pozyx Tag online";
     private static final String POZYX_OFFLINE = "Pozyx Tag OFFLINE";
@@ -179,7 +180,7 @@ public class Car {
                 message[carIDLen+2] = 0;
             else
                 message[carIDLen+2] = (byte)throttle_power;
-            byte[] ack = pozyx.sendCarCommand(message, true);
+            byte[] ack = pozyx.sendCarCommand(message, false);
             redundant_throttle=0;
             return(ack!=null);
         }
@@ -198,13 +199,34 @@ public class Car {
             message[carIDLen] = minMessageLen+1;
             message[carIDLen+1] = SET_STEERING;
             message[carIDLen+2] = (byte)steer;
-            byte[] ack = pozyx.sendCarCommand(message, true);
+            byte[] ack = pozyx.sendCarCommand(message, false);
             redundant_steer=0;
             return(ack!=null);
         }
         else
             redundant_steer++;
         return true;
+    }
+    private int redundant_orient = 0;
+    public boolean setOrientation(double orient){
+        if(true || redundant_orient==REDUNDANT_MSG_RESEND){
+            double orientUncalib = (orient + xAxisCalib)%360;
+            int orientInt = (int)((360-orientUncalib)*5759)/360;
+            byte[] orientdata = ByteBuffer.allocate(2).putShort((short)(orientInt)).array();
+            byte[] id = ByteBuffer.allocate(carIDLen).putShort((short)(carID)).array();
+            byte[] message = new byte[carIDLen + minMessageLen +2];            
+            System.arraycopy(id, 0, message, 0, id.length);
+            message[carIDLen] = minMessageLen+2;
+            message[carIDLen+1] = SET_ORIENT;
+            System.arraycopy(orientdata, 0, message, minMessageLen, orientdata.length);
+            pozyx.sendCarCommand(message, false);
+            redundant_orient = 0;
+            return true;
+        }
+        else
+            redundant_orient++;
+        return true;
+        
     }
     public boolean throttleIncrement(){
         return adjustThrottle(throttle_power + THROTTLE_INCREMENT_STEP);

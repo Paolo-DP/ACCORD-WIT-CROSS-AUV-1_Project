@@ -62,16 +62,22 @@ public class PozyxSerialComm {
             System.out.print(">");
             selectBlePort=sc.nextInt();
         }while(selectport<0 && selectport>=ports.length);
-        
+        System.out.println("Starting Serial Ports...");
         comPort = ports[selectport];
-        comPort.openPort();
+        boolean succPozyx = comPort.openPort();
         comPort.setBaudRate(baudRate);
         comPort.setComPortTimeouts(SerialPort.TIMEOUT_READ_SEMI_BLOCKING | SerialPort.TIMEOUT_WRITE_BLOCKING, 500, 0);
         
         comPortBLE = ports[selectBlePort];
-        comPortBLE.openPort();
+        boolean succBLE = comPortBLE.openPort();
         comPortBLE.setBaudRate(baudRate);
         comPortBLE.setComPortTimeouts(SerialPort.TIMEOUT_READ_SEMI_BLOCKING | SerialPort.TIMEOUT_WRITE_BLOCKING, 500, 0);
+        
+        if(succPozyx && succBLE){
+            System.out.println("Serial Ports openned successfully!");
+        }
+        else
+            System.out.println("ERROr: Failed to open Serial ports");
         
         try{
             Thread.sleep(ARDUINO_RESET_WAIT); //wait for Arduino to Reset
@@ -79,6 +85,7 @@ public class PozyxSerialComm {
         
     }
     public boolean setSerialPortPozyx(SerialPort port){
+        comPort.closePort();
         comPort = port;
         boolean open = comPort.openPort();
         comPort.setBaudRate(baudRate);
@@ -86,6 +93,7 @@ public class PozyxSerialComm {
         return open;
     }
     public boolean setSerialPortBLE(SerialPort port){
+        comPortBLE.closePort();
         comPortBLE = port;
         boolean open = comPortBLE.openPort();
         comPortBLE.setBaudRate(baudRate);

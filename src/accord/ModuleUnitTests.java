@@ -12,10 +12,10 @@ import java.util.Scanner;
  * @author Paolo
  */
 public class ModuleUnitTests {
-    private static int[] tags = {0x6a5e, 0x6a1a, 0x6a4f, 0x6a3f};
-    private static int[] anchorIDs = {0x6717, 0x6735, 0x6e3c, 0x6e38}; 
+    private static int[] tags = {0x6a3f};
+    private static int[] anchorIDs = {0x6e3c, 0x6e38, 0x6717, 0x6735}; 
     private static int[] anchorX = {0, 8400, 0, 8400};
-    private static int[] anchorY = {0, 0, 3000, 3000};
+    private static int[] anchorY = {0, 0, 3600, 3600};
     private static int[] anchorZ = {0, 0, 0, 0};
     
         
@@ -384,11 +384,27 @@ public class ModuleUnitTests {
         //}
     }
     //Car Simulation Tests
+    public static void testCarSetOrientation(){
+        PozyxSerialComm pozyx = setUpPozyxDevices(tags);
+        Car[] cars = new Car[tags.length];
+        for(int i=0; i<cars.length; i++){
+            cars[i] = new Car(tags[i], pozyx);
+            cars[i].alignXAxis();
+        }
+        Scanner sc = new Scanner(System.in);
+        double orient = 0;
+        while(true){
+            System.out.println("Set Orientation>");
+            orient = sc.nextDouble();
+            for(int i=0; i<cars.length; i++)
+                cars[i].setOrientation(orient);
+        }
+    }
     public static void testCarSimulationLine(){
         Track tr = new Track();
         TrackSegment seg = new TrackSegment();
         seg.createLineSegment(8000, 600, 0);
-        seg.setAbsoluteLocation(200, 1500);
+        seg.setAbsoluteLocation(200, 1800);
         tr.addTrackSegment(seg);
         tr.complete();
         CarSimulator carSim = new CarSimulator();
