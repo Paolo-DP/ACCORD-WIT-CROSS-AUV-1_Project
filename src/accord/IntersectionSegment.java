@@ -32,7 +32,7 @@ import vehicle.VehicleProperty;
  *
  * @author Paolo
  */
-public class IntersectionSegment implements SimulationConstants{
+public class IntersectionSegment extends TrackSegment implements SimulationConstants{
     private int dimensionSize = 0;
     private int resolution = 64;
     public int timeBaseNs = 10 * 1000000;
@@ -53,20 +53,45 @@ public class IntersectionSegment implements SimulationConstants{
     public static final String strSTRAIGHT = "STRAIGHT";
     
     IntersectionSegment(int size_mm){
+        setIsIntersection(true);
         dimensionSize = size_mm;
         double currDirection = 0;
         for(int ent=0; ent<intersectSegs.length; ent++){
             for(int turn=0; turn<intersectSegs[ent].length; turn++){
                 intersectSegs[ent][turn] = new TrackSegment();
-                intersectSegs[ent][0].create90DegTurn((int)(dimensionSize*0.75), true, dimensionSize/2, currDirection);
-                intersectSegs[ent][1].createLineSegment(dimensionSize, dimensionSize/2, currDirection);
-                intersectSegs[ent][0].create90DegTurn((int)(dimensionSize/4), false, dimensionSize/2, currDirection);
+                switch(turn){
+                    case 0:
+                        intersectSegs[ent][0].create90DegTurn((int)(dimensionSize*0.75), true, dimensionSize/2, currDirection);
+                        break;
+                    case 1:
+                        intersectSegs[ent][1].createLineSegment(dimensionSize, dimensionSize/2, currDirection);
+                        break;
+                    case 2:
+                        intersectSegs[ent][2].create90DegTurn((int)(dimensionSize/4), false, dimensionSize/2, currDirection);
+                        break;
+                }
+                
             }
             currDirection+=90;
             currDirection%=360;
         }
         sect = new Intersection(dimensionSize, resolution);
         
+    }
+    
+    @Override
+    public int distFromCenterLine(Car c){
+        return distFromCenterLine(c.getXLocation(), c.getYLocation());
+    }
+    
+    @Override
+    public double idealDirection(Car c){
+        return idealDirection(c.getXLocation(), c.getYLocation());
+    }
+    
+    @Override
+    public boolean isWithinBounds(Car c){
+        return isWithinBounds(c.getXLocation(), c.getYLocation());
     }
     
     public void connectSegments(TrackSegment[] entrances, TrackSegment[] exits){

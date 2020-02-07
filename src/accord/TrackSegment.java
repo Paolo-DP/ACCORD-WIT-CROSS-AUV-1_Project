@@ -14,16 +14,17 @@ import java.util.*;
 public class TrackSegment {
     public String segmentID = "Track Segment";
     public boolean isEnteringIntersection = false;
+    private boolean isIntersection = false;
     
     public static final String SEGSHAPE_CIRCULAR = "CIRCULAR";
     public static final String SEGSHAPE_LINEAR = "LINEAR";
     public static final String SEGSHAPE_90DEGTURN = "90TURN";
     public static final String LEFTTURN = "LEFT TURN";
     public static final String RIGHTTURN = "RIGHT TURN";
-    public static final String STRAIGHT = "STRAIGHT";
+    public static final String STRAIGHTTURN = "STRAIGHT";
     
-    private TrackSegment[] nextSeg = new TrackSegment[3];
-    private TrackSegment[] prevSeg = new TrackSegment[3];
+    private TrackSegment nextSeg = new TrackSegment();
+    private TrackSegment prevSeg = new TrackSegment();
     
     private String segShape = "LINEAR";
     private double direction = 0;
@@ -158,6 +159,9 @@ public class TrackSegment {
         }
         return centerDistance;
     }
+    public int distFromCenterLine(Car c){
+        return distFromCenterLine(c.getXLocation(), c.getYLocation());
+    }
     public double idealDirection(int xLoc, int yLoc){
         switch(segShape){
             case SEGSHAPE_LINEAR:
@@ -183,68 +187,45 @@ public class TrackSegment {
                 return 0;
         }
     }
+    public double idealDirection(Car c){
+        return idealDirection(c.getXLocation(), c.getYLocation());
+    }
     public boolean isWithinBounds(int xLoc, int yLoc){
         return (xLoc>=Math.min(xHitBox1, xHitBox2))&&
                 (xLoc<=Math.max(xHitBox1, xHitBox2))&&
                 (yLoc>=Math.min(yHitBox1, yHitBox2))&&
                 (yLoc<=Math.max(yHitBox1, yHitBox2));
     }
+    public boolean isWithinBounds(Car c){
+        return isWithinBounds(c.getXLocation(), c.getYLocation());
+    }
     
     public void connectNextSegment(TrackSegment next){
         if(next==null)
             return;
-        nextSeg[0] = next;
-        nextSeg[0].setAbsoluteLocation(absoluteExitXLoc, absoluteExitYLoc);
-        nextSeg[0].connectPrevSegment(this);
+        nextSeg = next;
+        nextSeg.setAbsoluteLocation(absoluteExitXLoc, absoluteExitYLoc);
+        nextSeg.connectPrevSegment(this);
     }
     public void connectPrevSegment(TrackSegment prev){
         if(prev==null)
             return;
-        prevSeg[0] = prev;
+        prevSeg = prev;
     }
     public void connectSegments(TrackSegment prev, TrackSegment next){
-        prevSeg[0] = prev;
+        prevSeg = prev;
         if(prev!=null)
-            setAbsoluteLocation(prevSeg[0].getExitXLocation(), prevSeg[0].getExitYLocation());
+            setAbsoluteLocation(prevSeg.getExitXLocation(), prevSeg.getExitYLocation());
         connectNextSegment(next);
     }
-    
-    public void connectSegments(
-            TrackSegment prevStraight, 
-            TrackSegment prevTurnLeft, 
-            TrackSegment prevTurnRight,
-            TrackSegment nextStraight, 
-            TrackSegment nextTurnLeft, 
-            TrackSegment nextTurnRight)
-    {
-        prevSeg[0] = prevStraight;
-        prevSeg[1] = prevTurnLeft; 
-        prevSeg[2] = prevTurnRight;
-        nextSeg[0] = nextStraight;
-        nextSeg[1] = nextTurnLeft; 
-        nextSeg[2] = nextTurnRight;
-        for(int i=0; i<3; i++){
-            if(prevSeg[i]!=null){
-                setAbsoluteLocation(prevSeg[i].absoluteExitXLoc, prevSeg[0].getExitYLocation());
-                return;
-            }
-        }
         
-    }
-    
     public TrackSegment getNextSeg(){
-        return nextSeg[0];
-    }
-    public TrackSegment getNextSeg(int turn){
-        return nextSeg[turn];
+        return nextSeg;
     }
     public TrackSegment getPrevSeg(){
-        return prevSeg[0];
+        return prevSeg;
     }
-    public TrackSegment getPrevSeg(int turn){
-        return prevSeg[turn];
-    }
-    
+        
     public int getXLocation(){
         return this.absoluteXLoc;
     }
@@ -378,5 +359,11 @@ public class TrackSegment {
                 yHitBox2 = absoluteExitYLoc;
                 break;
         }
+    }
+    public boolean isIntersection(){
+        return isIntersection;
+    }
+    public void setIsIntersection(boolean isInter){
+        isIntersection = isInter;
     }
 }
