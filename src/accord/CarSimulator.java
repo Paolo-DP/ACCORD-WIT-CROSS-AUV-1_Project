@@ -12,7 +12,7 @@ import java.util.ArrayList;
  * @author Paolo
  */
 public class CarSimulator {
-    private int minDistanceToCorrect = 100;
+    private int minDistanceToCorrect = 70;
     private double minAngleToCorrect = 10;
     private double orientCorrection = 15;
     private boolean verboseOutput = false;
@@ -68,6 +68,8 @@ public class CarSimulator {
                 */
                 //c.adjustSteering(computeNextSteering(c));
                 c.maintainOrientation(computeNextOrientation(c));
+                double[] orientTimed = computeSteerCompensateTime(c);
+                c.maintainOrientationTimed(orientTimed[0], orientTimed[1]);
                 c.adjustThrottle(computeNextThrottle(c));
             }
         }
@@ -111,10 +113,26 @@ public class CarSimulator {
                 System.out.println("CarSimulator: ID " + Integer.toHexString(c.getID())
                     + " Out of Bounds");
             
-            return 0;
+            return c.getOrientation();
         }
         else
             c.outOfBounds = false;
+        /*if(Math.abs(distCLine)>minDistanceToCorrect){
+            
+            if(distCLine>0)
+                followOrient += orientCorrection;
+            else
+                followOrient -= orientCorrection;
+        }
+        */     
+        return followOrient;
+    }
+    private double[] computeSteerCompensateTime(Car c){
+        double[] data = new double[2];
+        double time = 0;
+        int distCLine = track.distfromCenterLine(c);
+        double followOrient = track.idealDirection(c.getXLocation(), c.getYLocation());
+        time = (distCLine*1000)/c.minSpeedmm;
         if(Math.abs(distCLine)>minDistanceToCorrect){
             
             if(distCLine>0)
@@ -122,15 +140,16 @@ public class CarSimulator {
             else
                 followOrient -= orientCorrection;
         }
-               
-        return followOrient;
+        data[0] = followOrient;
+        data[1] = time;
+        return data;
     }
     private int computeNextThrottle(Car c){
         int throttle = c.getThrottlePower();
         double frontCollision = checkFront(c);
         double RearCollision = checkRear(c);
         if(c.outOfBounds)
-            return 0;
+            return c.getThrottlePower()-Car.THROTTLE_INCREMENT_STEP;
         else
             return throttle+Car.THROTTLE_INCREMENT_STEP;
         /*else if(frontCollision == -1){

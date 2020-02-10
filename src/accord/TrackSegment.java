@@ -23,8 +23,8 @@ public class TrackSegment {
     public static final String RIGHTTURN = "RIGHT TURN";
     public static final String STRAIGHTTURN = "STRAIGHT";
     
-    private TrackSegment nextSeg = new TrackSegment();
-    private TrackSegment prevSeg = new TrackSegment();
+    private TrackSegment nextSeg = null;
+    private TrackSegment prevSeg = null;
     
     private String segShape = "LINEAR";
     private double direction = 0;

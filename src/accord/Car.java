@@ -24,19 +24,22 @@ public class Car {
     
     private int steering_power = 0;
     private int throttle_power = 0;
+    private double maintain_orient = 0;
+    private double temp_orient = 0;
     
     public boolean outOfBounds = false;
     
-    public static final int THROTTLE_INCREMENT_STEP = 1;
+    public static final int THROTTLE_INCREMENT_STEP = 5;
     public static final int STEERING_INCREMENT_STEP = 10;
-    public int speedLimit=10;
-    public int minSpeedmm = 200; //mm/s
+    public int speedLimit=70;
+    public int minSpeedmm = 100; //mm/s
     
     private static final byte carIDLen = 2;
     private static final byte minMessageLen = 2;
     private static final byte SET_SPEED = 2;
     private static final byte SET_STEERING = 4;
     private static final byte SET_ORIENT = 7;
+    private static final byte SET_ORIENT_TIMED = 8;
     private static final int REDUNDANT_MSG_RESEND = 10;
     private static final String POZYX_ONLINE = "Pozyx Tag online";
     private static final String POZYX_OFFLINE = "Pozyx Tag OFFLINE";
@@ -59,7 +62,8 @@ public class Car {
         Coordinates coor = pozyx.getCoordinates(carID);
         if(coor!=null){
             pozyxStatus = POZYX_ONLINE;
-            if(coor.x>=0  && coor.y>=0){
+            //if(coor.x>=0  && coor.y>=0 && coor.timeStamp!=timeStampHist[0]){
+            if(coor.timeStamp!=timeStampHist[0]){
             //if(true){
                 xloc = ((int)coor.x + xloc)/2;
                 yloc = ((int)coor.y + yloc)/2;
@@ -71,14 +75,17 @@ public class Car {
                 orientHistory[0] =  orient;
                 timeStampHist[0] =  coor.timeStamp;
                 calculateSpeed();
+                updated = true;
                 return true;
             }
             else
+                updated = false;
                 adjustSteering(0);
                 throttleDecrement();
                 return false;
         }
         else {
+            updated = false;
             pozyxStatus = POZYX_OFFLINE;
             if(verbose)
                 System.out.println("Car " + carID + ": Update Error\n");
@@ -124,6 +131,12 @@ public class Car {
     public int getThrottlePower(){
         return throttle_power;
     }
+    public double getMaintainOrient(){
+        return maintain_orient;
+    }
+    public double getTempOrient(){
+        return temp_orient;
+    }
     public CarDetails getFullDetails(){
         CarDetails deets = new CarDetails();
         deets.carID = carID;
@@ -147,7 +160,13 @@ public class Car {
         );
         return vp;
     }
-    
+    private boolean updated = false;
+    public boolean isUpdated(){
+        return updated;
+    }
+    public double getLastTimeStamp(){
+        return timeStampHist[0];
+    }
     
     private void calculateSpeed(){
         if(timeStampHist[0] - timeStampHist[timeStampHist.length-1] == 0)
@@ -167,9 +186,12 @@ public class Car {
     }
     private int redundant_throttle = 0;
     public boolean adjustThrottle(int throttle){
-        if(throttle_power!=throttle || redundant_throttle==REDUNDANT_MSG_RESEND){
+        //if(throttle_power!=throttle || redundant_throttle==REDUNDANT_MSG_RESEND){
+        if(true){
             if(throttle > speedLimit)
                 throttle_power = speedLimit;
+            else if(throttle<=0)
+                throttle_power=0;
             else
                 throttle_power = throttle;
             byte[] message = new byte[carIDLen + minMessageLen +1];
@@ -211,9 +233,10 @@ public class Car {
     private int redundant_orient = 0;
     public boolean maintainOrientation(double orient){
         if(true || redundant_orient==REDUNDANT_MSG_RESEND){
+            maintain_orient = orient;
             double orientUncalib = (orient + xAxisCalib)%360;
             int orientInt = (int)((360-orientUncalib)*5759)/360;
-            System.out.println("Uncalib = " + orientUncalib + "\tInt = " + orientInt);
+            //System.out.println("Uncalib = " + orientUncalib + "\tInt = " + orientInt);
             byte[] orientdata = ByteBuffer.allocate(2).putShort((short)(orientInt)).array();
             byte[] id = ByteBuffer.allocate(carIDLen).putShort((short)(carID)).array();
             byte[] message = new byte[carIDLen + minMessageLen +2];            
@@ -229,6 +252,30 @@ public class Car {
             redundant_orient++;
         return true;
         
+    }
+    private int redundant_orient_timed = 0;
+    public boolean maintainOrientationTimed(double orient, double time){
+        if(true || redundant_orient_timed==REDUNDANT_MSG_RESEND){
+            temp_orient = orient;
+            double orientUncalib = (orient + xAxisCalib)%360;
+            int orientInt = (int)((360-orientUncalib)*5759)/360;
+            //System.out.println("Uncalib = " + orientUncalib + "\tInt = " + orientInt);
+            byte[] orientdata = ByteBuffer.allocate(2).putShort((short)(orientInt)).array();
+            byte[] timedata = ByteBuffer.allocate(4).putInt((int)time).array();
+            byte[] id = ByteBuffer.allocate(carIDLen).putShort((short)(carID)).array();
+            byte[] message = new byte[carIDLen + minMessageLen +6];            
+            System.arraycopy(id, 0, message, 0, id.length);
+            message[carIDLen] = minMessageLen+6;
+            message[carIDLen+1] = SET_ORIENT_TIMED;
+            System.arraycopy(orientdata, 0, message, carIDLen + minMessageLen, orientdata.length);
+            System.arraycopy(timedata, 0, message, carIDLen + minMessageLen + 2, timedata.length);
+            pozyx.sendCarCommand(message, false);
+            redundant_orient_timed = 0;
+            return true;
+        }
+        else
+            redundant_orient_timed++;
+        return true;
     }
     public boolean throttleIncrement(){
         return adjustThrottle(throttle_power + THROTTLE_INCREMENT_STEP);
@@ -270,5 +317,17 @@ public class Car {
         xdimen = xdim;
         ydimen = ydim;
         this.speed = speed;
+    }
+    public void printCarAttributes(){
+        System.out.print("ID: " + Integer.toHexString(getID()));
+        System.out.print("\tUpdated: " + isUpdated());
+        System.out.print("\tTimeStamp: " + getLastTimeStamp());
+        System.out.print("\tX = " + getXLocation());
+        System.out.print("\tY = " + getYLocation());
+        System.out.print("\tOrient: " + getOrientation());
+        System.out.print("\tOut of Bounds: " + outOfBounds);
+        System.out.print("\tThrottle: " + getThrottlePower());
+        System.out.println("\tMaintain: " + (int)getMaintainOrient());
+        System.out.println("\tTemp: " + (int)getTempOrient());
     }
 }

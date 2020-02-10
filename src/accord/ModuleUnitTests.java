@@ -12,10 +12,10 @@ import java.util.Scanner;
  * @author Paolo
  */
 public class ModuleUnitTests {
-    private static int[] tags = {0x6a3f};
-    private static int[] anchorIDs = {0x6e3c, 0x6e38, 0x6717, 0x6735}; 
-    private static int[] anchorX = {0, 8400, 0, 8400};
-    private static int[] anchorY = {0, 0, 3600, 3600};
+    private static int[] tags = {0x6a3f, 0x6743};
+    private static int[] anchorIDs = {0x6e3c, 0x6735, 0x6e38, 0x6717}; 
+    private static int[] anchorX = {0, 7800, 0, 7800};
+    private static int[] anchorY = {0, 0, 4200, 4200};
     private static int[] anchorZ = {0, 0, 0, 0};
     
         
@@ -400,11 +400,30 @@ public class ModuleUnitTests {
                 cars[i].maintainOrientation(orient);
         }
     }
+    public static void testCarSetOrientationTimed(){
+        PozyxSerialComm pozyx = setUpPozyxDevices(tags);
+        Car[] cars = new Car[tags.length];
+        for(int i=0; i<cars.length; i++){
+            cars[i] = new Car(tags[i], pozyx);
+            cars[i].alignXAxis();
+        }
+        Scanner sc = new Scanner(System.in);
+        double orient = 0;
+        double time = 0;
+        while(true){
+            System.out.print("Set Orientation > ");
+            orient = sc.nextDouble();
+            System.out.print("For how long > ");
+            time = sc.nextDouble();
+            for(int i=0; i<cars.length; i++)
+                cars[i].maintainOrientationTimed(orient, time);
+        }
+    }
     public static void testCarSimulationLine(){
         Track tr = new Track();
         TrackSegment seg = new TrackSegment();
-        seg.createLineSegment(8000, 600, 0);
-        seg.setAbsoluteLocation(200, 1800);
+        seg.createLineSegment(7000, 600, 0);
+        seg.setAbsoluteLocation(0, 2100);
         tr.addTrackSegment(seg);
         tr.complete();
         CarSimulator carSim = new CarSimulator();
@@ -432,14 +451,10 @@ public class ModuleUnitTests {
         while(true){
             for(int i=0; i<cars.length; i++){
                 carSim.simulate();
-                System.out.print("ID: " + Integer.toHexString(cars[i].getID()));
-                System.out.print("\tX = " + cars[i].getXLocation());
-                System.out.print("\tY = " + cars[i].getYLocation());
-                System.out.print("\tOrient: " + cars[i].getOrientation());
-                System.out.print("\tOut of Bounds: " + cars[i].outOfBounds);
-                System.out.print("\tThrottle: " + cars[i].getThrottlePower());
-                System.out.println("\tSteer: " + cars[i].getSteeringPower());
-        
+                if(cars[i].isUpdated()){
+                    cars[i].printCarAttributes();
+                }
+                
             }
         }
     }
@@ -514,15 +529,8 @@ public class ModuleUnitTests {
         while(true){
             for(int i=0; i<cars.length; i++){
                 cars[i].updateLocation();
-                //if(i>0)
-                //    continue;
-                System.out.print("ID: " + Integer.toHexString(cars[i].getID()));
-                System.out.print("\tX = " + cars[i].getXLocation());
-                System.out.print("\tY = " + cars[i].getYLocation());
-                System.out.print("\tOrient: " + cars[i].getOrientation());
-                System.out.print("\tOut of Bounds: " + cars[i].outOfBounds);
-                System.out.print("\tThrottle: " + cars[i].getThrottlePower());
-                System.out.println("\tSteer: " + cars[i].getSteeringPower());
+                if(cars[i].isUpdated())
+                    cars[i].printCarAttributes();
         
             }
         }
