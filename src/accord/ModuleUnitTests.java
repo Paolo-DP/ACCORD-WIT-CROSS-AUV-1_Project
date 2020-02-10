@@ -397,7 +397,7 @@ public class ModuleUnitTests {
             System.out.println("Set Orientation>");
             orient = sc.nextDouble();
             for(int i=0; i<cars.length; i++)
-                cars[i].setOrientation(orient);
+                cars[i].maintainOrientation(orient);
         }
     }
     public static void testCarSimulationLine(){

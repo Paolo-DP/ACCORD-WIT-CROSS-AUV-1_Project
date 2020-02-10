@@ -13,7 +13,8 @@ import java.util.ArrayList;
  */
 public class CarSimulator {
     private int minDistanceToCorrect = 100;
-    private double minAngleToCorrect = 5;
+    private double minAngleToCorrect = 10;
+    private double orientCorrection = 15;
     private boolean verboseOutput = false;
     ArrayList <Car> carList = new ArrayList<Car>();
     Track track = null;
@@ -65,7 +66,8 @@ public class CarSimulator {
                 else
                     steer=0;
                 */
-                c.adjustSteering(computeNextSteering(c));
+                //c.adjustSteering(computeNextSteering(c));
+                c.maintainOrientation(computeNextOrientation(c));
                 c.adjustThrottle(computeNextThrottle(c));
             }
         }
@@ -98,6 +100,30 @@ public class CarSimulator {
         }
         
         return (steer_dist + steer_orient)%128;
+    }
+    private double computeNextOrientation(Car c){
+        int distCLine = track.distfromCenterLine(c);
+        //double correctOrient = track.directionDeviation(c);
+        double followOrient = track.idealDirection(c.getXLocation(), c.getYLocation());
+        if(distCLine == Integer.MAX_VALUE){
+            c.outOfBounds = true;
+            if(verboseOutput)
+                System.out.println("CarSimulator: ID " + Integer.toHexString(c.getID())
+                    + " Out of Bounds");
+            
+            return 0;
+        }
+        else
+            c.outOfBounds = false;
+        if(Math.abs(distCLine)>minDistanceToCorrect){
+            
+            if(distCLine>0)
+                followOrient += orientCorrection;
+            else
+                followOrient -= orientCorrection;
+        }
+               
+        return followOrient;
     }
     private int computeNextThrottle(Car c){
         int throttle = c.getThrottlePower();

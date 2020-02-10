@@ -15,6 +15,7 @@ public class Track {
     ArrayList<TrackSegment> segments = new ArrayList<TrackSegment>();
     ArrayList<Car> carList = new ArrayList<Car>();
     ArrayList<TrackSegment> carSegList = new ArrayList<TrackSegment>();
+    ArrayList<CarTracker> trackers = new ArrayList<CarTracker>();
     
     double trackAngleOffset = 0;
     
@@ -39,6 +40,37 @@ public class Track {
         
         segments.remove(seg);
     }
+    
+    public CarTracker updateCarTracker(Car c){
+        CarTracker ct = null;
+        for(int i=0; i<trackers.size(); i++){
+            if(trackers.get(i).car == c){
+                ct = trackers.get(i);
+                break;
+            }
+        }
+        if(ct == null)
+            ct = new CarTracker(c);
+        if(getCurrentSegment(ct)==null)
+            ct.isOutOfBounds=true;
+        else{
+            ct.isOutOfBounds=false;
+            ct.distanceFromDrivingLine = ct.currentSeg.distFromCenterLine(c);
+            ct.idealAngle = ct.currentSeg.idealDirection(c);
+            ct.angleDeviation = directionDeviation(ct);
+        }
+        return ct;
+    }
+    public CarTracker getCarTracker(Car c){
+        CarTracker ct = null;
+        for(int i=0; i<trackers.size(); i++){
+            if(trackers.get(i).car == c){
+                ct = trackers.get(i);
+                break;
+            }
+        }
+        return ct;
+    }
     public TrackSegment getCurrentSegment(int xLoc, int yLoc){
         for(int i=0; i<segments.size(); i++){
             if(segments.get(i).isWithinBounds(xLoc, yLoc))
@@ -46,26 +78,36 @@ public class Track {
         }
         return null;
     }
-    public TrackSegment getCurrentSegment(Car c){        
-        int carIndex = carList.indexOf(c);
-        int xLoc = c.getXLocation();
-        int yLoc = c.getYLocation();
-        /*
-        if(carSegList.get(carIndex).isWithinBounds(xLoc, yLoc))
-            return carSegList.get(carIndex);
-        else{
-            int count = 0;
-            TrackSegment seg2chk = carSegList.get(carIndex).getNextSeg();
-            while(count < segments.size()-1){
-                if(seg2chk.isWithinBounds(xLoc, yLoc))
-                    return carSegList.get(carIndex);
-                seg2chk = seg2chk.getNextSeg();
-            }
-            return null;
+    public TrackSegment getCurrentSegment(CarTracker ct){
+        if(ct.currentSeg==null){
+            ct.currentSeg = searchCurrentSegment(ct.car);
+            ct.nextSeg = ct.currentSeg.getNextSeg();
+            return ct.currentSeg;
         }
-        */
-        return getCurrentSegment(xLoc, yLoc);
+        else if(ct.currentSeg.isWithinBounds(ct.car))
+            return ct.currentSeg;
+        else if(ct.nextSeg.isWithinBounds(ct.car)){
+            ct.currentSeg = ct.nextSeg;
+            ct.nextSeg = ct.currentSeg.getNextSeg();
+            return ct.currentSeg;
+        }
+        else{
+            ct.currentSeg = searchCurrentSegment(ct.car);
+            ct.nextSeg = ct.currentSeg.getNextSeg();
+            return ct.currentSeg;
+        }
     }
+    private TrackSegment searchCurrentSegment(Car c){
+        TrackSegment current = null;
+        for(int i=0; i<segments.size(); i++){
+            if(segments.get(i).isWithinBounds(c)){
+                current = segments.get(i);
+                break;
+            }
+        }
+        return current;
+    }
+    
     public int distfromCenterLine(Car c){
         int xLoc = c.getXLocation();
         int yLoc = c.getYLocation();
@@ -91,6 +133,12 @@ public class Track {
             return 0;
         double segDir = currSeg.idealDirection(xLoc, yLoc);
         double deviat = Math.abs(carDir-segDir);
+        if(deviat>180)
+            deviat = -(360-deviat);
+        return deviat;
+    }
+    public double directionDeviation(CarTracker ct){
+        double deviat = Math.abs(ct.car.getOrientation()-ct.currentSeg.idealDirection(ct.car));
         if(deviat>180)
             deviat = -(360-deviat);
         return deviat;

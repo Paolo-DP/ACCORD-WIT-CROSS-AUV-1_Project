@@ -36,10 +36,28 @@ public class IntersectionSegment extends TrackSegment implements SimulationConst
     private int dimensionSize = 0;
     private int resolution = 64;
     public int timeBaseNs = 10 * 1000000;
+    private int absoluteXLoc = 0;
+    private int absoluteYLoc = 0;
+    
+    private int boundaryMargin = 10;
+    private int xHitBox1 = 0;
+    private int yHitBox1 = 0;
+    private int xHitBox2 = 0;
+    private int yHitBox2 = 0;
     
     ReservationManager resMan = new ReservationManager();
-    TrackSegment[] entrance = null;
-    TrackSegment[] exit = null;
+    TrackSegment[] entrance = new TrackSegment[4];
+    /**
+     * [0] starts with 0 degrees (eastbound)
+     * [1] 90 degrees (northbound)
+     * [2] 180 degrees (westbound)
+     * [3] 270 degrees (southbound)
+     */
+    TrackSegment[] exit = new TrackSegment[4];
+    
+    private TrackSegment nextSeg = new TrackSegment();
+    private TrackSegment prevSeg = new TrackSegment();
+    
     /* 
         index [0][*] starting at 0 degrees (West entrance]
         intex 1, straight, left, right
@@ -52,6 +70,7 @@ public class IntersectionSegment extends TrackSegment implements SimulationConst
     public static final String strRIGHTTURN = "RIGHT TURN";
     public static final String strSTRAIGHT = "STRAIGHT";
     
+    private boolean verbose = false;
     IntersectionSegment(int size_mm){
         setIsIntersection(true);
         dimensionSize = size_mm;
@@ -78,7 +97,26 @@ public class IntersectionSegment extends TrackSegment implements SimulationConst
         sect = new Intersection(dimensionSize, resolution);
         
     }
-    
+    @Override
+    public void connectNextSegment(TrackSegment next){
+        if(next==null)
+            return;
+        
+        nextSeg.connectPrevSegment(this);
+    }
+    @Override
+    public void connectPrevSegment(TrackSegment prev){
+        if(prev==null)
+            return;
+        prevSeg = prev;
+    }
+    @Override
+    public void connectSegments(TrackSegment prev, TrackSegment next){
+        prevSeg = prev;
+        if(prev!=null)
+            setAbsoluteLocation(prevSeg.getExitXLocation(), prevSeg.getExitYLocation());
+        connectNextSegment(next);
+    }
     @Override
     public int distFromCenterLine(Car c){
         return distFromCenterLine(c.getXLocation(), c.getYLocation());
@@ -92,6 +130,13 @@ public class IntersectionSegment extends TrackSegment implements SimulationConst
     @Override
     public boolean isWithinBounds(Car c){
         return isWithinBounds(c.getXLocation(), c.getYLocation());
+    }
+    
+    public TrackSegment getNextSeg(Car c){
+        return null;
+    }
+    public TrackSegment getPrevSeg(Car c){
+        return null;
     }
     
     public void connectSegments(TrackSegment[] entrances, TrackSegment[] exits){
@@ -113,5 +158,9 @@ public class IntersectionSegment extends TrackSegment implements SimulationConst
     }
     public boolean releaseReservation(Car car){
         return resMan.remove(car.getID());
+    }
+    
+    public void setVerbose(boolean verb){
+        verbose = verb;
     }
 }
