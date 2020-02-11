@@ -15,7 +15,7 @@ import java.util.Arrays;
 public class PozyxSerialComm {
     private boolean verboseOutput = false;
     
-    public static final int baudRate = 115200;
+    public static final int baudRate = 19200;
     private static final int ARDUINO_RESET_WAIT = 3000;
     private static final int ackWaitAttempts = 10;
     private static final int WAIT_FOR_BYTES_DELAY = 10;
@@ -238,6 +238,15 @@ public class PozyxSerialComm {
         boolean success = true;
         comPort.writeBytes(sendme, sendme.length);
         return success;
+    }
+    private boolean sendTrailingZeroes(int n){
+        if(!comPort.isOpen())
+            return false;
+        byte[] zeroes = new byte[n];
+        for(int i=0; i<zeroes.length; i++){
+            zeroes[i] = 0;
+        }
+        return true;
     }
     public void closeComm(){
         comPort.closePort();

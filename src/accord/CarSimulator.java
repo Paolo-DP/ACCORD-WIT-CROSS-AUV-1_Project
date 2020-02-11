@@ -56,7 +56,7 @@ public class CarSimulator {
             for(int i=0; i<carList.size(); i++){
                 Car c = carList.get(i);
                 if(c.updateLocation()){
-                    CarTracker ct = track.getCarTracker(c);
+                    CarTracker ct = track.updateCarTracker(c);
                     doSteering(c, ct);
                     doThrottle(c, ct);
                 }
@@ -72,31 +72,33 @@ public class CarSimulator {
     
     //manuver handling methods
     private void doSteering(Car c, CarTracker tracker){
-        String segShape = tracker.currentSeg.getSegShape();
-        if(segShape == TrackSegment.SEGSHAPE_LINEAR){
-            c.maintainOrientation(computeNextOrientation(c));
-            double[] orientTimed = computeSteerCompensateTime(c);
-            c.maintainOrientationTimed(orientTimed[0], orientTimed[1]);
-        }
-        else if(segShape == TrackSegment.SEGSHAPE_90DEGTURN){
-            double exitDirection = tracker.currentSeg.idealDirection(
-                    tracker.currentSeg.getExitXLocation(), 
-                    tracker.currentSeg.getExitYLocation());
-            double deviat = Math.abs(c.getOrientation()-exitDirection);
-            if(deviat>180)
-                deviat = -(360-deviat);
-            if(Math.abs(c.getOrientation()-exitDirection) > minAngleToCorrect){
-                c.maintainOrientation(exitDirection);
-            }
-            else{
+        if(!tracker.isOutOfBounds){
+            String segShape = tracker.currentSeg.getSegShape();
+            if(segShape == TrackSegment.SEGSHAPE_LINEAR){
+                c.maintainOrientation(computeNextOrientation(c));
                 double[] orientTimed = computeSteerCompensateTime(c);
                 c.maintainOrientationTimed(orientTimed[0], orientTimed[1]);
+            }
+            else if(segShape == TrackSegment.SEGSHAPE_90DEGTURN){
+                double exitDirection = tracker.currentSeg.idealDirection(
+                        tracker.currentSeg.getExitXLocation(), 
+                        tracker.currentSeg.getExitYLocation());
+                double deviat = Math.abs(c.getOrientation()-exitDirection);
+                if(deviat>180)
+                    deviat = -(360-deviat);
+                if(Math.abs(c.getOrientation()-exitDirection) > minAngleToCorrect){
+                    c.maintainOrientation(exitDirection);
+                }
+                else{
+                    double[] orientTimed = computeSteerCompensateTime(c);
+                    c.maintainOrientationTimed(orientTimed[0], orientTimed[1]);
+                }
             }
         }
     }
     private void doThrottle(Car c, CarTracker tracker){
         if(tracker.isOutOfBounds)
-            c.adjustThrottle(0);
+            c.throttleDecrement();
         else{
             c.adjustThrottle(computeNextThrottle(c));
         }

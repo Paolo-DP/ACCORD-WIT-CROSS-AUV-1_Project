@@ -81,20 +81,58 @@ public class Track {
         return null;
     }
     public TrackSegment getCurrentSegment(CarTracker ct){
-        if(ct.currentSeg==null){
+        /*if(ct.currentSeg==null && ct.nextSeg==null){
             ct.currentSeg = searchCurrentSegment(ct.car);
+            if(ct.currentSeg == null)
+                return null;
             ct.nextSeg = ct.currentSeg.getNextSeg();
             return ct.currentSeg;
         }
         else if(ct.currentSeg.isWithinBounds(ct.car))
             return ct.currentSeg;
-        else if(ct.nextSeg.isWithinBounds(ct.car)){
-            ct.currentSeg = ct.nextSeg;
-            ct.nextSeg = ct.currentSeg.getNextSeg();
-            return ct.currentSeg;
+        else {
+            if(ct.nextSeg.isWithinBounds(ct.car)){
+                ct.currentSeg = ct.nextSeg;
+                ct.nextSeg = ct.currentSeg.getNextSeg();
+                return ct.currentSeg;
+            }
         }
         else{
             ct.currentSeg = searchCurrentSegment(ct.car);
+            ct.nextSeg = ct.currentSeg.getNextSeg();
+            return ct.currentSeg;
+        }*/
+        if(ct.currentSeg != null){
+            if(ct.currentSeg.isWithinBounds(ct.car)){
+                ct.nextSeg = ct.currentSeg.getNextSeg();
+                return ct.currentSeg;
+            }
+            else{
+                ct.currentSeg = searchCurrentSegment(ct.car);
+                if(ct.currentSeg == null)
+                    return null;
+                ct.nextSeg = ct.currentSeg.getNextSeg();
+                return ct.currentSeg;
+            }
+        }
+        else if(ct.nextSeg != null){
+            if(ct.nextSeg.isWithinBounds(ct.car)){
+                ct.currentSeg = ct.nextSeg;
+                ct.nextSeg = ct.currentSeg.getNextSeg();
+                return ct.currentSeg;
+            }
+            else{
+                ct.currentSeg = searchCurrentSegment(ct.car);
+                if(ct.currentSeg == null)
+                    return null;
+                ct.nextSeg = ct.currentSeg.getNextSeg();
+                return ct.currentSeg;
+            }
+        }
+        else{
+            ct.currentSeg = searchCurrentSegment(ct.car);
+            if(ct.currentSeg == null)
+                return null;
             ct.nextSeg = ct.currentSeg.getNextSeg();
             return ct.currentSeg;
         }

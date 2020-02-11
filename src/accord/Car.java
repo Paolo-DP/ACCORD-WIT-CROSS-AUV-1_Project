@@ -34,8 +34,8 @@ public class Car {
     private double temp_orient = 0;
     public static final int THROTTLE_INCREMENT_STEP = 5;
     public static final int STEERING_INCREMENT_STEP = 10;
-    public int speedLimit=70;
-    public int minSpeedmm = 100; //mm/s
+    public int speedLimit=30;
+    public int minSpeedmm = 300; //mm/s
     
     //For Communications
     private static final byte carIDLen = 2;
@@ -44,7 +44,7 @@ public class Car {
     private static final byte SET_STEERING = 4;
     private static final byte SET_ORIENT = 7;
     private static final byte SET_ORIENT_TIMED = 8;
-    private static final int REDUNDANT_MSG_RESEND = 10;
+    private static final int REDUNDANT_MSG_RESEND = 3;
     private static final String POZYX_ONLINE = "Pozyx Tag online";
     private static final String POZYX_OFFLINE = "Pozyx Tag OFFLINE";
     private String pozyxStatus = POZYX_OFFLINE;
@@ -331,13 +331,13 @@ public class Car {
     public void printCarAttributes(){
         System.out.print("ID: " + Integer.toHexString(getID()));
         System.out.print("\tUpdated: " + isUpdated());
-        System.out.print("\tTimeStamp: " + getLastTimeStamp());
+        System.out.print("\tTimeStamp: " + (int)getLastTimeStamp());
         System.out.print("\tX = " + getXLocation());
         System.out.print("\tY = " + getYLocation());
-        System.out.print("\tOrient: " + getOrientation());
+        System.out.print("\tOrient: " + (int)getOrientation());
         System.out.print("\tOut of Bounds: " + outOfBounds);
         System.out.print("\tThrottle: " + getThrottlePower());
-        System.out.println("\tMaintain: " + (int)getMaintainOrient());
+        System.out.print("\tMaintain: " + (int)getMaintainOrient());
         System.out.println("\tTemp: " + (int)getTempOrient());
     }
 }

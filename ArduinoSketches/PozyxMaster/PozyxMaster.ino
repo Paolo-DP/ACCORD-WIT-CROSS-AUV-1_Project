@@ -39,7 +39,7 @@ byte RXBuffer[255];
 int remoteAckWaitms = 1;
 
 void setup() {
-  Serial.begin(115200);
+  Serial.begin(19200);
   while(!Serial);
   if(Pozyx.begin() == POZYX_FAILURE){
     //Serial.println(F("ERROR: Unable to connect to POZYX shield"));

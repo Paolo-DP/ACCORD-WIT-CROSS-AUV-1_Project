@@ -19,25 +19,23 @@ SoftwareSerial mySeriala(3, 2); // RX, TX
 
 int length = 4;
 uint8_t buffer[4];
-byte *data;
-byte dataArrays[4][64];
-int dataArraysIndex = 0; 
+byte data[64]; 
 byte const headerBytes[] = {0xF0, 0xF0, 0xF0};
 byte test[] = {0xF0, 0xF0, 0xF0};
 word destination;
 int const headerLength = sizeof(headerBytes) + 1; //header leading bytes + length byte
 byte lengthbyte;
 byte message[32];
+int const messagelength = 20;
 
 
 void setup(){
-  Serial.begin(115200);
+  Serial.begin(19200);
   mySeriala.begin(9600);
-  //delay(500);
+  //delay(1000);
   mySerialb.begin(9600);
   mySerialc.begin(9600);
   mySeriald.begin(9600);
-  delay(100);
   mySeriala.write("AT+CON508CB165DE33");
   delay(100);
   mySerialb.write("AT+CON508CB165E1CA");
@@ -50,19 +48,11 @@ void setup(){
 void loop(){
 
   if(messageIncoming()){
-    dataArraysIndex++;
-    dataArraysIndex%=4;
-    data = dataArrays[dataArraysIndex];
       lengthbyte = Serial.read();
       Serial.readBytes(data, lengthbyte - headerLength);
       int messageindex = 3;
       int messageLength = lengthbyte-headerLength-3;
       destination = word(data[1], data[2]);
-      for(int i=0; i<lengthbyte - headerLength; i++){
-        Serial.write(data[i]);
-        //Serial.print(" ");
-      }
-      //Serial.println();
       
       switch(data[0]){
        
@@ -100,27 +90,21 @@ void loop(){
        
           break;
     }
-    
     }
 }
-int headerCount = 0;
+
 boolean messageIncoming(){
   if(Serial.available()<headerLength){
     return false;
   }
   byte b;
-  boolean messageRec = false
-  while(Serial.available()<headerLength){
-    for(int i=headerCount; i<headerLength-1; i++){
-      //b = Serial.read();
-      b = Serial.read();
-      if(b!=headerBytes[i]){
-        break;
-      }
+  for(int i=0; i<headerLength-1; i++){
+    //b = Serial.read();
+    b = Serial.read();
+    if(b!=headerBytes[i]){
+      return false;
     }
-    if(messageRec)
-      return true;
   }
-  return messageRec;
+  return true;
 }
 
