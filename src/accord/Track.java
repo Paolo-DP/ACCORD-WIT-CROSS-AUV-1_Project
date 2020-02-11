@@ -49,16 +49,18 @@ public class Track {
                 break;
             }
         }
-        if(ct == null)
+        if(ct == null){
             ct = new CarTracker(c);
+            trackers.add(ct);
+        }
         if(getCurrentSegment(ct)==null)
             ct.isOutOfBounds=true;
         else{
             ct.isOutOfBounds=false;
             ct.distanceFromDrivingLine = ct.currentSeg.distFromCenterLine(c);
-            ct.idealAngle = ct.currentSeg.idealDirection(c);
-            ct.angleDeviation = directionDeviation(ct);
+            updateCarTrackerAngles(ct);
         }
+        ct.car.outOfBounds = ct.isOutOfBounds;
         return ct;
     }
     public CarTracker getCarTracker(Car c){
@@ -143,6 +145,15 @@ public class Track {
             deviat = -(360-deviat);
         return deviat;
     }
+    public boolean updateCarTrackerAngles(CarTracker ct){
+        if(ct.currentSeg==null)
+            return false;
+        ct.idealAngle = ct.currentSeg.idealDirection(ct.car);
+        ct.angleDeviation = Math.abs(ct.car.getOrientation() - ct.idealAngle);
+        if(ct.angleDeviation>180)
+            ct.angleDeviation = ct.angleDeviation - 360;
+        return true;
+    } 
     public double idealDirection(int xLoc, int yLoc){
         TrackSegment seg = getCurrentSegment(xLoc, yLoc);
         if(seg==null)

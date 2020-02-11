@@ -21,6 +21,7 @@ public class CarSimulator {
     
     private static final double MIN_TIME_TO_COLLISION = 1000; //ms until collision
     private static final double MAX_TIME_TO_COLLISION = 3000;
+    //Set up methods
     public void addCar(Car c){
         carList.add(c);
         
@@ -49,31 +50,58 @@ public class CarSimulator {
     public void setTrack(Track t){
         track = t;
     }
+    
     public void simulate(){
         if(track!=null && carList.size()>0){
             for(int i=0; i<carList.size(); i++){
                 Car c = carList.get(i);
-                c.updateLocation();
-                //int distCLine = track.distfromCenterLine(c);
-                /*
-                int steer;
-                if(Math.abs(distCLine)>minDistanceToCorrect){
-                    steer = 127;
-                    if(distCLine>0);
-                        steer *= -1;
-                    
+                if(c.updateLocation()){
+                    CarTracker ct = track.getCarTracker(c);
+                    doSteering(c, ct);
+                    doThrottle(c, ct);
                 }
-                else
-                    steer=0;
-                */
-                //c.adjustSteering(computeNextSteering(c));
+                /*
                 c.maintainOrientation(computeNextOrientation(c));
                 double[] orientTimed = computeSteerCompensateTime(c);
                 c.maintainOrientationTimed(orientTimed[0], orientTimed[1]);
                 c.adjustThrottle(computeNextThrottle(c));
+                */
             }
         }
     }
+    
+    //manuver handling methods
+    private void doSteering(Car c, CarTracker tracker){
+        String segShape = tracker.currentSeg.getSegShape();
+        if(segShape == TrackSegment.SEGSHAPE_LINEAR){
+            c.maintainOrientation(computeNextOrientation(c));
+            double[] orientTimed = computeSteerCompensateTime(c);
+            c.maintainOrientationTimed(orientTimed[0], orientTimed[1]);
+        }
+        else if(segShape == TrackSegment.SEGSHAPE_90DEGTURN){
+            double exitDirection = tracker.currentSeg.idealDirection(
+                    tracker.currentSeg.getExitXLocation(), 
+                    tracker.currentSeg.getExitYLocation());
+            double deviat = Math.abs(c.getOrientation()-exitDirection);
+            if(deviat>180)
+                deviat = -(360-deviat);
+            if(Math.abs(c.getOrientation()-exitDirection) > minAngleToCorrect){
+                c.maintainOrientation(exitDirection);
+            }
+            else{
+                double[] orientTimed = computeSteerCompensateTime(c);
+                c.maintainOrientationTimed(orientTimed[0], orientTimed[1]);
+            }
+        }
+    }
+    private void doThrottle(Car c, CarTracker tracker){
+        if(tracker.isOutOfBounds)
+            c.adjustThrottle(0);
+        else{
+            c.adjustThrottle(computeNextThrottle(c));
+        }
+    }
+    //computation methods
     private int computeNextSteering(Car c){
         int steer_dist = 0;
         int steer_orient = 0;
@@ -128,13 +156,16 @@ public class CarSimulator {
         return followOrient;
     }
     private double[] computeSteerCompensateTime(Car c){
-        double[] data = new double[2];
-        double time = 0;
         int distCLine = track.distfromCenterLine(c);
         double followOrient = track.idealDirection(c.getXLocation(), c.getYLocation());
-        time = (distCLine*1000)/c.minSpeedmm;
-        if(Math.abs(distCLine)>minDistanceToCorrect){
-            
+        
+        return computeSteerCompensateTime(distCLine, followOrient, c.minSpeedmm);
+    }
+    private double[] computeSteerCompensateTime(int distCLine, double followOrient, int speed){
+        double[] data = new double[2];
+        double time = 0;
+        time = (distCLine*1000)/speed;
+        if(Math.abs(distCLine)>minDistanceToCorrect){            
             if(distCLine>0)
                 followOrient += orientCorrection;
             else
@@ -148,10 +179,8 @@ public class CarSimulator {
         int throttle = c.getThrottlePower();
         double frontCollision = checkFront(c);
         double RearCollision = checkRear(c);
-        if(c.outOfBounds)
-            return c.getThrottlePower()-Car.THROTTLE_INCREMENT_STEP;
-        else
-            return throttle+Car.THROTTLE_INCREMENT_STEP;
+        
+        return throttle+Car.THROTTLE_INCREMENT_STEP;
         /*else if(frontCollision == -1){
             return throttle += Car.THROTTLE_INCREMENT_STEP;
         }

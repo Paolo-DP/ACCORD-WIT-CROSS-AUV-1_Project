@@ -19,21 +19,25 @@ public class Car {
     private int xdimen = 0;
     private int ydimen = 0;
     private int speed = 0;
-    
     private double xAxisCalib = 0;
     
+    //car stati
+    public boolean outOfBounds = false;
+    public final int MVSTATUS_NORMAL = 1;
+    public final int MVSTATUS_WAIT_UNTIL_ORIENT = 2;
+    private int movementStatus = MVSTATUS_NORMAL;
+    
+    //throttle and steering control
     private int steering_power = 0;
     private int throttle_power = 0;
     private double maintain_orient = 0;
     private double temp_orient = 0;
-    
-    public boolean outOfBounds = false;
-    
     public static final int THROTTLE_INCREMENT_STEP = 5;
     public static final int STEERING_INCREMENT_STEP = 10;
     public int speedLimit=70;
     public int minSpeedmm = 100; //mm/s
     
+    //For Communications
     private static final byte carIDLen = 2;
     private static final byte minMessageLen = 2;
     private static final byte SET_SPEED = 2;
@@ -46,6 +50,7 @@ public class Car {
     private String pozyxStatus = POZYX_OFFLINE;
     private PozyxSerialComm pozyx = null;
     
+    //positioning and movement data
     private final int historyLength = 5;
     private int[] xLocHistory = new int[historyLength];
     private int[] yLocHistory = new int[historyLength];
@@ -107,6 +112,7 @@ public class Car {
     public void updateOrientation(){
         updateLocation();
     }
+    
     public int getID(){
         return carID;
     }
@@ -166,6 +172,9 @@ public class Car {
     }
     public double getLastTimeStamp(){
         return timeStampHist[0];
+    }
+    public int getMovementStatus(){
+        return movementStatus;
     }
     
     private void calculateSpeed(){
@@ -289,6 +298,7 @@ public class Car {
     public boolean steeringDecrement(){
         return adjustThrottle(steering_power - STEERING_INCREMENT_STEP);
     }
+    
     public void setPozyxComm(PozyxSerialComm pozyx){
         this.pozyx = pozyx;
     }

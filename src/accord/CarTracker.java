@@ -29,9 +29,9 @@ package accord;
  */
 public class CarTracker {
     public Car car;
-    public TrackSegment currentSeg;
-    public TrackSegment nextSeg;
-    public boolean isOutOfBounds = false;
+    public TrackSegment currentSeg = null;
+    public TrackSegment nextSeg = null;
+    public boolean isOutOfBounds = true;
     public int distanceFromDrivingLine = 0;
     public double angleDeviation = 0;
     public double idealAngle = 0;

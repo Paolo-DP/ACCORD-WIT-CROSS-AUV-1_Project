@@ -428,17 +428,46 @@ public class ModuleUnitTests {
         tr.complete();
         CarSimulator carSim = new CarSimulator();
         carSim.setTrack(tr);
-        /*PozyxSerialComm pozyx = new PozyxSerialComm();
-        for(int i=0; i<anchorIDs.length; i++){
-         /   pozyx.addAnchor(anchorIDs[i], anchorX[i], anchorY[i], anchorZ[i]);
-        }
-        pozyx.addTag(c.getID());
-        pozyx.finalizeDeviceList();
-        */
+        
         PozyxSerialComm pozyx = setUpPozyxDevices(tags);
         Car[] cars = new Car[tags.length];
+                
+        for(int i=0; i<cars.length; i++){
+            cars[i] = new Car(tags[i], pozyx);
+            carSim.addCar(cars[i]);
+            //cars[i].alignXAxis();
+        }
+        Scanner sc = new Scanner(System.in);
+        System.out.println("Allign all cars with X Axis and hit enter...");
+        sc.nextLine();
+        carSim.allignXAxis();
+        while(true){
+            for(int i=0; i<cars.length; i++){
+                carSim.simulate();
+                if(cars[i].isUpdated()){
+                    cars[i].printCarAttributes();
+                }
+                
+            }
+        }
+    }
+    public static void testCarSimulationStraightTurn(){
+        Track tr = new Track();
+        TrackSegment seg = new TrackSegment();
+        seg.createLineSegment(7000, 600, 0);
+        seg.setAbsoluteLocation(0, 2100);
+        tr.addTrackSegment(seg);
+        seg = new TrackSegment();
+        seg.create90DegTurn(300, true, 600, 0);
+        tr.addTrackSegment(seg);
+        tr.complete();
         
+        CarSimulator carSim = new CarSimulator();
+        carSim.setTrack(tr);
         
+        PozyxSerialComm pozyx = setUpPozyxDevices(tags);
+        Car[] cars = new Car[tags.length];
+                
         for(int i=0; i<cars.length; i++){
             cars[i] = new Car(tags[i], pozyx);
             carSim.addCar(cars[i]);
