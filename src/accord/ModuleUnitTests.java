@@ -12,10 +12,10 @@ import java.util.Scanner;
  * @author Paolo
  */
 public class ModuleUnitTests {
-    private static int[] tags = {0x6a1a};
-    private static int[] anchorIDs = {0x6735, 0x6e38, 0x6e3c, 0x6717}; 
-    private static int[] anchorX = {0, 9000, 0, 9000};
-    private static int[] anchorY = {0, 0, 3600, 3600};
+    private static int[] tags = {0x6a1a, 0x6a40, 0x6a3f, 0x6743};
+    private static int[] anchorIDs = {0x6e38, 0x6e3c, 0x6717, 0x6735}; 
+    private static int[] anchorX = {0, 8400, 0, 8400};
+    private static int[] anchorY = {0, 0, 4200, 4200};
     private static int[] anchorZ = {0, 0, 0, 0};
     
         
@@ -78,7 +78,7 @@ public class ModuleUnitTests {
             System.out.println("Distance from point (5,5): " + testSegment.distFromCenterLine(5, 5));
             System.out.print("\n\n");
         }
-    }
+}
     public static void testSimpleOvalTrack(){
         Track tr = createSimpleOvalTrack(1500, 500, 100, false,0,0);
         int[][] testdata = {
@@ -397,7 +397,7 @@ public class ModuleUnitTests {
             System.out.println("Set Orientation>");
             orient = sc.nextDouble();
             for(int i=0; i<cars.length; i++)
-                cars[i].maintainOrientation(orient);
+                cars[i].maintainOrientation(orient, false);
         }
     }
     public static void testCarSetOrientationTimed(){
@@ -422,8 +422,8 @@ public class ModuleUnitTests {
     public static void testCarSimulationLine(){
         Track tr = new Track();
         TrackSegment seg = new TrackSegment();
-        seg.createLineSegment(7000, 600, 0);
-        seg.setAbsoluteLocation(0, 2100);
+        seg.createLineSegment((anchorX[3]/2)-300, 3000, 0);
+        seg.setAbsoluteLocation(0, anchorY[3]/2);
         tr.addTrackSegment(seg);
         tr.complete();
         CarSimulator carSim = new CarSimulator();
@@ -444,9 +444,9 @@ public class ModuleUnitTests {
         while(true){
             for(int i=0; i<cars.length; i++){
                 carSim.simulate();
-                if(cars[i].isUpdated()){
+                //if(cars[i].isUpdated()){
                     cars[i].printCarAttributes();
-                }
+                //}
                 
             }
         }
@@ -454,12 +454,13 @@ public class ModuleUnitTests {
     public static void testCarSimulationStraightTurn(){
         Track tr = new Track();
         TrackSegment seg = new TrackSegment();
-        seg.createLineSegment(anchorX[3]/2, 600, 0);
+        seg.createLineSegment(anchorX[3]/2, 3000, 0);
         seg.setAbsoluteLocation(0, anchorY[3]/2);
         tr.addTrackSegment(seg);
         seg = new TrackSegment();
-        seg.create90DegTurn(1000, true, 1000, 0);
+        seg.create90DegTurn(650, true, 1000, 0);
         tr.addTrackSegment(seg);
+        tr.setTrackMargin(0);
         tr.complete();
         
         CarSimulator carSim = new CarSimulator();
@@ -471,7 +472,8 @@ public class ModuleUnitTests {
         for(int i=0; i<cars.length; i++){
             cars[i] = new Car(tags[i], pozyx);
             carSim.addCar(cars[i]);
-            //cars[i].alignXAxis();
+            cars[i].updateLocation();
+            cars[i].alignXAxis();
         }
         Scanner sc = new Scanner(System.in);
         System.out.println("Allign all cars with X Axis and hit enter...");
@@ -593,10 +595,19 @@ public class ModuleUnitTests {
         pozyx.setVerboseOutput(false);
         for(int i=0; i<anchorIDs.length; i++){
             pozyx.addAnchor(anchorIDs[i], anchorX[i], anchorY[i], anchorZ[i]);
+            try{
+                Thread.sleep(100);
+            }catch(Exception e){}
         }
         for(int i=0; i<tags.length; i++)
             pozyx.addTag(tags[i]);
+        try{
+                Thread.sleep(100);
+            }catch(Exception e){}
         pozyx.finalizeDeviceList();
+        try{
+                Thread.sleep(100);
+            }catch(Exception e){}
         return pozyx;
     }
     

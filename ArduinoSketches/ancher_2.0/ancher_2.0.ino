@@ -19,7 +19,7 @@ SoftwareSerial mySeriala(3, 2); // RX, TX
 
 int length = 4;
 uint8_t buffer[4];
-byte data[64]; 
+byte data[256]; 
 byte const headerBytes[] = {0xF0, 0xF0, 0xF0};
 byte test[] = {0xF0, 0xF0, 0xF0};
 word destination;

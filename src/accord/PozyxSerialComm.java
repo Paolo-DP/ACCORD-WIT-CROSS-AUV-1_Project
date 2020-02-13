@@ -15,14 +15,15 @@ import java.util.Arrays;
 public class PozyxSerialComm {
     private boolean verboseOutput = false;
     
-    public static final int baudRate = 19200;
+    public static final int POZYX_baudRate = 115200;
+    public static final int BLE_baudRate = 19200;
     private static final int ARDUINO_RESET_WAIT = 3000;
     private static final int ackWaitAttempts = 10;
     private static final int WAIT_FOR_BYTES_DELAY = 10;
     private static final int waitForDataAttempts = 20;
     private static final int MAX_FRAME_LENGTH = 32;
     private static final int POZYX_POSITIONING_DELAY = 20;
-    private static final int WAIT_TO_FLUSH_DELAY = ((32 * 8 * 1000) / baudRate) + POZYX_POSITIONING_DELAY;
+    private static final int WAIT_TO_FLUSH_DELAY = ((32 * 8 * 1000) / POZYX_baudRate) + POZYX_POSITIONING_DELAY;
             
     private static final byte[] frameHeader = {(byte)0xF0, (byte)0xF0, (byte)0xF0};
     private static final int frameHeaderLen = frameHeader.length + 1;
@@ -65,12 +66,12 @@ public class PozyxSerialComm {
         System.out.println("Starting Serial Ports...");
         comPort = ports[selectport];
         boolean succPozyx = comPort.openPort();
-        comPort.setBaudRate(baudRate);
+        comPort.setBaudRate(POZYX_baudRate);
         comPort.setComPortTimeouts(SerialPort.TIMEOUT_READ_SEMI_BLOCKING | SerialPort.TIMEOUT_WRITE_BLOCKING, 500, 0);
         
         comPortBLE = ports[selectBlePort];
         boolean succBLE = comPortBLE.openPort();
-        comPortBLE.setBaudRate(baudRate);
+        comPortBLE.setBaudRate(BLE_baudRate);
         comPortBLE.setComPortTimeouts(SerialPort.TIMEOUT_READ_SEMI_BLOCKING | SerialPort.TIMEOUT_WRITE_BLOCKING, 500, 0);
         
         if(succPozyx && succBLE){
@@ -89,7 +90,7 @@ public class PozyxSerialComm {
         comPort.closePort();
         comPort = port;
         boolean open = comPort.openPort();
-        comPort.setBaudRate(baudRate);
+        comPort.setBaudRate(POZYX_baudRate);
         comPort.setComPortTimeouts(SerialPort.TIMEOUT_READ_SEMI_BLOCKING | SerialPort.TIMEOUT_WRITE_BLOCKING, 500, 0);
         return open;
     }
@@ -97,7 +98,7 @@ public class PozyxSerialComm {
         comPortBLE.closePort();
         comPortBLE = port;
         boolean open = comPortBLE.openPort();
-        comPortBLE.setBaudRate(baudRate);
+        comPortBLE.setBaudRate(BLE_baudRate);
         comPortBLE.setComPortTimeouts(SerialPort.TIMEOUT_READ_SEMI_BLOCKING | SerialPort.TIMEOUT_WRITE_BLOCKING, 500, 0);
         return open;
     }

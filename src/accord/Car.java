@@ -33,9 +33,9 @@ public class Car {
     private int throttle_power = 0;
     private double maintain_orient = 0;
     private double temp_orient = 0;
-    public static final int THROTTLE_INCREMENT_STEP = 5;
-    public static final int STEERING_INCREMENT_STEP = 10;
-    public int speedLimit=30;
+    public int speedLimit=120;
+    public int THROTTLE_INCREMENT_STEP = speedLimit/5;
+    public int STEERING_INCREMENT_STEP = 10;
     public int minSpeedmm = 300; //mm/s
     
     //For Communications
@@ -45,7 +45,7 @@ public class Car {
     private static final byte SET_STEERING = 4;
     private static final byte SET_ORIENT = 7;
     private static final byte SET_ORIENT_TIMED = 8;
-    private static final int REDUNDANT_MSG_RESEND = 3;
+    private static final int REDUNDANT_MSG_RESEND = 0;
     private static final String POZYX_ONLINE = "Pozyx Tag online";
     private static final String POZYX_OFFLINE = "Pozyx Tag OFFLINE";
     private String pozyxStatus = POZYX_OFFLINE;
@@ -245,19 +245,24 @@ public class Car {
         return true;
     }
     private int redundant_orient = 0;
-    public boolean maintainOrientation(double orient){
-        if(true || redundant_orient==REDUNDANT_MSG_RESEND){
+    public boolean maintainOrientation(double orient, boolean overwrite){
+        if(true || redundant_orient>=REDUNDANT_MSG_RESEND){
             maintain_orient = orient;
+            temp_orient = 0;
             double orientUncalib = (orient + xAxisCalib)%360;
             int orientInt = (int)((360-orientUncalib)*5759)/360;
             //System.out.println("Uncalib = " + orientUncalib + "\tInt = " + orientInt);
             byte[] orientdata = ByteBuffer.allocate(2).putShort((short)(orientInt)).array();
             byte[] id = ByteBuffer.allocate(carIDLen).putShort((short)(carID)).array();
-            byte[] message = new byte[carIDLen + minMessageLen +2];            
+            byte[] message = new byte[carIDLen + minMessageLen +3];            
             System.arraycopy(id, 0, message, 0, id.length);
             message[carIDLen] = minMessageLen+2;
             message[carIDLen+1] = SET_ORIENT;
             System.arraycopy(orientdata, 0, message, carIDLen + minMessageLen, orientdata.length);
+            if(overwrite)
+                message[carIDLen + minMessageLen + 2] = (byte)0xff;
+            else
+                message[carIDLen + minMessageLen + 2] = 0;
             pozyx.sendCarCommand(message, false);
             redundant_orient = 0;
             return true;
@@ -269,7 +274,7 @@ public class Car {
     }
     private int redundant_orient_timed = 0;
     public boolean maintainOrientationTimed(double orient, double time){
-        if(true || redundant_orient_timed==REDUNDANT_MSG_RESEND){
+        if(true || redundant_orient_timed>=REDUNDANT_MSG_RESEND){
             temp_orient = orient;
             double orientUncalib = (orient + xAxisCalib)%360;
             int orientInt = (int)((360-orientUncalib)*5759)/360;

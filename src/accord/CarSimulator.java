@@ -75,7 +75,7 @@ public class CarSimulator {
         if(!tracker.isOutOfBounds){
             String segShape = tracker.currentSeg.getSegShape();
             if(segShape == TrackSegment.SEGSHAPE_LINEAR){
-                c.maintainOrientation(computeNextOrientation(c));
+                c.maintainOrientation(computeNextOrientation(c), false);
                 double[] orientTimed = computeSteerCompensateTime(c);
                 c.maintainOrientationTimed(orientTimed[0], orientTimed[1]);
             }
@@ -86,8 +86,8 @@ public class CarSimulator {
                 double deviat = Math.abs(c.getOrientation()-exitDirection);
                 if(deviat>180)
                     deviat = -(360-deviat);
-                if(Math.abs(c.getOrientation()-exitDirection) > minAngleToCorrect){
-                    c.maintainOrientation(exitDirection);
+                if(Math.abs(deviat) > minAngleToCorrect){
+                    c.maintainOrientation(exitDirection, true);
                 }
                 else{
                     double[] orientTimed = computeSteerCompensateTime(c);
@@ -182,7 +182,7 @@ public class CarSimulator {
         double frontCollision = checkFront(c);
         double RearCollision = checkRear(c);
         
-        return throttle+Car.THROTTLE_INCREMENT_STEP;
+        return throttle+c.THROTTLE_INCREMENT_STEP;
         /*else if(frontCollision == -1){
             return throttle += Car.THROTTLE_INCREMENT_STEP;
         }
