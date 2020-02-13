@@ -6,6 +6,7 @@
 package accord;
 
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 import vehicle.VehicleProperty;
 /**
  *
@@ -70,24 +71,25 @@ public class Car {
             //if(coor.x>=0  && coor.y>=0 && coor.timeStamp!=timeStampHist[0]){
             if(coor.timeStamp!=timeStampHist[0]){
             //if(true){
-                xloc = ((int)coor.x + xloc)/2;
-                yloc = ((int)coor.y + yloc)/2;
-                orient = ((5759-coor.eulerAngles[0])*360)/5759;
-
                 adjustHistory();
-                xLocHistory[0] =  xloc;
-                yLocHistory[0] =  yloc;
-                orientHistory[0] =  orient;
+                xLocHistory[0] =  ((int)coor.x + xloc)/2;
+                yLocHistory[0] =  ((int)coor.y + yloc)/2;
+                orientHistory[0] =  ((5759-coor.eulerAngles[0])*360)/5759;
                 timeStampHist[0] =  coor.timeStamp;
+                
+                xloc = (xLocHistory[0] + xLocHistory[1])/2;
+                yloc = (yLocHistory[0] + yLocHistory[1])/2;
+                orient = orientHistory[0];
+                
                 calculateSpeed();
                 updated = true;
                 return true;
             }
             else
                 updated = false;
-                adjustSteering(0);
-                throttleDecrement();
-                return false;
+                //adjustSteering(0);
+                //throttleDecrement();
+            return false;
         }
         else {
             updated = false;
@@ -148,11 +150,14 @@ public class Car {
         deets.carID = carID;
         deets.xloc = xloc;
         deets.yloc = yloc;
-        deets.orient = orient;
-        deets.speed = speed;
+        deets.orient = getOrientation();
+        deets.speed = getSpeed();
         deets.xdimen = xdimen;
         deets.ydimen = ydimen;
-                
+        deets.xLocHistory = Arrays.copyOf(xLocHistory, xLocHistory.length);
+        deets.yLocHistory = Arrays.copyOf(yLocHistory, yLocHistory.length);
+        deets.orientHistory = Arrays.copyOf(orientHistory, orientHistory.length);
+        deets.timeStampHist = Arrays.copyOf(timeStampHist, timeStampHist.length);
         return deets;
     }
     public VehicleProperty getVehicleProperty(){
@@ -327,6 +332,10 @@ public class Car {
         xdimen = xdim;
         ydimen = ydim;
         this.speed = speed;
+    }
+    public void setLocation(int x, int y, double time){
+        xloc = x;
+        yloc = y;
     }
     public void printCarAttributes(){
         System.out.print("ID: " + Integer.toHexString(getID()));

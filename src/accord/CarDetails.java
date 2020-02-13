@@ -17,4 +17,8 @@ public class CarDetails {
     public int xdimen = 0;
     public int ydimen = 0;
     public double speed = 0;
+    public int[] xLocHistory = null;
+    public int[] yLocHistory = null;
+    public double[] orientHistory = null;
+    public double[] timeStampHist = null;
 }

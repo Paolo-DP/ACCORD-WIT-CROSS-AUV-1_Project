@@ -206,6 +206,17 @@ public class CarSimulator {
         return timeToCollision;
     }
     
+    private final int MAX_LOCATION_SPIKE = 1000;
+    private boolean isValidData(Car car, CarTracker ct){
+        boolean valid = true;
+        CarDetails deets = car.getFullDetails();
+        
+        return valid;
+    }
+    private void estimateCarLocation(Car car, CarTracker ct){
+        
+    }
+    
     public void setVerboseOutput(boolean v){
         verboseOutput = v;
     }

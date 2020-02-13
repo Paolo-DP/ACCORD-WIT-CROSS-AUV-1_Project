@@ -80,9 +80,10 @@ public class PozyxSerialComm {
             System.out.println("ERROr: Failed to open Serial ports");
         
         try{
+            System.out.println("Waiting for Arduinos to initialize...");
             Thread.sleep(ARDUINO_RESET_WAIT); //wait for Arduino to Reset
         }catch(Exception e){}
-        
+        System.out.println("Commuications READY!");
     }
     public boolean setSerialPortPozyx(SerialPort port){
         comPort.closePort();
