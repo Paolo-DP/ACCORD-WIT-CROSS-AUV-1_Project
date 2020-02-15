@@ -18,7 +18,7 @@ public class Track {
     ArrayList<CarTracker> trackers = new ArrayList<CarTracker>();
     
     double trackAngleOffset = 0;
-    
+    private int[][] trackbounds = new int[2][2];
     public void addTrackSegment(TrackSegment seg){
         if(!segments.isEmpty())
             segments.get(segments.size()-1).connectNextSegment(seg);
@@ -246,5 +246,15 @@ public class Track {
             
         }
         return bounds;
+    }
+    public void setTrackBounds(int x1, int y1, int x2, int y2){
+        trackbounds[0][0] = x1;
+        trackbounds[0][1] = y1;
+        trackbounds[1][0] = x2;
+        trackbounds[1][1] = y2;
+    }
+    public boolean isWithinTrack(int x, int y){
+        return (x >= trackbounds[0][0] && x <= trackbounds[1][0] &&
+                y >= trackbounds[0][1] && y <= trackbounds[1][1]);
     }
 }

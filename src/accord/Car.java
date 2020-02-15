@@ -63,13 +63,17 @@ public class Car {
     Car(int ID, PozyxSerialComm pozyx){
         carID = ID;
         this.pozyx = pozyx;
+        Arrays.fill(xLocHistory, 0);
+        Arrays.fill(yLocHistory, 0);
+        Arrays.fill(orientHistory, 0);
+        Arrays.fill(timeStampHist, 0);
     }
     public boolean updateLocation(){
         Coordinates coor = pozyx.getCoordinates(carID);
         if(coor!=null){
             pozyxStatus = POZYX_ONLINE;
             //if(coor.x>=0  && coor.y>=0 && coor.timeStamp!=timeStampHist[0]){
-            if(coor.timeStamp!=timeStampHist[0]){
+            if(coor.timeStamp>timeStampHist[0]){
             //if(true){
                 adjustHistory();
                 xLocHistory[0] =  ((int)coor.x + xloc)/2;
@@ -111,9 +115,7 @@ public class Car {
             return false;
         }
     }
-    public void updateOrientation(){
-        updateLocation();
-    }
+    
     
     public int getID(){
         return carID;

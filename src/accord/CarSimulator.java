@@ -15,6 +15,8 @@ public class CarSimulator {
     private int minDistanceToCorrect = 70;
     private double minAngleToCorrect = 10;
     private double orientCorrection = 15;
+    private double timePredictionSet = 500; //prediction of car location time step (ms)
+    private final int MAX_LOCATION_SPIKE = 1000;
     private boolean verboseOutput = false;
     ArrayList <Car> carList = new ArrayList<Car>();
     Track track = null;
@@ -24,7 +26,7 @@ public class CarSimulator {
     //Set up methods
     public void addCar(Car c){
         carList.add(c);
-        
+        c.updateLocation();
     }
     public void allignXAxis(){
         for(int i=0; i<carList.size(); i++){
@@ -56,6 +58,8 @@ public class CarSimulator {
             for(int i=0; i<carList.size(); i++){
                 Car c = carList.get(i);
                 if(c.updateLocation()){
+                    if(!isValidData(c))
+                        estimateCarLocation(c, null);
                     CarTracker ct = track.updateCarTracker(c);
                     doSteering(c, ct);
                     doThrottle(c, ct);
@@ -206,14 +210,26 @@ public class CarSimulator {
         return timeToCollision;
     }
     
-    private final int MAX_LOCATION_SPIKE = 1000;
-    private boolean isValidData(Car car, CarTracker ct){
-        boolean valid = true;
+    private boolean isValidData(Car car){
+        if(car == null)
+            return false;
         CarDetails deets = car.getFullDetails();
-        
-        return valid;
+        return isValidData(deets);
     }
-    private void estimateCarLocation(Car car, CarTracker ct){
+    private boolean isValidData(CarDetails deets){
+        if(deets == null)
+            return false;
+        double deltaX = (deets.xLocHistory[0]-deets.xLocHistory[1])/(deets.timeStampHist[0]-deets.timeStampHist[1]);
+        double deltaY = (deets.yLocHistory[0]-deets.yLocHistory[1])/(deets.timeStampHist[0]-deets.timeStampHist[1]);
+        return (Math.sqrt((deltaX*deltaX)+(deltaY*deltaY)) < MAX_LOCATION_SPIKE);
+    }
+    private void estimateCarLocation(Car car, CarDetails deets){
+        if(deets == null)
+            deets = car.getFullDetails();
+        
+        int startIndex = deets.timeStampHist.length - 1;
+        while(deets.timeStampHist[startIndex]<=0)
+            startIndex++;
         
     }
     
