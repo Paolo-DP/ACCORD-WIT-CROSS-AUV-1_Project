@@ -21,4 +21,7 @@ public class CarDetails {
     public int[] yLocHistory = null;
     public double[] orientHistory = null;
     public double[] timeStampHist = null;
+    
+    public boolean isValidated = false;
+    public boolean[] isValidData = null;
 }

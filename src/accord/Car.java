@@ -33,7 +33,7 @@ public class Car {
     private int throttle_power = 0;
     private double maintain_orient = 0;
     private double temp_orient = 0;
-    public int speedLimit=120;
+    public int speedLimit=50;
     public int THROTTLE_INCREMENT_STEP = speedLimit/5;
     public int STEERING_INCREMENT_STEP = 10;
     public int minSpeedmm = 300; //mm/s

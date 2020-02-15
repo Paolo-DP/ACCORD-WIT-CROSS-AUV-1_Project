@@ -226,11 +226,24 @@ public class CarSimulator {
     private void estimateCarLocation(Car car, CarDetails deets){
         if(deets == null)
             deets = car.getFullDetails();
-        
+        if(!deets.isValidated)
+            validateDataHistory(deets);
         int startIndex = deets.timeStampHist.length - 1;
         while(deets.timeStampHist[startIndex]<=0)
-            startIndex++;
+            startIndex--;
         
+    }
+    
+    private void validateDataHistory(CarDetails deets){
+        boolean[] valid = new boolean[deets.timeStampHist.length];
+        for(int i=valid.length-1; i>=0; i--){
+            valid[i] = false;
+        }
+        for(int i=0; i<valid.length; i++){
+            valid[i] = (deets.timeStampHist[i] > 0) && 
+                    (deets.timeStampHist[i] > deets.timeStampHist[i+1]) &&
+                    track.isWithinTrack(deets.xLocHistory[i], deets.yLocHistory[i]);       
+        }
     }
     
     public void setVerboseOutput(boolean v){
