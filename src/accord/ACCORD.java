@@ -59,15 +59,18 @@ public class ACCORD {
         //ModuleUnitTests.testPozyxAck();
         //ModuleUnitTests.testPozyxLocalization();
         
+        //ModuleUnitTests.testCarSpeedCalculations();
+        
         //ModuleUnitTests.testCoordinatesPolling();
         //ModuleUnitTests.testCarSetOrientation();
         //ModuleUnitTests.testCarSetOrientationTimed();
         //ModuleUnitTests.testCarLocationPolling();
-        ModuleUnitTests.testCarSimulationLine();
+        //ModuleUnitTests.testCarSimulationLine();
         //ModuleUnitTests.testCarSimulationStraightTurn();
         //ModuleUnitTests.testCarSimulationOval();
         //ModuleUnitTests.testCarCommand();
         
         //ModuleUnitTests.testVisualizer();
+        ModuleUnitTests.testTimeSyncing();
     }
 }

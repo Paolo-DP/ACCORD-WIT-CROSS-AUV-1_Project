@@ -6,6 +6,7 @@
 package accord;
 import com.fazecast.jSerialComm.*;
 import java.nio.ByteBuffer;
+import java.time.LocalTime;
 import java.util.Scanner;
 import java.util.Arrays;
 /**
@@ -14,6 +15,8 @@ import java.util.Arrays;
  */
 public class PozyxSerialComm {
     private boolean verboseOutput = false;
+    
+    private LocalTime syncTime = LocalTime.now();
     
     public static final int POZYX_baudRate = 115200;
     public static final int BLE_baudRate = 19200;
@@ -102,6 +105,20 @@ public class PozyxSerialComm {
         comPortBLE.setComPortTimeouts(SerialPort.TIMEOUT_READ_SEMI_BLOCKING | SerialPort.TIMEOUT_WRITE_BLOCKING, 500, 0);
         return open;
     }
+    
+    public boolean syncArduinoTime(){
+        return true;
+    }
+    public LocalTime getTimeSynced(){
+        return syncTime;
+    }
+    public double getTimeSyncedMillis(){
+        return syncTime.toNanoOfDay() * 1000;
+    }
+    public double getTimeSyncedNanos(){
+        return syncTime.toNanoOfDay();
+    }
+    
     
     public boolean addAnchor(int deviceID, int xLoc, int yLoc, int zLoc){
         byte[] frame = new byte[minFrameLength + 14];

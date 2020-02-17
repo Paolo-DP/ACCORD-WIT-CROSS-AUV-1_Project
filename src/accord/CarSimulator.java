@@ -16,7 +16,7 @@ public class CarSimulator {
     private double minAngleToCorrect = 10;
     private double orientCorrection = 15;
     private double timePredictionSet = 500; //prediction of car location time step (ms)
-    private final int MAX_LOCATION_SPIKE = 1000;
+    private final int MAX_LOCATION_SPIKE = 500000;
     private boolean verboseOutput = false;
     ArrayList <Car> carList = new ArrayList<Car>();
     Track track = null;
@@ -232,6 +232,8 @@ public class CarSimulator {
         while(deets.timeStampHist[startIndex]<=0)
             startIndex--;
         
+        
+        double timeLookAhead = car.timeSinceLastUpdate();
     }
     
     private void validateDataHistory(CarDetails deets){

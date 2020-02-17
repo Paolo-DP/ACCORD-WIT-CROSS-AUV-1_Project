@@ -50,9 +50,7 @@ void setup() {
 }
 
 void loop() {
-  if(messageIncoming()){
-    processMessage();
-  }
+  comms();
   if(devicesReady){
     updatePosition(currentTag);
     currentTag++;
@@ -60,11 +58,19 @@ void loop() {
   }
 }
 
+void comms(){
+  while(messageIncoming()){
+    processMessage();
+  }
+}
+
 boolean updatePosition(short tagIndex){
   coordinates_t position;
   sensor_raw_t sensor_raw;
   int status1 = Pozyx.doRemotePositioning(tags[tagIndex], &position, dimension, height, algorithm);
+  comms();
   int status2 = Pozyx.getRawSensorData(&sensor_raw, tags[tagIndex]);
+  comms();
   int32_t t = millis();
   if(status1 == POZYX_SUCCESS && status2 == POZYX_SUCCESS){
     tags_x[tagIndex] = (int32_t)position.x;
@@ -81,10 +87,11 @@ boolean updatePosition(short tagIndex){
       Serial.println("Sensor Data Error");
     return false;
   }
+  comms();
 }
 
 boolean messageIncoming(){
-  if(Serial.available()<headerLength-1){
+  if(Serial.available()<headerLength){
     return false;
   }
   byte b;
@@ -100,6 +107,7 @@ boolean messageIncoming(){
 
 void processMessage(){
   //delay(100);
+  uint32_t now;
   int frameLength = 0;
   int timeOut=50;
   while(!Serial.available()&&timeOut>0){
@@ -119,6 +127,18 @@ void processMessage(){
   
   
   switch(frameType){
+    case 133:
+      sendAck(frameType);
+      Serial.write(headerBytes, headerLength-1);
+      Serial.write(minFrameLength + 4);
+      Serial.write(134);
+      now = millis();
+      Serial.write(now>>24);
+      Serial.write(now>>16);
+      Serial.write(now>>8);
+      Serial.write(now);
+      
+      break;
     case 1: //send message to Pozyx Device
       uint16_t destID;
       destID = ((uint16_t)RXBuffer[1])<<8 | (uint16_t)RXBuffer[2];

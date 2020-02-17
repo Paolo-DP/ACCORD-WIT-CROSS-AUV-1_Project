@@ -19,7 +19,7 @@ public class Car {
     private double orient = 0;
     private int xdimen = 0;
     private int ydimen = 0;
-    private int speed = 0;
+    private double speed = 0;
     private double xAxisCalib = 0;
     
     //car stati
@@ -59,7 +59,12 @@ public class Car {
     private double[] timeStampHist = new double[historyLength];
     
     public boolean verbose = false;
-    
+    Car(){
+        Arrays.fill(xLocHistory, 0);
+        Arrays.fill(yLocHistory, 0);
+        Arrays.fill(orientHistory, 0);
+        Arrays.fill(timeStampHist, 0);
+    }
     Car(int ID, PozyxSerialComm pozyx){
         carID = ID;
         this.pozyx = pozyx;
@@ -132,7 +137,7 @@ public class Car {
         else
             return orient - xAxisCalib;
     }
-    public int getSpeed(){
+    public double getSpeed(){
         return speed;
     }
     public int getSteeringPower(){
@@ -177,6 +182,9 @@ public class Car {
     public boolean isUpdated(){
         return updated;
     }
+    public double timeSinceLastUpdate(){
+        return 500;
+    }
     public double getLastTimeStamp(){
         return timeStampHist[0];
     }
@@ -184,12 +192,19 @@ public class Car {
         return movementStatus;
     }
     
-    private void calculateSpeed(){
+    public double calculateSpeed(){
         if(timeStampHist[0] - timeStampHist[timeStampHist.length-1] == 0)
-            return;
-        int xspeed = ((xLocHistory[0] + xLocHistory[xLocHistory.length-1])*1000) / (int)(timeStampHist[0] - timeStampHist[timeStampHist.length-1]);
-        int yspeed = ((yLocHistory[0] + yLocHistory[yLocHistory.length-1])*1000) / (int)(timeStampHist[0] - timeStampHist[timeStampHist.length-1]);
-        speed = (int)Math.sqrt((xspeed*xspeed) + (yspeed*yspeed));
+            return 0;
+        //double xspeed = ((xLocHistory[0] - xLocHistory[xLocHistory.length-1])*1000) / (timeStampHist[0] - timeStampHist[timeStampHist.length-1]);
+        //double yspeed = ((yLocHistory[0] - yLocHistory[yLocHistory.length-1])*1000) / (timeStampHist[0] - timeStampHist[timeStampHist.length-1]);
+        double xspeed = ((xLocHistory[0] - xLocHistory[1])*1000) / (timeStampHist[0] - timeStampHist[1]);
+        double yspeed = ((yLocHistory[0] - yLocHistory[1])*1000) / (timeStampHist[0] - timeStampHist[1]);
+        speed = Math.sqrt((xspeed*xspeed) + (yspeed*yspeed));
+        if(verbose){
+            System.out.println("Car " + Integer.toHexString(carID) + " x speed: " + xspeed);
+            System.out.println("Car " + Integer.toHexString(carID) + " y speed: " + yspeed);
+        }
+        return speed;
     }
     private void adjustHistory(){
         for(int i=historyLength-1; i>0; i--){
@@ -339,6 +354,24 @@ public class Car {
         xdimen = xdim;
         ydimen = ydim;
         this.speed = speed;
+    }
+    public void setDataHistory(int[] xHist, int[] yHist, double[] orientHist, double[] timeHist){
+        xLocHistory = Arrays.copyOf(xHist, historyLength);
+        yLocHistory = Arrays.copyOf(yHist, historyLength);
+        orientHistory = Arrays.copyOf(orientHist, historyLength);
+        timeStampHist = Arrays.copyOf(timeHist, historyLength);
+        if(verbose){
+            System.out.println("x history: " + Arrays.toString(xLocHistory));
+            System.out.println("y history: " + Arrays.toString(yLocHistory));
+            System.out.println("orient history: " + Arrays.toString(orientHistory));
+            System.out.println("time history: " + Arrays.toString(timeStampHist));
+        }
+    }
+    public int getXDimension(){
+        return xdimen;
+    }
+    public int getYDimension(){
+        return ydimen;
     }
     public void setLocation(int x, int y, double time){
         xloc = x;

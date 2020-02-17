@@ -6,7 +6,9 @@
 package accord;
 
 import com.fazecast.jSerialComm.SerialPort;
+import java.util.Arrays;
 import java.util.Scanner;
+import java.time.LocalTime;
 /**
  *
  * @author Paolo
@@ -383,6 +385,29 @@ public class ModuleUnitTests {
             }
         //}
     }
+    //Car methods and data tests
+    public static void testCarSpeedCalculations(){
+        Car c = new Car();
+        c.verbose = true;
+        int[] xhist = {1000,700,400,100};
+        int[] yhist = {1700,1300,900,500};
+        double[] orient = {0,15,30,45,60};
+        double[] time = {4000,3000,2000,1000};
+        c.setDataHistory(xhist, yhist, orient, time);
+        System.out.println("X: " + Arrays.toString(xhist));
+        System.out.println("Y: " + Arrays.toString(yhist));
+        System.out.println("time: " + Arrays.toString(time));
+        System.out.println("Car speed: " + c.calculateSpeed());
+        xhist[0] = 1000; xhist[1] = 500;
+        yhist[0] = 2000; yhist[1] = 1500;
+        time[0] = 5000; time[1] = 4000;
+        c.setDataHistory(xhist, yhist, orient, time);
+        System.out.println("X: " + Arrays.toString(xhist));
+        System.out.println("Y: " + Arrays.toString(yhist));
+        System.out.println("time: " + Arrays.toString(time));
+        System.out.println("Car speed: " + c.calculateSpeed());
+        
+    }
     //Car Simulation Tests
     public static void testCarSetOrientation(){
         PozyxSerialComm pozyx = setUpPozyxDevices(tags);
@@ -621,5 +646,18 @@ public class ModuleUnitTests {
         Visualizer vs = new Visualizer();
         vs.setVerboseOutput(true);
         vs.setTrack(tr);
+    }
+    public static void testTimeSyncing(){
+        LocalTime time = LocalTime.now();
+        System.out.println("now:\t" + time.toString());
+        System.out.println("toSeconds\t" + time.toSecondOfDay());
+        System.out.println("ToMili\t" + (time.toSecondOfDay()*1000 + (time.getNano()/1000)));
+        try{
+            Thread.sleep(500);
+        }catch(Exception e){};
+        LocalTime time2 = LocalTime.now();
+        
+        System.out.println("Time2: " + time2.toString());
+        System.out.println("time1 - time2 = " + time2.minusNanos(time.toNanoOfDay()));
     }
 }
