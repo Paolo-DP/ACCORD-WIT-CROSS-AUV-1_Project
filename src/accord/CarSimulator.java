@@ -16,7 +16,7 @@ public class CarSimulator {
     private double minAngleToCorrect = 10;
     private double orientCorrection = 15;
     private double timePredictionSet = 500; //prediction of car location time step (ms)
-    private final int MAX_LOCATION_SPIKE = 500000;
+    private final int MAX_LOCATION_SPIKE = 1000;
     private boolean verboseOutput = false;
     ArrayList <Car> carList = new ArrayList<Car>();
     Track track = null;
@@ -219,8 +219,8 @@ public class CarSimulator {
     private boolean isValidData(CarDetails deets){
         if(deets == null)
             return false;
-        double deltaX = (deets.xLocHistory[0]-deets.xLocHistory[1])/(deets.timeStampHist[0]-deets.timeStampHist[1]);
-        double deltaY = (deets.yLocHistory[0]-deets.yLocHistory[1])/(deets.timeStampHist[0]-deets.timeStampHist[1]);
+        double deltaX = (deets.xLocHistory[0]-deets.xLocHistory[1])*1000/(deets.timeStampHist[0]-deets.timeStampHist[1]);
+        double deltaY = (deets.yLocHistory[0]-deets.yLocHistory[1])*1000/(deets.timeStampHist[0]-deets.timeStampHist[1]);
         return (Math.sqrt((deltaX*deltaX)+(deltaY*deltaY)) < MAX_LOCATION_SPIKE);
     }
     private void estimateCarLocation(Car car, CarDetails deets){
@@ -241,14 +241,23 @@ public class CarSimulator {
         for(int i=valid.length-1; i>=0; i--){
             valid[i] = false;
         }
-        for(int i=0; i<valid.length; i++){
+        for(int i=0; i<valid.length-1; i++){
             valid[i] = (deets.timeStampHist[i] > 0) && 
                     (deets.timeStampHist[i] > deets.timeStampHist[i+1]) &&
                     track.isWithinTrack(deets.xLocHistory[i], deets.yLocHistory[i]);       
         }
+        deets.isValidated = true;
+        deets.isValidData = valid;
     }
     
     public void setVerboseOutput(boolean v){
         verboseOutput = v;
+    }
+    public void printAllCarDetails(){
+        if(verboseOutput){
+            for(int i=0; i<carList.size(); i++){
+                carList.get(i).printCarAttributes();
+            }
+        }
     }
 }

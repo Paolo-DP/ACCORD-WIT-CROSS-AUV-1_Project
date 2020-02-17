@@ -33,8 +33,9 @@ public class Car {
     private int throttle_power = 0;
     private double maintain_orient = 0;
     private double temp_orient = 0;
-    public int speedLimit=50;
-    public int THROTTLE_INCREMENT_STEP = speedLimit/5;
+    public int speedLimit=60;
+    public int speedFloor = 20;
+    public int THROTTLE_INCREMENT_STEP = speedLimit-speedFloor/5;
     public int STEERING_INCREMENT_STEP = 10;
     public int minSpeedmm = 300; //mm/s
     
@@ -221,8 +222,10 @@ public class Car {
         if(true){
             if(throttle > speedLimit)
                 throttle_power = speedLimit;
-            else if(throttle<=0)
-                throttle_power=0;
+            else if(throttle > 0 && throttle <= speedFloor)
+                throttle_power = speedFloor;
+            else if(throttle <= 0)
+                throttle_power = 0;
             else
                 throttle_power = throttle;
             byte[] message = new byte[carIDLen + minMessageLen +1];
@@ -314,10 +317,16 @@ public class Car {
         return true;
     }
     public boolean throttleIncrement(){
-        return adjustThrottle(throttle_power + THROTTLE_INCREMENT_STEP);
+        if(throttle_power <= 0)
+            return adjustThrottle(speedFloor);
+        else
+            return adjustThrottle(throttle_power + THROTTLE_INCREMENT_STEP);
     }
     public boolean throttleDecrement(){
-        return adjustThrottle(throttle_power - THROTTLE_INCREMENT_STEP);
+        if(throttle_power <= speedFloor)
+            return adjustThrottle(0);
+        else
+            return adjustThrottle(throttle_power - THROTTLE_INCREMENT_STEP);
     }
     public boolean steeringIncrement(){
         return adjustThrottle(steering_power + STEERING_INCREMENT_STEP);

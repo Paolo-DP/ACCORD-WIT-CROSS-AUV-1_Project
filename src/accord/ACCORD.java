@@ -66,11 +66,11 @@ public class ACCORD {
         //ModuleUnitTests.testCarSetOrientationTimed();
         //ModuleUnitTests.testCarLocationPolling();
         //ModuleUnitTests.testCarSimulationLine();
-        //ModuleUnitTests.testCarSimulationStraightTurn();
+        ModuleUnitTests.testCarSimulationStraightTurn();
         //ModuleUnitTests.testCarSimulationOval();
         //ModuleUnitTests.testCarCommand();
         
         //ModuleUnitTests.testVisualizer();
-        ModuleUnitTests.testTimeSyncing();
+        //ModuleUnitTests.testTimeSyncing();
     }
 }

@@ -14,9 +14,9 @@ import java.time.LocalTime;
  * @author Paolo
  */
 public class ModuleUnitTests {
-    private static int[] tags = {0x6a40, 0x6a3f, 0x6743};
-    private static int[] anchorIDs = {0x6717, 0x6e3c, 0x6e38, 0x6735}; 
-    private static int[] anchorX = {0, 8400, 0, 8400};
+    private static int[] tags = {0x6a40, 0x6a3f, 0x6a1a, 0x6743};
+    private static int[] anchorIDs = {0x6717, 0x6e38, 0x6735, 0x6e3c}; 
+    private static int[] anchorX = {0, 6600, 0, 6600};
     private static int[] anchorY = {0, 0, 4200, 4200};
     private static int[] anchorZ = {0, 0, 0, 0};
     
@@ -483,12 +483,13 @@ public class ModuleUnitTests {
         seg.setAbsoluteLocation(0, anchorY[3]/2);
         tr.addTrackSegment(seg);
         seg = new TrackSegment();
-        seg.create90DegTurn(650, true, 1000, 0);
+        seg.create90DegTurn(650, true, 3000, 0);
         tr.addTrackSegment(seg);
         tr.setTrackMargin(0);
         tr.complete();
         
         CarSimulator carSim = new CarSimulator();
+        carSim.setVerboseOutput(true);
         carSim.setTrack(tr);
         
         PozyxSerialComm pozyx = setUpPozyxDevices(tags);
@@ -507,8 +508,9 @@ public class ModuleUnitTests {
         while(true){
             for(int i=0; i<cars.length; i++){
                 carSim.simulate();
+                carSim.printAllCarDetails();
                 //if(cars[i].isUpdated()){
-                    cars[i].printCarAttributes();
+                    //cars[i].printCarAttributes();
                 //}
                 
             }

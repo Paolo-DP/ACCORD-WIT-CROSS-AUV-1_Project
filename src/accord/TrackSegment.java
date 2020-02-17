@@ -134,6 +134,13 @@ public class TrackSegment {
         computeOtherParameters();
     }
     
+    public void setSegmentID(String id){
+        segmentID = id;
+    }
+    public String getSegmentID(){
+        return segmentID;
+    }
+    
     public void setAbsoluteLocation(int x, int y){
         this.absoluteXLoc = x;
         this.absoluteYLoc = y;
