@@ -5,14 +5,16 @@
  */
 package accord;
 
+import java.io.FileWriter;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
+import simulator.SimulationConstants;
 import vehicle.VehicleProperty;
 /**
  *
  * @author Paolo
  */
-public class Car {
+public class Car implements SimulationConstants{
     private int carID = 0;
     private int xloc = 0;
     private int yloc = 0;
@@ -387,15 +389,25 @@ public class Car {
         yloc = y;
     }
     public void printCarAttributes(){
-        System.out.print("ID: " + Integer.toHexString(getID()));
-        System.out.print("\tUpdated: " + isUpdated());
-        System.out.print("\tTimeStamp: " + (int)getLastTimeStamp());
-        System.out.print("\tX = " + getXLocation());
-        System.out.print("\tY = " + getYLocation());
-        System.out.print("\tOrient: " + (int)getOrientation());
-        System.out.print("\tOut of Bounds: " + outOfBounds);
-        System.out.print("\tThrottle: " + getThrottlePower());
-        System.out.print("\tMaintain: " + (int)getMaintainOrient());
-        System.out.println("\tTemp: " + (int)getTempOrient());
+        if(verbose){
+            System.out.print("ID: " + Integer.toHexString(getID()));
+            System.out.print("\tUpdated: " + isUpdated());
+            System.out.print("\tTimeStamp: " + (int)getLastTimeStamp());
+            System.out.print("\tX = " + getXLocation());
+            System.out.print("\tY = " + getYLocation());
+            System.out.print("\tOrient: " + (int)getOrientation());
+            System.out.print("\tOut of Bounds: " + outOfBounds);
+            System.out.print("\tThrottle: " + getThrottlePower());
+            System.out.print("\tMaintain: " + (int)getMaintainOrient());
+            System.out.println("\tTemp: " + (int)getTempOrient());
+        }
+        if(writer != null){
+            
+        }
+            
+    }
+    FileWriter writer = null;
+    public void setFileWriter(FileWriter fw){
+        writer = fw;
     }
 }
