@@ -221,15 +221,20 @@ public class TrackSegment {
     }
     public void connectSegments(TrackSegment prev, TrackSegment next){
         prevSeg = prev;
+        nextSeg = next;
+        /*
         if(prev!=null)
             setAbsoluteLocation(prevSeg.getExitXLocation(), prevSeg.getExitYLocation());
         connectNextSegment(next);
+        */
     }
+    public void setPrevSegment(TrackSegment prev){prevSeg = prev;}
+    public void setNextSegment(TrackSegment next){nextSeg = next;}
         
-    public TrackSegment getNextSeg(){
+    public TrackSegment getNextSeg(Car c){
         return nextSeg;
     }
-    public TrackSegment getPrevSeg(){
+    public TrackSegment getPrevSeg(Car c){
         return prevSeg;
     }
         

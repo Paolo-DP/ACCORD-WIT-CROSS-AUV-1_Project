@@ -19,12 +19,13 @@ public class Track {
     
     double trackAngleOffset = 0;
     private int[][] trackbounds = new int[2][2];
-    public void addTrackSegment(TrackSegment seg){
+    public void addTrackSegment(TrackSegment seg, boolean autoConnect){
         if(!segments.isEmpty())
-            segments.get(segments.size()-1).connectNextSegment(seg);
+            if(autoConnect)
+                segments.get(segments.size()-1).connectNextSegment(seg);
         segments.add(seg);
     }
-    public void addIntersection(TrackSegment[] intersectionSegs){
+    public void addIntersection(IntersectionSegment intersect, TrackSegment[] intersectionSegs){
         
     }
     public boolean complete(){
@@ -34,7 +35,7 @@ public class Track {
         return true;
     }
     public TrackSegment getNextSegment(Car c){
-        return carSegList.get(carList.indexOf(c)).getNextSeg();
+        return carSegList.get(carList.indexOf(c)).getNextSeg(c);
     }
     public void removeTrackSegment(TrackSegment seg){
         
@@ -104,28 +105,28 @@ public class Track {
         }*/
         if(ct.currentSeg != null){
             if(ct.currentSeg.isWithinBounds(ct.car)){
-                ct.nextSeg = ct.currentSeg.getNextSeg();
+                ct.nextSeg = ct.currentSeg.getNextSeg(ct.car);
                 return ct.currentSeg;
             }
             else{
                 ct.currentSeg = searchCurrentSegment(ct.car);
                 if(ct.currentSeg == null)
                     return null;
-                ct.nextSeg = ct.currentSeg.getNextSeg();
+                ct.nextSeg = ct.currentSeg.getNextSeg(ct.car);
                 return ct.currentSeg;
             }
         }
         else if(ct.nextSeg != null){
             if(ct.nextSeg.isWithinBounds(ct.car)){
                 ct.currentSeg = ct.nextSeg;
-                ct.nextSeg = ct.currentSeg.getNextSeg();
+                ct.nextSeg = ct.currentSeg.getNextSeg(ct.car);
                 return ct.currentSeg;
             }
             else{
                 ct.currentSeg = searchCurrentSegment(ct.car);
                 if(ct.currentSeg == null)
                     return null;
-                ct.nextSeg = ct.currentSeg.getNextSeg();
+                ct.nextSeg = ct.currentSeg.getNextSeg(ct.car);
                 return ct.currentSeg;
             }
         }
@@ -133,7 +134,7 @@ public class Track {
             ct.currentSeg = searchCurrentSegment(ct.car);
             if(ct.currentSeg == null)
                 return null;
-            ct.nextSeg = ct.currentSeg.getNextSeg();
+            ct.nextSeg = ct.currentSeg.getNextSeg(ct.car);
             return ct.currentSeg;
         }
     }

@@ -60,6 +60,8 @@ public class Car implements SimulationConstants{
     private int[] yLocHistory = new int[historyLength];
     private double[] orientHistory = new double[historyLength];
     private double[] timeStampHist = new double[historyLength];
+    private int[] routeDirections = new int[16];
+    private int routeCount = 0;
     
     public boolean verbose = false;
     Car(){
@@ -67,6 +69,7 @@ public class Car implements SimulationConstants{
         Arrays.fill(yLocHistory, 0);
         Arrays.fill(orientHistory, 0);
         Arrays.fill(timeStampHist, 0);
+        Arrays.fill(routeDirections, 0);
     }
     Car(int ID, PozyxSerialComm pozyx){
         carID = ID;
@@ -345,6 +348,28 @@ public class Car implements SimulationConstants{
     }
     public boolean isPozyxOnline(){
         return pozyxStatus==POZYX_ONLINE;
+    }
+    
+    public int getNextRouteDirection(){
+        if(routeCount > 0)
+            return routeDirections[0];
+        else
+            return STRAIGHT;
+    }
+    public boolean addRouteDirection(int dir){
+        if(routeCount >= routeDirections.length)
+            return false;
+        routeDirections[routeCount] = dir;
+        routeCount++;
+        return true;
+    }
+    public void advanceRoute(){
+        for(int i=0; i<routeCount; i++){
+            routeDirections[i] = routeDirections[i+1];
+        }
+        routeCount--;
+        if(routeCount < 0)
+            routeCount = 0;
     }
     
     /**

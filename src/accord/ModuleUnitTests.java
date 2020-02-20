@@ -131,11 +131,11 @@ public class ModuleUnitTests {
                     seg.getExitXLocation() + ", " + 
                     seg.getExitYLocation());
         }
-        tr.addTrackSegment(seg);
+        tr.addTrackSegment(seg, true);
        
         seg = new TrackSegment();
         seg.create90DegTurn(width/2, true, roadWidth, 0);
-        tr.addTrackSegment(seg);
+        tr.addTrackSegment(seg, true);
         if(troubleshoot){
             System.out.println("Segment 2");
             System.out.println("Entry Point: (" + 
@@ -148,7 +148,7 @@ public class ModuleUnitTests {
        
         seg = new TrackSegment();
         seg.create90DegTurn(width/2, true, roadWidth, 90);
-        tr.addTrackSegment(seg);
+        tr.addTrackSegment(seg, true);
         if(troubleshoot){
             System.out.println("Segment 3");
             System.out.println("Entry Point: (" + 
@@ -161,7 +161,7 @@ public class ModuleUnitTests {
        
         seg = new TrackSegment();
         seg.createLineSegment(length-width, roadWidth, 180);
-        tr.addTrackSegment(seg);
+        tr.addTrackSegment(seg, true);
         if(troubleshoot){
             System.out.println("Segment 4");
             System.out.println("Entry Point: (" + 
@@ -174,7 +174,7 @@ public class ModuleUnitTests {
        
         seg = new TrackSegment();
         seg.create90DegTurn(width/2, true, roadWidth, 180);
-        tr.addTrackSegment(seg);
+        tr.addTrackSegment(seg, true);
         if(troubleshoot){
             System.out.println("Segment 5");
             System.out.println("Entry Point: (" + 
@@ -187,7 +187,7 @@ public class ModuleUnitTests {
        
         seg = new TrackSegment();
         seg.create90DegTurn(width/2, true, roadWidth, 270);
-        tr.addTrackSegment(seg);
+        tr.addTrackSegment(seg, true);
         if(troubleshoot){
             System.out.println("Segment 6");
             System.out.println("Entry Point: (" + 
@@ -449,7 +449,7 @@ public class ModuleUnitTests {
         TrackSegment seg = new TrackSegment();
         seg.createLineSegment((anchorX[3]/2)-300, 3000, 0);
         seg.setAbsoluteLocation(0, anchorY[3]/2);
-        tr.addTrackSegment(seg);
+        tr.addTrackSegment(seg, true);
         tr.complete();
         CarSimulator carSim = new CarSimulator();
         carSim.setTrack(tr);
@@ -481,10 +481,10 @@ public class ModuleUnitTests {
         TrackSegment seg = new TrackSegment();
         seg.createLineSegment(anchorX[3]/2, 3000, 0);
         seg.setAbsoluteLocation(0, anchorY[3]/2);
-        tr.addTrackSegment(seg);
+        tr.addTrackSegment(seg, true);
         seg = new TrackSegment();
         seg.create90DegTurn(650, true, 3000, 0);
-        tr.addTrackSegment(seg);
+        tr.addTrackSegment(seg, true);
         tr.setTrackMargin(0);
         tr.complete();
         
@@ -661,5 +661,11 @@ public class ModuleUnitTests {
         
         System.out.println("Time2: " + time2.toString());
         System.out.println("time1 - time2 = " + time2.minusNanos(time.toNanoOfDay()));
+    }
+    
+    public static Track createIntersectionTrack(int dimension){
+        Track tr = new Track();
+        
+        return tr;
     }
 }
