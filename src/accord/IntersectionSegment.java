@@ -233,14 +233,36 @@ public class IntersectionSegment extends TrackSegment implements SimulationConst
         return false;
     }
     public boolean reserve(Car car, TrackSegment entrance, int turn){
+        if(findSlot(car) != null)
+            return true;
+        
         VehicleProperty vp = car.getVehicleProperty();
-        int heading = NORTH;
-        int direction = STRAIGHT;
+        int heading = getEntranceHeading(entrance);
+        int direction = turn;
+        LocalTime arrival = LocalTime.now();
         resMan.reserve(sect, LocalTime.now(), vp, car.getSpeed(), 0, heading, direction, car.getID(), timeBaseNs);
         return true;
     }
     public boolean releaseReservation(Car car){
         return resMan.remove(car.getID());
+    }
+    public boolean isReserved(CarTracker ct){
+        
+        return false;
+    }
+    
+    private int getEntranceHeading(TrackSegment enter){
+        int heading = -1;
+        if(enter == entrance[0])
+            heading = EAST;
+        else if(enter == entrance[1])
+            heading = NORTH;
+        else if(enter == entrance[2])
+            heading = WEST;
+        else if(enter == entrance[3])
+            heading = SOUTH;
+        
+        return heading;
     }
     
     public void setVerbose(boolean verb){

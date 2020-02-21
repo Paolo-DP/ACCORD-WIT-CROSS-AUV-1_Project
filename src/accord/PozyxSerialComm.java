@@ -16,7 +16,8 @@ import java.util.Arrays;
 public class PozyxSerialComm {
     private boolean verboseOutput = false;
     
-    private LocalTime syncTime = LocalTime.now();
+    private LocalTime syncTimeLocal = LocalTime.now();
+    private double syncTimeArduino = 0;
     
     public static final int POZYX_baudRate = 115200;
     public static final int BLE_baudRate = 19200;
@@ -42,6 +43,7 @@ public class PozyxSerialComm {
     public static final byte ADD_ANCHOR = (byte)129;
     public static final byte ADD_TAG = (byte)130;
     public static final byte FINALIZE_DEVICE_LIST = (byte)131;
+    public static final byte SYNC = (byte)133;
     
     public static final byte ACK = (byte)255;
     
@@ -107,16 +109,48 @@ public class PozyxSerialComm {
     }
     
     public boolean syncArduinoTime(){
+        if(!comPort.isOpen())
+            return false;
+        
+        byte[] message = new byte[minFrameLength];
+        System.arraycopy(frameHeader, 0, message, 0, frameHeader.length);
+        message[frameHeaderLen] = (byte)message.length;
+        message[minFrameLength-1] = SYNC;
+        flushRX(true);
+        if(comPort.writeBytes(message, message.length) > 0){
+            if(!ACKRecieved(SYNC))
+                return false;
+            
+            syncTimeLocal = LocalTime.now();
+            int replyLength = incomingFrame();
+            if(replyLength <= 0 || replyLength != minFrameLength+4)
+                return false;
+            else{
+                byte[] data = new byte[4];
+                comPort.readBytes(data, 4);
+                syncTimeArduino = ByteBuffer.wrap(Arrays.copyOfRange(message, 17, 21)).getInt();
+                if(syncTimeArduino <= 0){
+                    syncTimeArduino = 0;
+                    return false;
+                }
+            }
+        }
         return true;
     }
     public LocalTime getTimeSynced(){
-        return syncTime;
+        return syncTimeLocal;
     }
     public double getTimeSyncedMillis(){
-        return syncTime.toNanoOfDay() * 1000;
+        return syncTimeLocal.toNanoOfDay() * 1000;
     }
     public double getTimeSyncedNanos(){
-        return syncTime.toNanoOfDay();
+        return syncTimeLocal.toNanoOfDay();
+    }
+    public double getTimeSyncArduinoMs(){
+        return syncTimeArduino;
+    }
+    public LocalTime syncTimePlusMs(double ms){
+        return syncTimeLocal.plusNanos((long)(ms * 1000));
     }
     
     
@@ -223,7 +257,8 @@ public class PozyxSerialComm {
                                 coor.eulerAngles[0] = ByteBuffer.wrap(
                                         Arrays.copyOfRange(message, 15, 17)).getShort();
                                 coor.timeStamp = ByteBuffer.wrap(
-                                        Arrays.copyOfRange(message, 17, 21)).getInt();
+                                        Arrays.copyOfRange(message, 17, 21)).getInt()
+                                        - syncTimeArduino;
                                 if(verboseOutput){
                                     System.out.println("PozyxSerialComm - getCoordinates(): SUCCESS");
                                 }

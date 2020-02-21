@@ -7,6 +7,7 @@ package accord;
 
 import java.io.FileWriter;
 import java.nio.ByteBuffer;
+import java.time.LocalTime;
 import java.util.Arrays;
 import simulator.SimulationConstants;
 import vehicle.VehicleProperty;
@@ -62,6 +63,7 @@ public class Car implements SimulationConstants{
     private double[] timeStampHist = new double[historyLength];
     private int[] routeDirections = new int[16];
     private int routeCount = 0;
+    LocalTime timeSync = null;
     
     public boolean verbose = false;
     Car(){
@@ -193,6 +195,9 @@ public class Car implements SimulationConstants{
     }
     public double getLastTimeStamp(){
         return timeStampHist[0];
+    }
+    public LocalTime timeStampToLocalTime(double time){
+        return pozyx.syncTimePlusMs(time);
     }
     public int getMovementStatus(){
         return movementStatus;

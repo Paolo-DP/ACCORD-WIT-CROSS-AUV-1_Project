@@ -127,12 +127,12 @@ void processMessage(){
   
   
   switch(frameType){
-    case 133:
+    case 133: //sync time
       sendAck(frameType);
+      now = millis();
       Serial.write(headerBytes, headerLength-1);
       Serial.write(minFrameLength + 4);
       Serial.write(134);
-      now = millis();
       Serial.write(now>>24);
       Serial.write(now>>16);
       Serial.write(now>>8);

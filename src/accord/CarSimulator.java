@@ -62,6 +62,20 @@ public class CarSimulator {
                         estimateCarLocation(c, null);
                     CarTracker ct = track.updateCarTracker(c);
                     doSteering(c, ct);
+                                        
+                    if(ct.nextSeg.isIntersection()){ //if approaching an intersection
+                        IntersectionSegment intersect = (IntersectionSegment)ct.nextSeg;
+                        if(intersect.isReserved(ct)){ //Car already has reservation
+                            
+                        }
+                        else{
+                            if(intersect.reserve(c, ct.currentSeg, c.getNextRouteDirection())){
+                                
+                            }
+                            else //reservation is denied
+                                c.throttleDecrement();
+                        }
+                    }
                     doThrottle(c, ct);
                 }
                 /*
@@ -103,6 +117,8 @@ public class CarSimulator {
     private void doThrottle(Car c, CarTracker tracker){
         if(tracker.isOutOfBounds)
             c.throttleDecrement();
+        else if(tracker.currentSeg.isIntersection())
+            c.adjustThrottle(c.getThrottlePower());
         else{
             c.adjustThrottle(computeNextThrottle(c));
         }

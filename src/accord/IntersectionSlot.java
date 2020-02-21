@@ -29,6 +29,8 @@ package accord;
  */
 public class IntersectionSlot {
     public Car car = null;
+    public int heading = 0;
+    public int direction = 0;
     public TrackSegment enterFrom = null;
     public TrackSegment exitTo = null;
     public boolean isReserved = false;
