@@ -180,12 +180,9 @@ public class IntersectionSegment extends TrackSegment implements SimulationConst
     public void connectEntranceExits(TrackSegment[] entrances, TrackSegment[] exits){
         entrance = entrances;
         exit = exits;
-        for(int ent=0; ent<entrances.length; ent++){
-            for(int turn=0; turn<3; turn++){
-                
-            }
-        }
+        
     }
+    
     @Override
     public int distFromCenterLine(Car c){
         return distFromCenterLine(c.getXLocation(), c.getYLocation());
@@ -223,6 +220,9 @@ public class IntersectionSegment extends TrackSegment implements SimulationConst
                 return slots.get(i);
         }
         return null;
+    }
+    private void addSlot(Car c){
+        
     }
     
     public boolean isApproachingIntersection(TrackSegment segToCheck){
