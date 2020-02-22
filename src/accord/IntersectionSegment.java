@@ -61,7 +61,7 @@ public class IntersectionSegment extends TrackSegment implements SimulationConst
         index [0][*] starting at 0 degrees (West entrance]
         index 0 left, 1 straight, 2 right
     */
-    TrackSegment[][][] intersectSegs = new TrackSegment[4][3][];
+    TrackSegment[][][] intersectSegs = new TrackSegment[4][3][3];
     
     ArrayList<IntersectionSlot> slots = new ArrayList<>();
     
@@ -90,10 +90,12 @@ public class IntersectionSegment extends TrackSegment implements SimulationConst
                         break;
                     case 1:
                         intersectSegs[ent][turn] = new TrackSegment[1];
+                        intersectSegs[ent][turn][0] = new TrackSegment();
                         intersectSegs[ent][turn][0].createLineSegment(dimensionSize, dimensionSize/2, currDirection);
                         break;
                     case 2:
                         intersectSegs[ent][turn] = new TrackSegment[1];
+                        intersectSegs[ent][turn][0] = new TrackSegment();
                         intersectSegs[ent][turn][0].create90DegTurn((int)(dimensionSize/4), false, dimensionSize/2, currDirection);
                         break;
                 }
@@ -239,9 +241,9 @@ public class IntersectionSegment extends TrackSegment implements SimulationConst
         VehicleProperty vp = car.getVehicleProperty();
         int heading = getEntranceHeading(entrance);
         int direction = turn;
-        LocalTime arrival = LocalTime.now();
-        resMan.reserve(sect, LocalTime.now(), vp, car.getSpeed(), 0, heading, direction, car.getID(), timeBaseNs);
-        return true;
+        LocalTime arrival = LocalTime.now().plusNanos((long)timeToEntrance(car, entrance) * 1000);
+        return resMan.reserve(sect, arrival, vp, car.getSpeed(), 0, heading, direction, car.getID(), timeBaseNs);
+        //return true;
     }
     public boolean releaseReservation(Car car){
         return resMan.remove(car.getID());
@@ -252,17 +254,29 @@ public class IntersectionSegment extends TrackSegment implements SimulationConst
     }
     
     private int getEntranceHeading(TrackSegment enter){
-        int heading = -1;
         if(enter == entrance[0])
-            heading = EAST;
+            return EAST;
         else if(enter == entrance[1])
-            heading = NORTH;
+            return NORTH;
         else if(enter == entrance[2])
-            heading = WEST;
+            return WEST;
         else if(enter == entrance[3])
-            heading = SOUTH;
+            return SOUTH;
         
-        return heading;
+        return 0;
+    }
+    
+    private double timeToEntrance(Car c, TrackSegment entrance){
+        double time = 0;
+        int enterX = entrance.getExitXLocation();
+        int enterY = entrance.getExitYLocation();
+        int x = c.getXLocation();
+        int y = c.getYLocation();
+        double speed = c.getSpeed();
+        
+        time = Math.sqrt((enterX-x)*(enterX-x) + (enterY-y)*(enterY-y)) / speed;
+        
+        return time;
     }
     
     public void setVerbose(boolean verb){
