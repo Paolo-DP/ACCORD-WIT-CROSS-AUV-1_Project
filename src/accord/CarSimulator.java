@@ -23,8 +23,8 @@ public class CarSimulator {
     private boolean verboseOutput = false;
     ArrayList <Car> carList = new ArrayList<Car>();
     ArrayList <FileWriter> carWriters = new ArrayList<>();
-    private final String carDataLocation = "CarData\\";
-    private final String simDataLocation = "SimulationData\\";
+    private final String carDataLocation = "C:\\THESIS_Data\\CarData\\";
+    private final String simDataLocation = "C:\\THESIS_Data\\SimulationData\\";
     private String dataFileHeader = "";
     Track track = null;
     LocalTime startTime = LocalTime.now();
