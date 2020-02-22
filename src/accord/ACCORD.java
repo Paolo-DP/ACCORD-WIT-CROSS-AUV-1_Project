@@ -60,13 +60,14 @@ public class ACCORD {
         //ModuleUnitTests.testPozyxLocalization();
         
         //ModuleUnitTests.testCarSpeedCalculations();
+        ModuleUnitTests.testCarCSV();
         
         //ModuleUnitTests.testCoordinatesPolling();
         //ModuleUnitTests.testCarSetOrientation();
         //ModuleUnitTests.testCarSetOrientationTimed();
         //ModuleUnitTests.testCarLocationPolling();
         //ModuleUnitTests.testCarSimulationLine();
-        ModuleUnitTests.testCarSimulationStraightTurn();
+        //ModuleUnitTests.testCarSimulationStraightTurn();
         //ModuleUnitTests.testCarSimulationOval();
         //ModuleUnitTests.testCarCommand();
         

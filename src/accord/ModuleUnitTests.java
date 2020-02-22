@@ -6,6 +6,7 @@
 package accord;
 
 import com.fazecast.jSerialComm.SerialPort;
+import java.io.FileWriter;
 import java.util.Arrays;
 import java.util.Scanner;
 import java.time.LocalTime;
@@ -408,6 +409,23 @@ public class ModuleUnitTests {
         System.out.println("Car speed: " + c.calculateSpeed());
         
     }
+    public static void testCarCSV(){
+        
+            Car c = new Car();
+            c.verbose = true;
+            int[] xhist = {1000,700,400,100};
+            int[] yhist = {1700,1300,900,500};
+            double[] orient = {0,15,30,45,60};
+            double[] time = {4000,3000,2000,1000};
+            c.setDataHistory(xhist, yhist, orient, time);
+            c.printCarAttributes();
+            CarSimulator sim = new CarSimulator();
+            sim.setVerboseOutput(true);
+            sim.addCar(c);
+            sim.start();
+            sim.printAllCarDetails();
+        
+    }
     //Car Simulation Tests
     public static void testCarSetOrientation(){
         PozyxSerialComm pozyx = setUpPozyxDevices(tags);
@@ -470,7 +488,9 @@ public class ModuleUnitTests {
             for(int i=0; i<cars.length; i++){
                 carSim.simulate();
                 //if(cars[i].isUpdated()){
+                try{
                     cars[i].printCarAttributes();
+                }catch(Exception e){};
                 //}
                 
             }
@@ -587,8 +607,9 @@ public class ModuleUnitTests {
         while(true){
             for(int i=0; i<cars.length; i++){
                 cars[i].updateLocation();
-                if(cars[i].isUpdated())
-                    cars[i].printCarAttributes();
+                if(cars[i].isUpdated()){
+                    try{cars[i].printCarAttributes();}catch(Exception e){};
+                }
         
             }
         }

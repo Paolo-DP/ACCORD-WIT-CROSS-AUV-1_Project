@@ -5,6 +5,9 @@
  */
 package accord;
 
+import java.io.FileWriter;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 
 /**
@@ -19,14 +22,21 @@ public class CarSimulator {
     private final int MAX_LOCATION_SPIKE = 1000;
     private boolean verboseOutput = false;
     ArrayList <Car> carList = new ArrayList<Car>();
+    ArrayList <FileWriter> carWriters = new ArrayList<>();
+    private final String carDataLocation = "CarData\\";
+    private final String simDataLocation = "SimulationData\\";
+    private String dataFileHeader = "";
     Track track = null;
+    LocalTime startTime = LocalTime.now();
+    LocalDate startDate = LocalDate.now();
+    private boolean start = false;
     
     private static final double MIN_TIME_TO_COLLISION = 1000; //ms until collision
     private static final double MAX_TIME_TO_COLLISION = 3000;
     //Set up methods
     public void addCar(Car c){
         carList.add(c);
-        c.updateLocation();
+        //c.updateLocation();
     }
     public void allignXAxis(){
         for(int i=0; i<carList.size(); i++){
@@ -52,8 +62,42 @@ public class CarSimulator {
     public void setTrack(Track t){
         track = t;
     }
+    public void start(){
+        startTime = LocalTime.now();
+        dataFileHeader = startDate.toString() + "_" + startTime.toString();
+        dataFileHeader = dataFileHeader.replace(':', '-');
+        if(verboseOutput)
+            System.out.println("CarSimulator: fileHeader = " + dataFileHeader);
+        initFileWriters();
+        start = true;
+    }
+    public void stop(){
+        exportSimulationSummary();
+        start = false;
+    }
+    public void initFileWriters(){
+        for(FileWriter fw : carWriters){
+            try{fw.close();}catch(Exception e){};
+        }
+        carWriters.clear();
+        for(Car c : carList){
+            try{
+                //FileWriter fw = new FileWriter(carDataLocation + "2020-02-22_08-50-34.962" + "_ID-0x" + Integer.toHexString(c.getID())+".csv");
+                FileWriter fw = new FileWriter(carDataLocation + dataFileHeader + "_ID-0x" + Integer.toHexString(c.getID())+".csv");
+                c.setFileWriter(fw);
+                carWriters.add(fw);
+            }catch(Exception e){
+                if(verboseOutput)
+                    System.out.println("CarSimulator: failed to create CSV file " + Integer.toHexString(c.getID()));
+            };
+        }
+        
+    }
     
     public void simulate(){
+        if(!start)
+            start();
+        
         if(track!=null && carList.size()>0){
             for(int i=0; i<carList.size(); i++){
                 Car c = carList.get(i);
@@ -272,8 +316,20 @@ public class CarSimulator {
     public void printAllCarDetails(){
         if(verboseOutput){
             for(int i=0; i<carList.size(); i++){
-                carList.get(i).printCarAttributes();
+                try{ carList.get(i).printCarAttributes(); }
+                catch(Exception e){
+                    if(verboseOutput)
+                        System.out.println("CarSimulator: Failed to print Car attributes");
+                };
             }
+        }
+    }
+    public void exportSimulationSummary(){
+        
+    }
+    public void writeCarDetailesCSV(FileWriter writer){
+        if(writer != null){
+            
         }
     }
 }
