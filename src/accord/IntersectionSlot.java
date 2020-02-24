@@ -33,6 +33,6 @@ public class IntersectionSlot {
     public int direction = 0;
     public TrackSegment enterFrom = null;
     public TrackSegment exitTo = null;
-    public TrackSegment[] route = null;
+    public TrackSegment[] route;
     public boolean isReserved = false;
 }

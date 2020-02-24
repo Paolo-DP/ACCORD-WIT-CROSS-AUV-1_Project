@@ -15,7 +15,7 @@ import java.util.ArrayList;
  * @author Paolo
  */
 public class CarSimulator {
-    private int minDistanceToCorrect = 70;
+    private int minDistanceToCorrect = 100;
     private double minAngleToCorrect = 10;
     private double orientCorrection = 15;
     private double timePredictionSet = 500; //prediction of car location time step (ms)
@@ -102,14 +102,14 @@ public class CarSimulator {
             for(int i=0; i<carList.size(); i++){
                 Car c = carList.get(i);
                 if(c.updateLocation()){
-                    if(!isValidData(c))
-                        estimateCarLocation(c, null);
+                    //if(!isValidData(c))
+                    //    estimateCarLocation(c, null);
                     CarTracker ct = track.updateCarTracker(c);
                     doSteering(c, ct);
                                         
                     if(ct.nextSeg != null && ct.nextSeg.isIntersection()){ //if approaching an intersection
                         IntersectionSegment intersect = (IntersectionSegment)ct.nextSeg;
-                        if(intersect.isReserved(ct)){ //Car already has reservation
+                        if(intersect.isReserved(c)){ //Car already has reservation
                             
                         }
                         else{

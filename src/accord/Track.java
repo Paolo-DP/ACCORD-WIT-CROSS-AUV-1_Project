@@ -258,4 +258,28 @@ public class Track {
         return (x >= trackbounds[0][0] && x <= trackbounds[1][0] &&
                 y >= trackbounds[0][1] && y <= trackbounds[1][1]);
     }
+    
+    public Track getRouteTrack(Car c, TrackSegment start){
+        if(start == null)
+            return null;
+        TrackSegment current = start;
+        TrackSegment next;
+        Track routeTrack = new Track();
+        routeTrack.addTrackSegment(current, false);
+        while((next=current.getNextSeg(c))!=null)
+            routeTrack.addTrackSegment(next, false);
+        
+        return routeTrack;
+    }
+    
+    public void printAllSegments(){
+        for(int i=0; i<segments.size(); i++){
+            TrackSegment s = segments.get(i);
+            System.out.println("Segment ID: " + s.getSegmentID()
+                + "\tXLoc: " + s.getXLocation()
+                + "\tYLoc: " + s.getYLocation());
+        }
+    }
+    
+    
 }

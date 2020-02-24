@@ -61,7 +61,7 @@ public class IntersectionSegment extends TrackSegment implements SimulationConst
         index [0][*] starting at 0 degrees (West entrance]
         index 0 left, 1 straight, 2 right
     */
-    TrackSegment[][][] intersectSegs = new TrackSegment[4][3][3];
+    TrackSegment[][][] intersectSegs = new TrackSegment[4][3][];
     
     ArrayList<IntersectionSlot> slots = new ArrayList<>();
     
@@ -84,20 +84,25 @@ public class IntersectionSegment extends TrackSegment implements SimulationConst
                         intersectSegs[ent][turn] = new TrackSegment[3];
                         intersectSegs[ent][turn][0] = new TrackSegment();
                         intersectSegs[ent][turn][0].createLineSegment(dimensionSize/2, dimensionSize/2, currDirection);
+                        intersectSegs[ent][turn][0].setSegmentID("Intersection "+ent+turn+0+"\t direction: " + currDirection);
                         intersectSegs[ent][turn][1] = new TrackSegment();
                         intersectSegs[ent][turn][1].create90DegTurn((int)(dimensionSize/4), true, dimensionSize/2, currDirection);
+                        intersectSegs[ent][turn][1].setSegmentID("Intersection "+ent+turn+1+"\t direction: " + currDirection);
                         intersectSegs[ent][turn][2] = new TrackSegment();
                         intersectSegs[ent][turn][2].createLineSegment(dimensionSize/2, dimensionSize/2, currDirection + 90);
+                        intersectSegs[ent][turn][2].setSegmentID("Intersection "+ent+turn+2+"\t direction: " + currDirection);
                         break;
                     case 1:
                         intersectSegs[ent][turn] = new TrackSegment[1];
                         intersectSegs[ent][turn][0] = new TrackSegment();
                         intersectSegs[ent][turn][0].createLineSegment(dimensionSize, dimensionSize/2, currDirection);
+                        intersectSegs[ent][turn][0].setSegmentID("Intersection "+ent+turn+0+"\t direction: " + currDirection);
                         break;
                     case 2:
                         intersectSegs[ent][turn] = new TrackSegment[1];
                         intersectSegs[ent][turn][0] = new TrackSegment();
                         intersectSegs[ent][turn][0].create90DegTurn((int)(dimensionSize/4), false, dimensionSize/2, currDirection);
+                        intersectSegs[ent][turn][0].setSegmentID("Intersection "+ent+turn+0+"\t direction: " + currDirection);
                         break;
                 }
                 
@@ -108,6 +113,18 @@ public class IntersectionSegment extends TrackSegment implements SimulationConst
         setInternalSegmentLocations(absoluteXLoc,absoluteYLoc);
         sect = new Intersection(dimensionSize, resolution);
         
+    }
+    private String segmentID = "";
+    @Override
+    public void setSegmentID(String id){
+        segmentID = id;
+        for(int i=0; i<intersectSegs.length; i++){
+            for(int j=0; j<intersectSegs[i].length; j++){
+                for(int k=0; k<intersectSegs[i][j].length; k++){
+                    intersectSegs[i][j][k].setSegmentID(segmentID + " - " + intersectSegs[i][j][k].getSegmentID());
+                }
+            }
+        }
     }
     @Override
     public void setAbsoluteLocation(int x, int y){
@@ -120,6 +137,14 @@ public class IntersectionSegment extends TrackSegment implements SimulationConst
         xHitBox2 = x + dimensionSize + boundaryMargin;
         yHitBox2 = y + dimensionSize + boundaryMargin;
         
+    }
+    @Override
+    public int getXLocation(){
+        return absoluteXLoc;
+    }
+    @Override
+    public int getYLocation(){
+        return absoluteYLoc;
     }
     private void setInternalSegmentLocations(int x, int y){
         //eastbound left
@@ -188,23 +213,54 @@ public class IntersectionSegment extends TrackSegment implements SimulationConst
     
     @Override
     public int distFromCenterLine(Car c){
-       int dist = 0;
+       int dist = Integer.MAX_VALUE;
        IntersectionSlot sl = findSlot(c);
        if(sl==null)
            return Integer.MAX_VALUE;
+       int maxIndex = 0;
+       switch(sl.direction){
+           case LEFT_TURN:
+               maxIndex = 3;
+               break;
+           case STRAIGHT:
+               maxIndex = 1;
+               break;
+           case RIGHT_TURN:
+               maxIndex = 1;
+               break;
+       }
+       for(int i=0; i<maxIndex; i++){
+           
+           if(sl.route[i].isWithinBounds(c))
+               return sl.route[i].distFromCenterLine(c);
+       }
        return dist;
     }
     
     @Override
     public double idealDirection(Car c){
-        return idealDirection(c.getXLocation(), c.getYLocation());
+        int dist = Integer.MAX_VALUE;
+       IntersectionSlot sl = findSlot(c);
+       if(sl==null)
+           return Integer.MAX_VALUE;
+       for(int i=0; i<sl.route.length; i++){
+           if(sl.route[i].isWithinBounds(c))
+               return sl.route[i].idealDirection(c);
+       }
+       return dist;
     }
     
     @Override
     public boolean isWithinBounds(Car c){
         int x = c.getXLocation();
         int y = c.getYLocation();
-        return isWithinBounds(c.getXLocation(), c.getYLocation());
+        return x >= xHitBox1 && x <= xHitBox2 &&
+                y >= yHitBox1 && y <= yHitBox2;
+    }
+    @Override
+    public boolean isWithinBounds(int xLoc, int yLoc){
+        return xLoc >= xHitBox1 && xLoc <= xHitBox2 &&
+                yLoc >= yHitBox1 && yLoc <= yHitBox2;
     }
     
     public TrackSegment getNextSeg(Car c){
@@ -242,7 +298,7 @@ public class IntersectionSegment extends TrackSegment implements SimulationConst
         switch(heading){
             case EAST:
                 sl.enterFrom = entrance[0];
-                switch(heading){
+                switch(direction){
                     case LEFT_TURN:
                         sl.exitTo = exit[1];
                         sl.route = intersectSegs[0][0];
@@ -259,7 +315,7 @@ public class IntersectionSegment extends TrackSegment implements SimulationConst
                 break;
             case NORTH:
                 sl.enterFrom = entrance[1];
-                switch(heading){
+                switch(direction){
                     case LEFT_TURN:
                         sl.exitTo = exit[2];
                         sl.route = intersectSegs[1][0];
@@ -276,7 +332,7 @@ public class IntersectionSegment extends TrackSegment implements SimulationConst
                 break;
             case WEST:
                 sl.enterFrom = entrance[2];
-                switch(heading){
+                switch(direction){
                     case LEFT_TURN:
                         sl.exitTo = exit[3];
                         sl.route = intersectSegs[2][0];
@@ -293,7 +349,7 @@ public class IntersectionSegment extends TrackSegment implements SimulationConst
                 break;
             case SOUTH:
                 sl.enterFrom = entrance[3];
-                switch(heading){
+                switch(direction){
                     case LEFT_TURN:
                         sl.exitTo = exit[0];
                         sl.route = intersectSegs[3][0];
@@ -310,6 +366,14 @@ public class IntersectionSegment extends TrackSegment implements SimulationConst
                 break;
         }
         slots.add(sl);
+        if(verbose){
+            System.out.print("Intersection Segment: new slot added \tCar: 0x" + Integer.toHexString(sl.car.getID()) + "\tEntrance: " + sl.enterFrom.getSegmentID() + 
+                    "\tRoute " + sl.route.length + ":");
+            for(int i=0; i<sl.route.length; i++){
+                System.out.print("\t" + sl.route[i].getSegmentID() + ",");
+            }
+            System.out.println("\tExit: "+sl.exitTo.getSegmentID());
+        }
     }
     
     public boolean isApproachingIntersection(TrackSegment segToCheck){
@@ -333,7 +397,7 @@ public class IntersectionSegment extends TrackSegment implements SimulationConst
             System.out.println("Intersection Segment: (" + LocalTime.now() + ") Processing Reservation...");
         boolean res =  resMan.reserve(sect, arrival, vp, car.getSpeed(), 0, heading, direction, car.getID(), timeBaseNs);
         if(verbose)
-            System.out.println("Intersection Segment: (" + LocalTime.now() + ") DONE!");
+            System.out.println("Intersection Segment: (" + LocalTime.now() + ") DONE!\tResult: " + res);
         
         if(res)
             addSlot(car, heading, direction);
@@ -345,7 +409,11 @@ public class IntersectionSegment extends TrackSegment implements SimulationConst
     }
     public boolean isReserved(CarTracker ct){
         
-        return false;
+        return findSlot(ct.car) != null;
+    }
+    public boolean isReserved(Car c){
+        
+        return findSlot(c) != null;
     }
     
     private int getEntranceHeading(TrackSegment enter){
@@ -376,6 +444,22 @@ public class IntersectionSegment extends TrackSegment implements SimulationConst
     
     public void setVerbose(boolean verb){
         verbose = verb;
+    }
+    public void printAllSegments(){
+        if(verbose){
+            for(int i=0; i<intersectSegs.length; i++){
+                for(int j=0; j<intersectSegs[i].length; j++){
+                    for(int k=0; k<intersectSegs[i][j].length; k++){
+                        System.out.println("Segment ("+i+","+j+","+k+")\tID: " + intersectSegs[i][j][k].getSegmentID());
+                    }
+                }
+            }
+            
+            /*TrackSegment[] route = intersectSegs[0][1];
+            for(int i=0; i<route.length; i++){
+                System.out.println("Segment (0,0," + i + " )\tID: " + route[i].getSegmentID());
+            }*/
+        }
     }
     
     @Override

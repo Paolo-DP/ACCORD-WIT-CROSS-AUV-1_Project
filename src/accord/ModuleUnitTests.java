@@ -16,7 +16,7 @@ import java.time.LocalTime;
  */
 public class ModuleUnitTests {
     private static int[] tags = {0x6a40, 0x6a3f, 0x6a1a, 0x6743};
-    private static int[] anchorIDs = {0x6717, 0x6e38, 0x6735, 0x6e3c}; 
+    private static int[] anchorIDs = {0x6e38, 0x6735, 0x6717, 0x6e3c}; 
     private static int[] anchorX = {0, 5200, 0, 5200};
     private static int[] anchorY = {0, 0, 5200, 5200};
     private static int[] anchorZ = {0, 0, 0, 0};
@@ -692,7 +692,7 @@ public class ModuleUnitTests {
     
     public static void testIntersectionTrack(){
         Track tr = ACCORD.createIntersectionTestTrack(640, 500, 1460, 100);
-        
+        tr.printAllSegments();
         CarSimulator carSim = new CarSimulator();
         carSim.setVerboseOutput(true);
         carSim.setTrack(tr);
@@ -711,15 +711,17 @@ public class ModuleUnitTests {
         System.out.println("Allign all cars with X Axis and hit enter...");
         sc.nextLine();
         carSim.allignXAxis();
+        System.out.println("Press Enter to Start");
+        sc.nextLine();
         while(true){
-            for(int i=0; i<cars.length; i++){
+            //for(int i=0; i<cars.length; i++){
                 carSim.simulate();
                 carSim.printAllCarDetails();
                 //if(cars[i].isUpdated()){
                     //cars[i].printCarAttributes();
                 //}
                 
-            }
+            //}
         }
     }
 }

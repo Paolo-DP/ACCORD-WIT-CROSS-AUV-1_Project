@@ -56,6 +56,7 @@ public class ACCORD {
         TrackSegment[] exits = new TrackSegment[4];
         TrackSegment intersection = new IntersectionSegment(laneWidth*2);
         ((IntersectionSegment)intersection).setVerbose(true);
+        //((IntersectionSegment)intersection).printAllSegments();
         
         double direction=0;
         for(int i=0; i<4; i++){
@@ -135,7 +136,7 @@ public class ACCORD {
         //ModuleUnitTests.testTimeSyncing();
         
         //ACCORD.createIntersectionTestTrack(50,50,50,50);
-        
+        ModuleUnitTests.testIntersectionTrack();
         
     }
 }

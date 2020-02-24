@@ -37,8 +37,8 @@ public class Car implements SimulationConstants{
     private int throttle_power = 0;
     private double maintain_orient = 0;
     private double temp_orient = 0;
-    public int speedLimit=60;
-    public int speedFloor = 20;
+    public int speedLimit = 80;
+    public int speedFloor = 30;
     public int THROTTLE_INCREMENT_STEP = speedLimit-speedFloor/5;
     public int STEERING_INCREMENT_STEP = 10;
     public int minSpeedmm = 300; //mm/s
@@ -83,7 +83,7 @@ public class Car implements SimulationConstants{
         Arrays.fill(timeStampHist, 0);
     }
     public boolean updateLocation(){
-        if(pozyx != null)
+        if(pozyx == null)
             return false;
         
         Coordinates coor = pozyx.getCoordinates(carID);
