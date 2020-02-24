@@ -10,13 +10,14 @@ import java.io.FileWriter;
 import java.util.Arrays;
 import java.util.Scanner;
 import java.time.LocalTime;
+import simulator.SimulationConstants;
 /**
  *
  * @author Paolo
  */
-public class ModuleUnitTests {
+public class ModuleUnitTests implements SimulationConstants{
     private static int[] tags = {0x6a40, 0x6a3f, 0x6a1a, 0x6743};
-    private static int[] anchorIDs = {0x6e38, 0x6735, 0x6717, 0x6e3c}; 
+    private static int[] anchorIDs = {0x6e38, 0x6e3c, 0x6735, 0x6717}; 
     private static int[] anchorX = {0, 5200, 0, 5200};
     private static int[] anchorY = {0, 0, 5200, 5200};
     private static int[] anchorZ = {0, 0, 0, 0};
@@ -206,6 +207,15 @@ public class ModuleUnitTests {
         System.out.println("xloc = "+dets.xloc);
         dets.xloc = 69;
         System.out.println("xloc = "+dets.xloc);
+    }
+    public static void testRouteSubTrack(){
+        Track bigtrack = ACCORD.createIntersectionTestTrack(640, 460, 1500, 100);
+        Car c = new Car();
+        c.setAttributesManual(0x6969, 2700, 200, 90, 300, 200, 400);
+        c.addRouteDirection(LEFT_TURN);
+        CarTracker ct = bigtrack.updateCarTracker(c);
+        Track subtrack = bigtrack.getRouteTrack(c, ct.currentSeg);
+        subtrack.printAllSegments();
     }
     //PozyxSerialComm Tests
     public static void testSerialComm(){
@@ -699,7 +709,7 @@ public class ModuleUnitTests {
         
         PozyxSerialComm pozyx = setUpPozyxDevices(tags);
         Car[] cars = new Car[tags.length];
-                
+        
         for(int i=0; i<cars.length; i++){
             cars[i] = new Car(tags[i], pozyx);
             cars[i].verbose = true;
@@ -713,6 +723,76 @@ public class ModuleUnitTests {
         carSim.allignXAxis();
         System.out.println("Press Enter to Start");
         sc.nextLine();
+        while(true){
+            //for(int i=0; i<cars.length; i++){
+                carSim.simulate();
+                carSim.printAllCarDetails();
+                //if(cars[i].isUpdated()){
+                    //cars[i].printCarAttributes();
+                //}
+                
+            //}
+        }
+    }
+    public static void testIntersectionTrackSubtracking(){
+        Track tr = ACCORD.createIntersectionTestTrack(640, 800, 1160, 200);
+        tr.printAllSegments();
+        Track[] routes = new Track[tags.length];
+        
+        PozyxSerialComm pozyx = setUpPozyxDevices(tags);
+        Car[] cars = new Car[tags.length];
+        
+        
+        CarSimulator carSim = new CarSimulator();
+        carSim.setVerboseOutput(true);
+        carSim.setTrack(tr);
+        for(int i=0; i<cars.length; i++){
+            cars[i] = new Car(tags[i], pozyx);
+            
+            switch(tags[i]){
+                case 0x6a3f:
+                    cars[i].setAttributesManual(tags[i], 4540, 2930, 180, 270, 100, cars[i].minSpeedmm);
+                    cars[i].addRouteDirection(STRAIGHT);
+                    break;
+                case 0x6743:
+                    cars[i].setAttributesManual(tags[i], 660, 2280, 0, 270, 100, cars[i].minSpeedmm);
+                    cars[i].addRouteDirection(STRAIGHT);
+                    break;
+                case 0x6a1a:
+                    cars[i].setAttributesManual(tags[i], 2220, 4540, 270, 270, 100, cars[i].minSpeedmm);
+                    cars[i].addRouteDirection(STRAIGHT);
+                    break;
+                case 0x6a40:
+                    cars[i].setAttributesManual(tags[i], 2920, 660, 90, 270, 100, cars[i].minSpeedmm);
+                    cars[i].addRouteDirection(STRAIGHT);
+                    break;
+            }
+            routes[i] = tr.getRouteTrack(cars[i], tr.updateCarTracker(cars[i]).currentSeg);
+            System.out.println("Track route for Car 0x" + Integer.toHexString(cars[i].getID()));
+            routes[i].printAllSegments();
+            
+            cars[i].verbose = true;
+            carSim.addCar(cars[i], routes[i]);
+            cars[i].updateLocation();
+            cars[i].alignXAxis();
+            
+        }
+        
+        Scanner sc = new Scanner(System.in);
+        System.out.println("Allign all cars with X Axis and hit enter...");
+        sc.nextLine();
+        carSim.allignXAxis();
+        System.out.println("Press Enter to Start");
+        sc.nextLine();
+        
+        System.out.println("Doing updates...");
+        LocalTime initWait = LocalTime.now().plusSeconds(5);
+        while(LocalTime.now().isBefore(initWait)){
+            for(Car c : cars)
+                c.updateLocation();
+        }
+        System.out.println("Initial updates complete");
+        
         while(true){
             //for(int i=0; i<cars.length; i++){
                 carSim.simulate();

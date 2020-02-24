@@ -210,6 +210,64 @@ public class IntersectionSegment extends TrackSegment implements SimulationConst
         exit = exits;
         
     }
+    public TrackSegment[] getEntrances(){
+        return entrance;
+    }
+    public TrackSegment[] getExits(){
+        return exit;
+    }
+    public TrackSegment[] getRoute(int heading, int direction){
+        int headIndex=-1;
+        int dirIndex=-1;
+        switch(heading){
+            case EAST:
+                headIndex = 0;
+                break;
+            case NORTH:
+                headIndex = 1;
+                break;
+            case WEST:
+                headIndex = 2;
+                break;
+            case SOUTH:
+                headIndex = 3;
+                break;
+        }
+        switch(direction){
+            case LEFT_TURN:
+                dirIndex = 0;
+                break;
+            case STRAIGHT:
+                dirIndex = 1;
+                break;
+            case RIGHT_TURN:
+                dirIndex = 2;
+                break;
+        }
+        if(headIndex<=0 || dirIndex<=0)
+            return null;
+        
+        return intersectSegs[headIndex][dirIndex];
+    }
+    public TrackSegment getExitTo(TrackSegment enterFrom, int direction){
+        int segIndex = headingSegIndex(getEntranceHeading(enterFrom));
+        if(segIndex < 0)
+            return null;
+        switch(direction){
+            case LEFT_TURN:
+                segIndex++;
+                break;
+            case RIGHT_TURN:
+                segIndex--;
+                break;
+            case STRAIGHT:
+                break;
+            default:
+                return null;
+        }
+        segIndex%=4;
+        return exit[segIndex];
+    }
     
     @Override
     public int distFromCenterLine(Car c){
@@ -428,7 +486,32 @@ public class IntersectionSegment extends TrackSegment implements SimulationConst
         
         return 0;
     }
-    
+    private int headingSegIndex(int heading){
+        switch(heading){
+            case EAST:
+                return 0;
+            case NORTH:
+                return 1;
+            case WEST:
+                return 2;
+            case SOUTH:
+                return 3;
+            default:
+                return -1;
+        }
+    }
+    private int directionSegIndex(int direction){
+        switch(direction){
+            case LEFT_TURN:
+                return 0;
+            case STRAIGHT:
+                return 1;
+            case RIGHT_TURN:
+                return 2;
+            default:
+                return -1;
+        }
+    }
     private double timeToEntrance(Car c, TrackSegment entrance){
         double time = 0;
         int enterX = entrance.getExitXLocation();

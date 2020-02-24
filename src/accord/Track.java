@@ -260,14 +260,23 @@ public class Track {
     }
     
     public Track getRouteTrack(Car c, TrackSegment start){
-        if(start == null)
-            return null;
+        
         TrackSegment current = start;
-        TrackSegment next;
+        TrackSegment next = null;
+        TrackSegment prev = null;
         Track routeTrack = new Track();
-        routeTrack.addTrackSegment(current, false);
-        while((next=current.getNextSeg(c))!=null)
-            routeTrack.addTrackSegment(next, false);
+        if(c==null || start == null)
+            return routeTrack;
+        //routeTrack.addTrackSegment(current, false);
+        do{
+            routeTrack.addTrackSegment(current, false);
+            if(current.isIntersection())
+                next = ((IntersectionSegment)current).getExitTo(prev, c.getNextRouteDirection());
+            else
+                next = current.getNextSeg(c);
+            prev = current;
+            current = next;
+        }while(current != null);
         
         return routeTrack;
     }

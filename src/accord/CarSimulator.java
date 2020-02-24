@@ -27,6 +27,7 @@ public class CarSimulator {
     private String simDataLocation = "C:\\THESIS_Data\\SimulationData\\";
     private String dataFileHeader = "";
     Track track = null;
+    ArrayList<Track> routeTracks = new ArrayList<>();
     LocalTime startTime = LocalTime.now();
     LocalDate startDate = LocalDate.now();
     private boolean start = false;
@@ -36,7 +37,12 @@ public class CarSimulator {
     //Set up methods
     public void addCar(Car c){
         carList.add(c);
-        //c.updateLocation();
+        if(!c.updateLocation() & verboseOutput)
+            System.out.print("CarSimulator: Car 0x" + c.getID() + "Failed to initial update");
+    }
+    public void addCar(Car c, Track route){
+        addCar(c);
+        routeTracks.add(route);
     }
     public void allignXAxis(){
         for(int i=0; i<carList.size(); i++){
@@ -61,6 +67,14 @@ public class CarSimulator {
     }
     public void setTrack(Track t){
         track = t;
+    }
+    private Track getCarRoute(Car c){
+        int carIndex = carListIndex(c);
+        if(carIndex < 0)
+            return null;
+        if(carIndex >= routeTracks.size())
+            return track;
+        return routeTracks.get(carIndex);
     }
     public void start(){
         startTime = LocalTime.now();
@@ -97,14 +111,18 @@ public class CarSimulator {
     public void simulate(){
         if(!start)
             start();
-        
+        Track subtrack;
         if(track!=null && carList.size()>0){
             for(int i=0; i<carList.size(); i++){
                 Car c = carList.get(i);
+                if(i>=routeTracks.size())
+                    subtrack = track;
+                else
+                    subtrack = routeTracks.get(i);
                 if(c.updateLocation()){
                     //if(!isValidData(c))
                     //    estimateCarLocation(c, null);
-                    CarTracker ct = track.updateCarTracker(c);
+                    CarTracker ct = subtrack.updateCarTracker(c);
                     doSteering(c, ct);
                                         
                     if(ct.nextSeg != null && ct.nextSeg.isIntersection()){ //if approaching an intersection
@@ -169,10 +187,11 @@ public class CarSimulator {
     }
     //computation methods
     private int computeNextSteering(Car c){
+        Track subtrack = getCarRoute(c);
         int steer_dist = 0;
         int steer_orient = 0;
-        int distCLine = track.distfromCenterLine(c);
-        double correctOrient = track.directionDeviation(c);
+        int distCLine = subtrack.distfromCenterLine(c);
+        double correctOrient = subtrack.directionDeviation(c);
         //System.out.println(distCLine);
         if(distCLine == Integer.MAX_VALUE){
             c.outOfBounds = true;
@@ -198,9 +217,10 @@ public class CarSimulator {
         return (steer_dist + steer_orient)%128;
     }
     private double computeNextOrientation(Car c){
-        int distCLine = track.distfromCenterLine(c);
-        //double correctOrient = track.directionDeviation(c);
-        double followOrient = track.idealDirection(c.getXLocation(), c.getYLocation());
+        Track subtrack = getCarRoute(c);
+        int distCLine = subtrack.distfromCenterLine(c);
+        //double correctOrient = subtrack.directionDeviation(c);
+        double followOrient = subtrack.idealDirection(c.getXLocation(), c.getYLocation());
         if(distCLine == Integer.MAX_VALUE){
             c.outOfBounds = true;
             if(verboseOutput)
@@ -222,8 +242,9 @@ public class CarSimulator {
         return followOrient;
     }
     private double[] computeSteerCompensateTime(Car c){
-        int distCLine = track.distfromCenterLine(c);
-        double followOrient = track.idealDirection(c.getXLocation(), c.getYLocation());
+        Track subtrack = getCarRoute(c);
+        int distCLine = subtrack.distfromCenterLine(c);
+        double followOrient = subtrack.idealDirection(c.getXLocation(), c.getYLocation());
         
         return computeSteerCompensateTime(distCLine, followOrient, c.minSpeedmm);
     }
@@ -308,6 +329,14 @@ public class CarSimulator {
         }
         deets.isValidated = true;
         deets.isValidData = valid;
+    }
+    
+    private int carListIndex(Car c){
+        for(int i=0; i<carList.size(); i++){
+            if(carList.get(i) == c)
+                return i;
+        }
+        return -1;
     }
     
     public void setVerboseOutput(boolean v){

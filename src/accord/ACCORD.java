@@ -114,6 +114,7 @@ public class ACCORD {
         System.out.println("Running Module Tests...");
         //ModuleUnitTests.testLinearTrackSegment();
         //ModuleUnitTests.testSimpleOvalTrack();
+        ModuleUnitTests.testRouteSubTrack();
         
         //ModuleUnitTests.testPozyxSerialComm();
         //ModuleUnitTests.testPozyxIncommingFrame();
@@ -136,7 +137,7 @@ public class ACCORD {
         //ModuleUnitTests.testTimeSyncing();
         
         //ACCORD.createIntersectionTestTrack(50,50,50,50);
-        ModuleUnitTests.testIntersectionTrack();
-        
+        //ModuleUnitTests.testIntersectionTrack();
+        ModuleUnitTests.testIntersectionTrackSubtracking();
     }
 }
