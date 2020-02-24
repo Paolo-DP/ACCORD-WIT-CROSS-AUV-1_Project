@@ -17,8 +17,8 @@ import java.time.LocalTime;
 public class ModuleUnitTests {
     private static int[] tags = {0x6a40, 0x6a3f, 0x6a1a, 0x6743};
     private static int[] anchorIDs = {0x6717, 0x6e38, 0x6735, 0x6e3c}; 
-    private static int[] anchorX = {0, 6600, 0, 6600};
-    private static int[] anchorY = {0, 0, 4200, 4200};
+    private static int[] anchorX = {0, 5200, 0, 5200};
+    private static int[] anchorY = {0, 0, 5200, 5200};
     private static int[] anchorZ = {0, 0, 0, 0};
     
         
@@ -688,5 +688,38 @@ public class ModuleUnitTests {
         Track tr = new Track();
         
         return tr;
+    }
+    
+    public static void testIntersectionTrack(){
+        Track tr = ACCORD.createIntersectionTestTrack(640, 500, 1460, 100);
+        
+        CarSimulator carSim = new CarSimulator();
+        carSim.setVerboseOutput(true);
+        carSim.setTrack(tr);
+        
+        PozyxSerialComm pozyx = setUpPozyxDevices(tags);
+        Car[] cars = new Car[tags.length];
+                
+        for(int i=0; i<cars.length; i++){
+            cars[i] = new Car(tags[i], pozyx);
+            cars[i].verbose = true;
+            carSim.addCar(cars[i]);
+            cars[i].updateLocation();
+            cars[i].alignXAxis();
+        }
+        Scanner sc = new Scanner(System.in);
+        System.out.println("Allign all cars with X Axis and hit enter...");
+        sc.nextLine();
+        carSim.allignXAxis();
+        while(true){
+            for(int i=0; i<cars.length; i++){
+                carSim.simulate();
+                carSim.printAllCarDetails();
+                //if(cars[i].isUpdated()){
+                    //cars[i].printCarAttributes();
+                //}
+                
+            }
+        }
     }
 }

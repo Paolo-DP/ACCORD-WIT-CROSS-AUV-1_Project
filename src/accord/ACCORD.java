@@ -49,12 +49,13 @@ public class ACCORD {
         
     }
     
-    private static Track createIntersectionTestTrack(int laneWidth, int startUpLength, int straightWayLength, int margin){
+    public static Track createIntersectionTestTrack(int laneWidth, int startUpLength, int straightWayLength, int margin){
         Track tr = new Track();
         TrackSegment[] startUps = new TrackSegment[4];
         TrackSegment[] straights = new TrackSegment[4];
         TrackSegment[] exits = new TrackSegment[4];
         TrackSegment intersection = new IntersectionSegment(laneWidth*2);
+        ((IntersectionSegment)intersection).setVerbose(true);
         
         double direction=0;
         for(int i=0; i<4; i++){
@@ -134,5 +135,7 @@ public class ACCORD {
         //ModuleUnitTests.testTimeSyncing();
         
         //ACCORD.createIntersectionTestTrack(50,50,50,50);
+        
+        
     }
 }

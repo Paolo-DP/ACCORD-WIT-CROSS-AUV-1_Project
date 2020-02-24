@@ -23,8 +23,8 @@ public class CarSimulator {
     private boolean verboseOutput = false;
     ArrayList <Car> carList = new ArrayList<Car>();
     ArrayList <FileWriter> carWriters = new ArrayList<>();
-    private final String carDataLocation = "C:\\THESIS_Data\\CarData\\";
-    private final String simDataLocation = "C:\\THESIS_Data\\SimulationData\\";
+    private String carDataLocation = "C:\\THESIS_Data\\CarData\\";
+    private String simDataLocation = "C:\\THESIS_Data\\SimulationData\\";
     private String dataFileHeader = "";
     Track track = null;
     LocalTime startTime = LocalTime.now();
@@ -107,7 +107,7 @@ public class CarSimulator {
                     CarTracker ct = track.updateCarTracker(c);
                     doSteering(c, ct);
                                         
-                    if(ct.nextSeg.isIntersection()){ //if approaching an intersection
+                    if(ct.nextSeg != null && ct.nextSeg.isIntersection()){ //if approaching an intersection
                         IntersectionSegment intersect = (IntersectionSegment)ct.nextSeg;
                         if(intersect.isReserved(ct)){ //Car already has reservation
                             
@@ -331,5 +331,11 @@ public class CarSimulator {
         if(writer != null){
             
         }
+    }
+    public void setCarOutputPath(String path){
+        carDataLocation = path;
+    }
+    public void setSimOutputPath(String path){
+        simDataLocation = path;
     }
 }

@@ -104,6 +104,7 @@ public class Car implements SimulationConstants{
                 
                 calculateSpeed();
                 updated = true;
+                outputCSV();
                 return true;
             }
             else
@@ -150,7 +151,8 @@ public class Car implements SimulationConstants{
             return orient - xAxisCalib;
     }
     public double getSpeed(){
-        return speed;
+        //return speed;
+        return minSpeedmm;
     }
     public int getSteeringPower(){
         return steering_power;
@@ -435,6 +437,26 @@ public class Car implements SimulationConstants{
             System.out.print("\tMaintain: " + (int)getMaintainOrient());
             System.out.println("\tTemp: " + (int)getTempOrient());
         }
+        
+    }
+    FileWriter writer = null;
+    public void setFileWriter(FileWriter fw){
+        writer = fw;
+        try{
+        writer.append("Car ID,");
+        writer.append("Updated,");
+        writer.append("Time Stamp,");
+        writer.append("X,");
+        writer.append("Y,");
+        writer.append("Orientation,");
+        writer.append("Out of Bounds,");
+        writer.append("Throttle Power,");
+        writer.append("Maintain Orientation,");
+        writer.append("Temp Orientation\n");
+        
+        }catch(Exception e){if(verbose)System.out.println("File Error");};
+    }
+    public void outputCSV(){
         if(writer != null){
             try{
             writer.append(Integer.toHexString(getID())+",");
@@ -454,23 +476,5 @@ public class Car implements SimulationConstants{
                 }
             }
         }
-            
-    }
-    FileWriter writer = null;
-    public void setFileWriter(FileWriter fw){
-        writer = fw;
-        try{
-        writer.append("Car ID,");
-        writer.append("Updated,");
-        writer.append("Time Stamp,");
-        writer.append("X,");
-        writer.append("Y,");
-        writer.append("Orientation,");
-        writer.append("Out of Bounds,");
-        writer.append("Throttle Power,");
-        writer.append("Maintain Orientation,");
-        writer.append("Temp Orientation\n");
-        
-        }catch(Exception e){if(verbose)System.out.println("File Error");};
     }
 }

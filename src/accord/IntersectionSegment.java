@@ -72,6 +72,7 @@ public class IntersectionSegment extends TrackSegment implements SimulationConst
     public static final String strSTRAIGHT = "STRAIGHT";
     
     private boolean verbose = false;
+    private LocalTime verboseTimer = LocalTime.now();
     IntersectionSegment(int size_mm){
         setIsIntersection(true);
         dimensionSize = size_mm;
@@ -187,7 +188,11 @@ public class IntersectionSegment extends TrackSegment implements SimulationConst
     
     @Override
     public int distFromCenterLine(Car c){
-        return distFromCenterLine(c.getXLocation(), c.getYLocation());
+       int dist = 0;
+       IntersectionSlot sl = findSlot(c);
+       if(sl==null)
+           return Integer.MAX_VALUE;
+       return dist;
     }
     
     @Override
@@ -223,8 +228,88 @@ public class IntersectionSegment extends TrackSegment implements SimulationConst
         }
         return null;
     }
-    private void addSlot(Car c){
+    private void addSlot(Car c, int heading, int direction){
+        if(c == null)
+            return;
         
+        IntersectionSlot sl = new IntersectionSlot();
+        
+        sl.car = c;
+        sl.heading = heading;
+        sl.direction = direction;
+        sl.isReserved = true;
+        
+        switch(heading){
+            case EAST:
+                sl.enterFrom = entrance[0];
+                switch(heading){
+                    case LEFT_TURN:
+                        sl.exitTo = exit[1];
+                        sl.route = intersectSegs[0][0];
+                        break;
+                    case STRAIGHT:
+                        sl.exitTo = exit[0];
+                        sl.route = intersectSegs[0][1];
+                        break;
+                    case RIGHT_TURN:
+                        sl.exitTo = exit[3];
+                        sl.route = intersectSegs[0][2];
+                        break;
+                }
+                break;
+            case NORTH:
+                sl.enterFrom = entrance[1];
+                switch(heading){
+                    case LEFT_TURN:
+                        sl.exitTo = exit[2];
+                        sl.route = intersectSegs[1][0];
+                        break;
+                    case STRAIGHT:
+                        sl.exitTo = exit[1];
+                        sl.route = intersectSegs[1][1];
+                        break;
+                    case RIGHT_TURN:
+                        sl.exitTo = exit[0];
+                        sl.route = intersectSegs[1][2];
+                        break;
+                }
+                break;
+            case WEST:
+                sl.enterFrom = entrance[2];
+                switch(heading){
+                    case LEFT_TURN:
+                        sl.exitTo = exit[3];
+                        sl.route = intersectSegs[2][0];
+                        break;
+                    case STRAIGHT:
+                        sl.exitTo = exit[2];
+                        sl.route = intersectSegs[2][1];
+                        break;
+                    case RIGHT_TURN:
+                        sl.exitTo = exit[1];
+                        sl.route = intersectSegs[2][2];
+                        break;
+                }
+                break;
+            case SOUTH:
+                sl.enterFrom = entrance[3];
+                switch(heading){
+                    case LEFT_TURN:
+                        sl.exitTo = exit[0];
+                        sl.route = intersectSegs[3][0];
+                        break;
+                    case STRAIGHT:
+                        sl.exitTo = exit[3];
+                        sl.route = intersectSegs[3][1];
+                        break;
+                    case RIGHT_TURN:
+                        sl.exitTo = exit[2];
+                        sl.route = intersectSegs[3][2];
+                        break;
+                }
+                break;
+        }
+        slots.add(sl);
     }
     
     public boolean isApproachingIntersection(TrackSegment segToCheck){
@@ -235,6 +320,8 @@ public class IntersectionSegment extends TrackSegment implements SimulationConst
         return false;
     }
     public boolean reserve(Car car, TrackSegment entrance, int turn){
+        if(car == null || entrance == null)
+            return false;
         if(findSlot(car) != null)
             return true;
         
@@ -242,7 +329,15 @@ public class IntersectionSegment extends TrackSegment implements SimulationConst
         int heading = getEntranceHeading(entrance);
         int direction = turn;
         LocalTime arrival = LocalTime.now().plusNanos((long)timeToEntrance(car, entrance) * 1000);
-        return resMan.reserve(sect, arrival, vp, car.getSpeed(), 0, heading, direction, car.getID(), timeBaseNs);
+        if(verbose)
+            System.out.println("Intersection Segment: (" + LocalTime.now() + ") Processing Reservation...");
+        boolean res =  resMan.reserve(sect, arrival, vp, car.getSpeed(), 0, heading, direction, car.getID(), timeBaseNs);
+        if(verbose)
+            System.out.println("Intersection Segment: (" + LocalTime.now() + ") DONE!");
+        
+        if(res)
+            addSlot(car, heading, direction);
+        return res;
         //return true;
     }
     public boolean releaseReservation(Car car){
