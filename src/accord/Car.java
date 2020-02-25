@@ -104,7 +104,9 @@ public class Car implements SimulationConstants{
                 
                 calculateSpeed();
                 updated = true;
-                outputCSV();
+                if(verbose)
+                    printCarAttributes();
+                outputCSV("Coordinates Update");
                 return true;
             }
             else
@@ -235,6 +237,7 @@ public class Car implements SimulationConstants{
     private int redundant_throttle = 0;
     public boolean adjustThrottle(int throttle){
         //if(throttle_power!=throttle || redundant_throttle==REDUNDANT_MSG_RESEND){
+        outputCSV("throttle");
         if(true){
             if(throttle > speedLimit)
                 throttle_power = speedLimit;
@@ -264,6 +267,7 @@ public class Car implements SimulationConstants{
     }
     private int redundant_steer=0;
     public boolean adjustSteering(int steer){
+        outputCSV("steering");
         if(steering_power != steer || redundant_steer==REDUNDANT_MSG_RESEND){
             steering_power = steer;
             byte[] message = new byte[carIDLen + minMessageLen +1];
@@ -282,6 +286,7 @@ public class Car implements SimulationConstants{
     }
     private int redundant_orient = 0;
     public boolean maintainOrientation(double orient, boolean overwrite){
+        outputCSV("orient maintain");
         if(true || redundant_orient>=REDUNDANT_MSG_RESEND){
             maintain_orient = orient;
             temp_orient = 0;
@@ -310,6 +315,7 @@ public class Car implements SimulationConstants{
     }
     private int redundant_orient_timed = 0;
     public boolean maintainOrientationTimed(double orient, double time){
+        outputCSV("orient timed");
         if(true || redundant_orient_timed>=REDUNDANT_MSG_RESEND){
             temp_orient = orient;
             double orientUncalib = (orient + xAxisCalib)%360;
@@ -425,7 +431,7 @@ public class Car implements SimulationConstants{
         yloc = y;
     }
     public void printCarAttributes(){
-        if(verbose){
+        //if(verbose){
             System.out.print("ID: " + Integer.toHexString(getID()));
             System.out.print("\tUpdated: " + isUpdated());
             System.out.print("\tTimeStamp: " + (int)getLastTimeStamp());
@@ -436,14 +442,14 @@ public class Car implements SimulationConstants{
             System.out.print("\tThrottle: " + getThrottlePower());
             System.out.print("\tMaintain: " + (int)getMaintainOrient());
             System.out.println("\tTemp: " + (int)getTempOrient());
-        }
-        
+        //}
     }
     FileWriter writer = null;
     public void setFileWriter(FileWriter fw){
         writer = fw;
         try{
         writer.append("Car ID,");
+        writer.append("Source of change");
         writer.append("Updated,");
         writer.append("Time Stamp,");
         writer.append("X,");
@@ -456,10 +462,11 @@ public class Car implements SimulationConstants{
         
         }catch(Exception e){if(verbose)System.out.println("File Error");};
     }
-    public void outputCSV(){
+    public void outputCSV(String source){
         if(writer != null){
             try{
             writer.append(Integer.toHexString(getID())+",");
+            writer.append(source + ",");
             writer.append(Boolean.toString(isUpdated()) + ",");
             writer.append(Integer.toString((int)getLastTimeStamp()) + ",");
             writer.append(Integer.toString(getXLocation()) + ",");

@@ -6,6 +6,7 @@
 package accord;
 
 import com.fazecast.jSerialComm.SerialPort;
+import java.io.File;
 import java.io.FileWriter;
 import java.util.Arrays;
 import java.util.Scanner;
@@ -803,5 +804,13 @@ public class ModuleUnitTests implements SimulationConstants{
                 
             //}
         }
+    }
+    
+    public static void miscTests(){
+        String path = "C:\\testfolder\\subfolder";
+        File f = new File(path);
+        System.out.println("folder exists: " + f.isDirectory());
+        f.mkdirs();
+        System.out.println("folder exists: " + f.isDirectory());
     }
 }

@@ -55,7 +55,7 @@ public class ACCORD {
         TrackSegment[] straights = new TrackSegment[4];
         TrackSegment[] exits = new TrackSegment[4];
         TrackSegment intersection = new IntersectionSegment(laneWidth*2);
-        ((IntersectionSegment)intersection).setVerbose(true);
+        //((IntersectionSegment)intersection).setVerbose(true);
         //((IntersectionSegment)intersection).printAllSegments();
         
         double direction=0;
@@ -114,7 +114,7 @@ public class ACCORD {
         System.out.println("Running Module Tests...");
         //ModuleUnitTests.testLinearTrackSegment();
         //ModuleUnitTests.testSimpleOvalTrack();
-        ModuleUnitTests.testRouteSubTrack();
+        //ModuleUnitTests.testRouteSubTrack();
         
         //ModuleUnitTests.testPozyxSerialComm();
         //ModuleUnitTests.testPozyxIncommingFrame();
@@ -138,6 +138,8 @@ public class ACCORD {
         
         //ACCORD.createIntersectionTestTrack(50,50,50,50);
         //ModuleUnitTests.testIntersectionTrack();
-        ModuleUnitTests.testIntersectionTrackSubtracking();
+        //ModuleUnitTests.testIntersectionTrackSubtracking();
+        
+        ModuleUnitTests.miscTests();
     }
 }
