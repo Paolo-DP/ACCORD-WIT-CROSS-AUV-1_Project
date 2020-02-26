@@ -20,7 +20,7 @@ public class Track {
     double trackAngleOffset = 0;
     private int[][] trackbounds = new int[2][2];
     public void addTrackSegment(TrackSegment seg, boolean autoConnect){
-        if(!segments.isEmpty())
+        //if(!segments.isEmpty())
             if(autoConnect)
                 segments.get(segments.size()-1).connectNextSegment(seg);
         segments.add(seg);
@@ -54,6 +54,7 @@ public class Track {
             ct = new CarTracker(c);
             trackers.add(ct);
         }
+        /*
         if(getCurrentSegment(ct)==null)
             ct.isOutOfBounds=true;
         else{
@@ -61,12 +62,25 @@ public class Track {
             ct.distanceFromDrivingLine = ct.currentSeg.distFromCenterLine(c);
             updateCarTrackerAngles(ct);
         }
+        */
+        ct.currentSeg = searchCurrentSegment(c);
+        if(ct.currentSeg != null){
+            updateCarTrackerAngles(ct);
+            ct.nextSeg = ct.currentSeg.getNextSeg(c);
+        }
+        else{
+            ct.angleDeviation = 0;
+            ct.distanceFromDrivingLine = 0;
+            ct.idealAngle = c.getOrientation();
+            ct.hasReservation = false;
+        }
         if(ct.nextSeg != null && ct.nextSeg.isIntersection())
             ct.hasReservation = ((IntersectionSegment)ct.nextSeg).isReserved(c);
         else if(ct.currentSeg != null && ct.currentSeg.isIntersection())
             ct.hasReservation = ((IntersectionSegment)ct.currentSeg).isReserved(c);
         else
             ct.hasReservation = false;
+        ct.isOutOfBounds = (ct.currentSeg == null);
         ct.car.outOfBounds = ct.isOutOfBounds;
         return ct;
     }

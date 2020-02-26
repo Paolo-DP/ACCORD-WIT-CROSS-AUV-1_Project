@@ -414,7 +414,7 @@ public class SimTileRetriever {
 	}
 	
 	private void checkDirection(int direction) {
-		if (!(direction == STRAIGHT || direction != RIGHT_TURN || direction == LEFT_TURN))
+		if (!(direction == STRAIGHT || direction == RIGHT_TURN || direction == LEFT_TURN))
 			throw new IllegalArgumentException("Invalid direction.");
 	}
 	

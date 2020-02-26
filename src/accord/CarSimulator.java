@@ -11,6 +11,7 @@ import java.time.Clock;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  *
@@ -22,6 +23,7 @@ public class CarSimulator {
     private double orientCorrection = 15;
     private double timePredictionSet = 500; //prediction of car location time step (ms)
     private final int MAX_LOCATION_SPIKE = 1000;
+    private int distanceOfCollision = 1000; 
     private boolean verboseOutput = false;
     ArrayList <Car> carList = new ArrayList<Car>();
     Track track = null;
@@ -33,6 +35,7 @@ public class CarSimulator {
     private String instancePath = "";
     private String carDataLocation = "\\CarData";
     private String carTrackerLocation = "\\carTracker";
+    private String carCollisionLocation = "\\carCollision";
     private String dataFileHeader = "";
     ArrayList <FileWriter> fwCarTrackers = new ArrayList<>();
         
@@ -120,6 +123,12 @@ public class CarSimulator {
         for(Car c : carList){
             fwCarTrackers.add(initCSVCarTracker(path, c.getID()));
         }
+        
+        //Collisions CSV initialization
+        path = dataFileHeader + carCollisionLocation;
+        pathchk = new File(path);
+        pathchk.mkdir();
+        fwCollisions = initCSVCollision(path);
     }
     
     public void simulate(){
@@ -136,8 +145,8 @@ public class CarSimulator {
                 if(c.updateLocation()){
                     //if(!isValidData(c))
                     //    estimateCarLocation(c, null);
-                    CarTracker ct = subtrack.updateCarTracker(c);
-                    doSteering(c, ct);
+                    CarTracker ct = subtrack.updateCarTracker(c);            
+                    //doSteering(c, ct);
                                         
                     if(ct.nextSeg != null && ct.nextSeg.isIntersection()){ //if approaching an intersection
                         IntersectionSegment intersect = (IntersectionSegment)ct.nextSeg;
@@ -152,9 +161,36 @@ public class CarSimulator {
                                 c.throttleDecrement();
                         }
                     }
+                    if(ct.currentSeg != null && ct.currentSeg.isIntersection()){
+                        CarTracker temp = new CarTracker(c);
+                        temp.angleDeviation = ct.angleDeviation;
+                        temp.distanceFromDrivingLine = ct.distanceFromDrivingLine;
+                        temp.hasReservation = ct.hasReservation;
+                        temp.idealAngle = ct.idealAngle;
+                        temp.isOutOfBounds = ct.isOutOfBounds;
+                        temp.nextSeg = ct.nextSeg;
+                        temp.currentSeg = ((IntersectionSegment)ct.currentSeg).getCurrentInternalSegment(c);
+                        if(temp.currentSeg == null){
+                            temp.isOutOfBounds = true;
+                        }
+                        ct = temp;
+                    }
+                    c.outOfBounds = ct.isOutOfBounds;
+                    doSteering(c, ct);
                     doThrottle(c, ct);
                     
                     outputCSVCarTracker(c, ct);
+                    boolean[][] collisions = collisionCheck(distanceOfCollision);
+                    if(verboseOutput){
+                        if(collisions == null)
+                            System.out.println("collisions array is NULL");
+                        else{
+                            for(boolean[] row : collisions){
+                                System.out.println(Arrays.toString(row));
+                            }
+                        }
+                    }
+                    outputCSVCollisions(collisions);
                 }
                 /*
                 c.maintainOrientation(computeNextOrientation(c));
@@ -308,6 +344,28 @@ public class CarSimulator {
         return timeToCollision;
     }
     
+    private boolean[][] collisionCheck(int distance){
+        boolean[][] collisionChk = new boolean[carList.size()][carList.size()];
+        for(boolean[] row : collisionChk)
+            Arrays.fill(row, false);
+        
+        for(int car1=0; car1<carList.size(); car1++){
+            for(int car2=car1; car2<carList.size(); car2++){
+                if(car1 == car2)
+                    continue;
+                Car c1 = carList.get(car1);
+                Car c2 = carList.get(car2);
+                double x = c1.getXLocation() - c2.getXLocation();
+                double y = c1.getYLocation() - c2.getYLocation();
+                
+                double colDist = Math.sqrt((x*x) + (y*y));
+                collisionChk[car1][car2] = colDist<distance;
+                collisionChk[car2][car1] = collisionChk[car1][car2];
+            }
+        }
+        return collisionChk;
+    }
+    
     private boolean isValidData(Car car){
         if(car == null)
             return false;
@@ -446,4 +504,58 @@ public class CarSimulator {
                 System.out.println("CarSimulator: ERROR! Failed to write to Car Tracker CSV 0x" + Integer.toHexString(c.getID()));
         }
     }
+    FileWriter fwCollisions = null;
+    private FileWriter initCSVCollision(String path){
+        FileWriter fw = null;
+        File pathchk = new File(path);
+        if(pathchk.isDirectory()){
+            try{
+                fw = new FileWriter(path + "\\Collisions.csv");
+                fw.append("Local Time");
+                fw.append(",N Collisions");
+                for(int i=0; i<carList.size(); i++){
+                    for(int j=0; j<carList.size(); j++){
+                        fw.append(",0x" + Integer.toHexString(carList.get(i).getID()) + " - 0x" + Integer.toHexString(carList.get(j).getID()));
+                     }
+                }
+                fw.append("\n");
+                fw.flush();
+            }catch(Exception e){
+                if(verboseOutput){
+                    System.out.println("CarSimulator: Failed to open Collisions file writer");
+                }
+            }
+        }
+        else if(verboseOutput)
+            System.out.println("CarSimulator: ERROR! Path for Collisions does not exist");
+        return fw;
+    }
+    private void outputCSVCollisions(boolean[][] collisions){
+        int count = countNCollisions(collisions);
+        try{
+            fwCollisions.append(LocalTime.now().toString());
+            fwCollisions.append("," + Integer.toString(count));
+            for(int i=0; i<collisions.length; i++){
+                for(int j=0; j<collisions[i].length; j++){
+                    fwCollisions.append("," + Boolean.toString(collisions[i][j]));
+                }
+            }
+            fwCollisions.append("\n");
+            fwCollisions.flush();
+        }catch(Exception e){
+            
+        }
+            
+    }
+    private int countNCollisions(boolean[][] collisions){
+        int count = 0;
+        for(int i=0; i<collisions.length; i++){
+            for(int j=i; j<collisions[i].length; j++){
+                if(collisions[i][j])
+                    count++;
+            }
+        }
+        return count;
+    }
+    
 }

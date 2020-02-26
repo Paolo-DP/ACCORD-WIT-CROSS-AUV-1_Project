@@ -17,7 +17,7 @@ import simulator.SimulationConstants;
  * @author Paolo
  */
 public class ModuleUnitTests implements SimulationConstants{
-    private static int[] tags = {0x6a40, 0x6a3f, 0x6a1a, 0x6743};
+    private static int[] tags = {0x6a40, 0x673b, 0x6a1a, 0x6743};
     private static int[] anchorIDs = {0x6e3c, 0x6717, 0x6e38, 0x6735}; 
     private static int[] anchorX = {0, 5200, 0, 5200};
     private static int[] anchorY = {0, 0, 5200, 5200};
@@ -753,20 +753,20 @@ public class ModuleUnitTests implements SimulationConstants{
             cars[i] = new Car(tags[i], pozyx);
             
             switch(tags[i]){
-                case 0x6a40:
-                    cars[i].setAttributesManual(tags[i], 4540, 2930, 180, 270, 100, cars[i].minSpeedmm);
+                case 0x673b:
+                    cars[i].setAttributesManual(tags[i], 4540, 2930, 180, Car.DEFAULT_XDim, Car.DEFAULT_YDim, cars[i].minSpeedmm);
+                    cars[i].addRouteDirection(RIGHT_TURN);
+                    break;
+                case 0x6743:
+                    cars[i].setAttributesManual(tags[i], 660, 2280, 0, Car.DEFAULT_XDim, Car.DEFAULT_YDim, cars[i].minSpeedmm);
                     cars[i].addRouteDirection(STRAIGHT);
                     break;
                 case 0x6a1a:
-                    cars[i].setAttributesManual(tags[i], 660, 2280, 0, 270, 100, cars[i].minSpeedmm);
-                    cars[i].addRouteDirection(STRAIGHT);
+                    cars[i].setAttributesManual(tags[i], 2220, 4540, 270, Car.DEFAULT_XDim, Car.DEFAULT_YDim, cars[i].minSpeedmm);
+                    cars[i].addRouteDirection(RIGHT_TURN);
                     break;
-                case 0x6743:
-                    cars[i].setAttributesManual(tags[i], 2220, 4540, 270, 270, 100, cars[i].minSpeedmm);
-                    cars[i].addRouteDirection(STRAIGHT);
-                    break;
-                case 0x6a3f:
-                    cars[i].setAttributesManual(tags[i], 2920, 660, 90, 270, 100, cars[i].minSpeedmm);
+                case 0x6a40:
+                    cars[i].setAttributesManual(tags[i], 2920, 660, 90, Car.DEFAULT_XDim, Car.DEFAULT_YDim, cars[i].minSpeedmm);
                     cars[i].addRouteDirection(STRAIGHT);
                     break;
             }
@@ -781,14 +781,9 @@ public class ModuleUnitTests implements SimulationConstants{
             
         }
         
-        Scanner sc = new Scanner(System.in);
-        System.out.println("Allign all cars with X Axis and hit enter...");
-        sc.nextLine();
-        carSim.allignXAxis();
-        System.out.println("Press Enter to Start");
-        sc.nextLine();
         
-        System.out.println("Doing updates...");
+        
+        System.out.println("Doing initial updates...");
         LocalTime initWait = LocalTime.now().plusSeconds(5);
         while(LocalTime.now().isBefore(initWait)){
             for(Car c : cars)
@@ -796,6 +791,16 @@ public class ModuleUnitTests implements SimulationConstants{
         }
         System.out.println("Initial updates complete");
         
+        Scanner sc = new Scanner(System.in);
+        System.out.println("Allign all cars with X Axis and hit enter...");
+        sc.nextLine();
+        carSim.allignXAxis();
+        System.out.println("Press Enter to Start");
+        sc.nextLine();
+        
+        for(Car c : cars)
+            c.adjustThrottle(c.speedFloor);
+            //c.adjustThrottle(((c.speedLimit-c.speedFloor)/2) + c.speedFloor);
         while(true){
             //for(int i=0; i<cars.length; i++){
                 carSim.simulate();

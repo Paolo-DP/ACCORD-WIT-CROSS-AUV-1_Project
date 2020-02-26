@@ -28,6 +28,9 @@ public class Car implements SimulationConstants{
     private double speed = 0;
     private double xAxisCalib = 0;
     
+    public static final int DEFAULT_XDim = 278;
+    public static final int DEFAULT_YDim = 112;
+    
     //car stati
     public boolean outOfBounds = false;
     public final int MVSTATUS_NORMAL = 1;
@@ -75,10 +78,17 @@ public class Car implements SimulationConstants{
         Arrays.fill(orientHistory, 0);
         Arrays.fill(timeStampHist, 0);
         Arrays.fill(routeDirections, 0);
+        
+        xdimen = DEFAULT_XDim;
+        ydimen = DEFAULT_YDim;
     }
     Car(int ID, PozyxSerialComm pozyx){
         carID = ID;
         this.pozyx = pozyx;
+        
+        xdimen = DEFAULT_XDim;
+        ydimen = DEFAULT_YDim;
+        
         Arrays.fill(xLocHistory, 0);
         Arrays.fill(yLocHistory, 0);
         Arrays.fill(orientHistory, 0);
@@ -93,7 +103,7 @@ public class Car implements SimulationConstants{
             boolean retVal = false;
             pozyxStatus = POZYX_ONLINE;
             //if(coor.x>=0  && coor.y>=0 && coor.timeStamp!=timeStampHist[0]){
-            if(coor.timeStamp>timeStampHist[0]){
+            if(coor.timeStamp>timeStampHist[0] && coor.ID == carID){
             //if(true){
                 adjustHistory();
                 xLocHistory[0] =  ((int)coor.x + xloc)/2;
@@ -244,9 +254,10 @@ public class Car implements SimulationConstants{
     }
     private int redundant_throttle = 0;
     public boolean adjustThrottle(int throttle){
+        boolean retVal = false;
         //if(throttle_power!=throttle || redundant_throttle==REDUNDANT_MSG_RESEND){
         //outputCSV("throttle");
-        outputCarStateCSV("throttle");
+        
         if(true){
             if(throttle > speedLimit)
                 throttle_power = speedLimit;
@@ -267,12 +278,13 @@ public class Car implements SimulationConstants{
                 message[carIDLen+2] = (byte)throttle_power;
             byte[] ack = pozyx.sendCarCommand(message, false);
             redundant_throttle=0;
-            return(ack!=null);
+            retVal = true;
         }
         else{
             redundant_throttle++;
         }
-        return true;
+        outputCarStateCSV("throttle");
+        return retVal;
     }
     private int redundant_steer=0;
     public boolean adjustSteering(int steer){

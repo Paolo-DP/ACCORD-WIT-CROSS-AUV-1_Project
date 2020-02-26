@@ -272,7 +272,16 @@ public class IntersectionSegment extends TrackSegment implements SimulationConst
         segIndex%=4;
         return exit[segIndex];
     }
-    
+    public TrackSegment getCurrentInternalSegment(Car c){
+        IntersectionSlot slot = findSlot(c);
+        if(slot==null)
+            return null;
+        for(int i=0; i<slot.route.length; i++){
+            if(slot.route[i].isWithinBounds(c))
+                return slot.route[i];
+        }
+        return null;
+    }
     @Override
     public int distFromCenterLine(Car c){
        int dist = Integer.MAX_VALUE;

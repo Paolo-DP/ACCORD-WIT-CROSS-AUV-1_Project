@@ -365,10 +365,23 @@ public class TrackSegment {
                 break;
             
             case SEGSHAPE_90DEGTURN:
-                xHitBox1 = absoluteXLoc;
-                yHitBox1 = absoluteYLoc;
-                xHitBox2 = absoluteExitXLoc;
-                yHitBox2 = absoluteExitYLoc;
+                /*
+                xHitBox1 = (int) (Math.min(absoluteXLoc, absoluteExitXLoc) - width - boundaryMargin);
+                yHitBox1 = (int) (Math.min(absoluteYLoc, absoluteExitYLoc) - width -boundaryMargin);
+                xHitBox2 = (int) (Math.max(absoluteXLoc, absoluteExitXLoc) + width + boundaryMargin);
+                yHitBox2 = (int) (Math.max(absoluteYLoc, absoluteExitYLoc) + width + boundaryMargin);
+                */
+                if(turn90 == 1){
+                    switch((int)direction){
+                        case 180:
+                            xHitBox1 = absoluteExitXLoc - (int)(width/2) - boundaryMargin;
+                            yHitBox1 = absoluteExitYLoc - boundaryMargin;
+                            xHitBox2 = absoluteXLoc + boundaryMargin;
+                            yHitBox2 = absoluteYLoc + (int)(width/2) + boundaryMargin;
+                            break;
+
+                    }
+                }
                 break;
         }
     }
