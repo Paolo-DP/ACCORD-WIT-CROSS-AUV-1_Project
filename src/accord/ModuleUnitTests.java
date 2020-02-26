@@ -18,7 +18,7 @@ import simulator.SimulationConstants;
  */
 public class ModuleUnitTests implements SimulationConstants{
     private static int[] tags = {0x6a40, 0x6a3f, 0x6a1a, 0x6743};
-    private static int[] anchorIDs = {0x6e38, 0x6e3c, 0x6735, 0x6717}; 
+    private static int[] anchorIDs = {0x6e3c, 0x6717, 0x6e38, 0x6735}; 
     private static int[] anchorX = {0, 5200, 0, 5200};
     private static int[] anchorY = {0, 0, 5200, 5200};
     private static int[] anchorZ = {0, 0, 0, 0};
@@ -608,13 +608,15 @@ public class ModuleUnitTests implements SimulationConstants{
         
         for(int i=0; i<cars.length; i++){
             cars[i] = new Car(tags[i], pozyx);
-            
-            //cars[i].alignXAxis();
+            cars[i].verbose=true;
+            cars[i].setCSVOutput("C:\\test");
+            cars[i].verbose=false;
+            cars[i].alignXAxis();
         }
         Scanner sc = new Scanner(System.in);
         System.out.println("Allign all cars with X Axis and hit enter...");
         sc.nextLine();
-        cars[0].alignXAxis();
+        //cars[0].alignXAxis();
         while(true){
             for(int i=0; i<cars.length; i++){
                 cars[i].updateLocation();
@@ -772,7 +774,7 @@ public class ModuleUnitTests implements SimulationConstants{
             System.out.println("Track route for Car 0x" + Integer.toHexString(cars[i].getID()));
             routes[i].printAllSegments();
             
-            cars[i].verbose = true;
+            //cars[i].verbose = true;
             carSim.addCar(cars[i], routes[i]);
             cars[i].updateLocation();
             cars[i].alignXAxis();

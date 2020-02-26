@@ -5,9 +5,11 @@
  */
 package accord;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.time.Clock;
 import java.time.LocalTime;
 import java.util.Arrays;
 import simulator.SimulationConstants;
@@ -88,6 +90,7 @@ public class Car implements SimulationConstants{
         
         Coordinates coor = pozyx.getCoordinates(carID);
         if(coor!=null){
+            boolean retVal = false;
             pozyxStatus = POZYX_ONLINE;
             //if(coor.x>=0  && coor.y>=0 && coor.timeStamp!=timeStampHist[0]){
             if(coor.timeStamp>timeStampHist[0]){
@@ -106,14 +109,19 @@ public class Car implements SimulationConstants{
                 updated = true;
                 if(verbose)
                     printCarAttributes();
-                outputCSV("Coordinates Update");
-                return true;
+                //outputCSV("Coordinates Update");
+                outputCarStateCSV("valid coor update");
+                retVal = true;
             }
-            else
+            else{
                 updated = false;
+                outputCarStateCSV("INVALID coor update");
+                retVal = false;
+            }
                 //adjustSteering(0);
                 //throttleDecrement();
-            return false;
+            outputCoordinatesCSV(coor);    
+            return retVal;
         }
         else {
             updated = false;
@@ -237,7 +245,8 @@ public class Car implements SimulationConstants{
     private int redundant_throttle = 0;
     public boolean adjustThrottle(int throttle){
         //if(throttle_power!=throttle || redundant_throttle==REDUNDANT_MSG_RESEND){
-        outputCSV("throttle");
+        //outputCSV("throttle");
+        outputCarStateCSV("throttle");
         if(true){
             if(throttle > speedLimit)
                 throttle_power = speedLimit;
@@ -267,7 +276,8 @@ public class Car implements SimulationConstants{
     }
     private int redundant_steer=0;
     public boolean adjustSteering(int steer){
-        outputCSV("steering");
+        //outputCSV("steering");
+        outputCarStateCSV("steering");
         if(steering_power != steer || redundant_steer==REDUNDANT_MSG_RESEND){
             steering_power = steer;
             byte[] message = new byte[carIDLen + minMessageLen +1];
@@ -286,10 +296,13 @@ public class Car implements SimulationConstants{
     }
     private int redundant_orient = 0;
     public boolean maintainOrientation(double orient, boolean overwrite){
-        outputCSV("orient maintain");
+        boolean retVal = false;
+        //outputCSV("orient maintain");
+        
         if(true || redundant_orient>=REDUNDANT_MSG_RESEND){
             maintain_orient = orient;
-            temp_orient = 0;
+            if(overwrite)
+                temp_orient = maintain_orient;
             double orientUncalib = (orient + xAxisCalib)%360;
             int orientInt = (int)((360-orientUncalib)*5759)/360;
             //System.out.println("Uncalib = " + orientUncalib + "\tInt = " + orientInt);
@@ -306,16 +319,19 @@ public class Car implements SimulationConstants{
                 message[carIDLen + minMessageLen + 2] = 0;
             pozyx.sendCarCommand(message, false);
             redundant_orient = 0;
-            return true;
+            retVal = true;
         }
         else
             redundant_orient++;
-        return true;
+        
+        outputCarStateCSV("orient maintain");
+        return retVal;
         
     }
     private int redundant_orient_timed = 0;
     public boolean maintainOrientationTimed(double orient, double time){
-        outputCSV("orient timed");
+        boolean retVal = false;
+        //outputCSV("orient timed");
         if(true || redundant_orient_timed>=REDUNDANT_MSG_RESEND){
             temp_orient = orient;
             double orientUncalib = (orient + xAxisCalib)%360;
@@ -332,11 +348,15 @@ public class Car implements SimulationConstants{
             System.arraycopy(timedata, 0, message, carIDLen + minMessageLen + 2, timedata.length);
             pozyx.sendCarCommand(message, false);
             redundant_orient_timed = 0;
-            return true;
+            retVal = true;
         }
         else
             redundant_orient_timed++;
-        return true;
+        retVal = true;
+        
+        outputCarStateCSV("orient timed");
+        
+        return retVal;
     }
     public boolean throttleIncrement(){
         if(throttle_power <= 0)
@@ -462,6 +482,37 @@ public class Car implements SimulationConstants{
         
         }catch(Exception e){if(verbose)System.out.println("File Error");};
     }
+    
+    FileWriter fwCoordinates = null;
+    String coordinatesPath = "";
+    FileWriter fwCarState = null;
+    String carStatePath = "";
+    public boolean setCSVOutput(String path){
+        File filePath = new File(path);
+        if(filePath.isDirectory()){
+            try{
+                coordinatesPath = path + "\\CoordinatesUpdate";
+                carStatePath = path + "\\CarState";
+                File coorPath = new File(coordinatesPath);
+                File carPath = new File(carStatePath);
+                carPath.mkdirs();
+                coorPath.mkdirs();
+                
+                fwCoordinates = new FileWriter(coordinatesPath + "\\0x" + Integer.toHexString(carID) + "_CoordinatesUpdate.csv");
+                initCSVCoorHeaders();
+                fwCarState = new FileWriter(carStatePath + "\\0x" + Integer.toHexString(carID) + "_CarState.csv");
+                initCSVCarStateHeaders();
+                return true;
+            }catch(Exception e){
+                return false;
+            }
+        }
+        else{
+            if(verbose)
+                System.out.println("Car: ERROR! File path for csv files does not exist");
+            return false;
+        }
+    }
     public void outputCSV(String source){
         if(writer != null){
             try{
@@ -484,4 +535,81 @@ public class Car implements SimulationConstants{
             }
         }
     }
+    private void initCSVCoorHeaders(){
+        if(fwCoordinates != null){
+            try{
+                fwCoordinates.append("Car ID");
+                fwCoordinates.append(",Time Stamp");
+                fwCoordinates.append(",X");
+                fwCoordinates.append(",Y");
+                fwCoordinates.append(",Z");
+                fwCoordinates.append(",Euler Angle[0]");
+                fwCoordinates.append(",Euler Angle[1]");
+                fwCoordinates.append(",Euler Angle[2]\n");
+                fwCoordinates.flush();
+            }catch(Exception e){}
+        }
+        else if(verbose)
+            System.out.println("Car: ERROR! Coordinates file writer NULL");
+    }
+    private void outputCoordinatesCSV(Coordinates coor){
+        if(fwCoordinates != null && coor!= null){
+            try{
+                
+                fwCoordinates.append(Integer.toHexString(coor.ID));
+                fwCoordinates.append("," + Double.toString(coor.timeStamp));
+                fwCoordinates.append("," + Double.toString(coor.x));
+                fwCoordinates.append("," + Double.toString(coor.y));
+                fwCoordinates.append("," + Double.toString(coor.z));
+                fwCoordinates.append("," + Double.toString(coor.eulerAngles[0]));
+                fwCoordinates.append("," + Double.toString(coor.eulerAngles[1]));
+                fwCoordinates.append("," + Double.toString(coor.eulerAngles[2]) + "\n");
+                fwCoordinates.flush();
+                //fwCoordinates.close();
+            }catch(Exception e){
+                if(verbose)
+                    System.out.println("Car: ERROR! Failed to write Coordinates csv");
+            }
+        }
+        else if(verbose)
+            System.out.println("Car: ERROR! Coordinates file writer NULL");
+    }
+    private void initCSVCarStateHeaders(){
+        try{
+        fwCarState.append("Local Time,");
+        fwCarState.append("Car ID,");
+        fwCarState.append("Source of change,");
+        fwCarState.append("Updated,");
+        fwCarState.append("Time Stamp,");
+        fwCarState.append("X,");
+        fwCarState.append("Y,");
+        fwCarState.append("Orientation,");
+        fwCarState.append("Out of Bounds,");
+        fwCarState.append("Throttle Power,");
+        fwCarState.append("Maintain Orientation,");
+        fwCarState.append("Temp Orientation\n");
+        
+        fwCarState.flush();
+        }catch(Exception e){if(verbose)System.out.println("Car: ERROR! Car State file writer NULL");};
+    }
+    private void outputCarStateCSV(String source){
+        try{
+        fwCarState.append((LocalTime.now(Clock.systemDefaultZone())).toString() + ",");
+        fwCarState.append(Integer.toHexString(getID())+",");
+        fwCarState.append(source + ",");
+        fwCarState.append(Boolean.toString(isUpdated()) + ",");
+        fwCarState.append(Integer.toString((int)getLastTimeStamp()) + ",");
+        fwCarState.append(Integer.toString(getXLocation()) + ",");
+        fwCarState.append(Integer.toString(getYLocation()) + ",");
+        fwCarState.append(Integer.toString((int)getOrientation()) + ",");
+        fwCarState.append(Boolean.toString(outOfBounds) + ",");
+        fwCarState.append(Integer.toString(getThrottlePower()) + ",");
+        fwCarState.append(Integer.toString((int)getMaintainOrient()) + ",");
+        fwCarState.append(Integer.toString((int)getTempOrient()) + "\n");
+        
+        fwCarState.flush();
+        
+        }catch(Exception e){if(verbose)System.out.println("Car: ERROR! Car State file writer NULL");};
+    }
+    
 }

@@ -138,8 +138,8 @@ public class ACCORD {
         
         //ACCORD.createIntersectionTestTrack(50,50,50,50);
         //ModuleUnitTests.testIntersectionTrack();
-        //ModuleUnitTests.testIntersectionTrackSubtracking();
+        ModuleUnitTests.testIntersectionTrackSubtracking();
         
-        ModuleUnitTests.miscTests();
+        //ModuleUnitTests.miscTests();
     }
 }

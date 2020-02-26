@@ -5,7 +5,9 @@
  */
 package accord;
 
+import java.io.File;
 import java.io.FileWriter;
+import java.time.Clock;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -22,14 +24,18 @@ public class CarSimulator {
     private final int MAX_LOCATION_SPIKE = 1000;
     private boolean verboseOutput = false;
     ArrayList <Car> carList = new ArrayList<Car>();
-    ArrayList <FileWriter> carWriters = new ArrayList<>();
-    private String carDataLocation = "C:\\THESIS_Data\\CarData\\";
-    private String simDataLocation = "C:\\THESIS_Data\\SimulationData\\";
-    private String dataFileHeader = "";
     Track track = null;
     ArrayList<Track> routeTracks = new ArrayList<>();
+    
     LocalTime startTime = LocalTime.now();
     LocalDate startDate = LocalDate.now();
+    private String rootPath = "C:\\THESIS_Data";
+    private String instancePath = "";
+    private String carDataLocation = "\\CarData";
+    private String carTrackerLocation = "\\carTracker";
+    private String dataFileHeader = "";
+    ArrayList <FileWriter> fwCarTrackers = new ArrayList<>();
+        
     private boolean start = false;
     
     private static final double MIN_TIME_TO_COLLISION = 1000; //ms until collision
@@ -78,7 +84,7 @@ public class CarSimulator {
     }
     public void start(){
         startTime = LocalTime.now();
-        dataFileHeader = startDate.toString() + "_" + startTime.toString();
+        dataFileHeader = "\\" + startDate.toString() + "_" + startTime.toString();
         dataFileHeader = dataFileHeader.replace(':', '-');
         if(verboseOutput)
             System.out.println("CarSimulator: fileHeader = " + dataFileHeader);
@@ -90,22 +96,27 @@ public class CarSimulator {
         start = false;
     }
     public void initFileWriters(){
-        for(FileWriter fw : carWriters){
-            try{fw.close();}catch(Exception e){};
-        }
-        carWriters.clear();
+        //Car Data CSV initialization
+        String path = dataFileHeader + carDataLocation;
+        File pathchk = new File(path);
+            pathchk.mkdirs();
         for(Car c : carList){
             try{
-                //FileWriter fw = new FileWriter(carDataLocation + "2020-02-22_08-50-34.962" + "_ID-0x" + Integer.toHexString(c.getID())+".csv");
-                FileWriter fw = new FileWriter(carDataLocation + dataFileHeader + "_ID-0x" + Integer.toHexString(c.getID())+".csv");
-                c.setFileWriter(fw);
-                carWriters.add(fw);
+                c.setCSVOutput(path);
             }catch(Exception e){
                 if(verboseOutput)
                     System.out.println("CarSimulator: failed to create CSV file " + Integer.toHexString(c.getID()));
             };
         }
+        //Car Tracker CSV initialization
+        for(FileWriter fw : fwCarTrackers)
+            try{fw.close();}catch(Exception e){}
+        fwCarTrackers.clear();
         
+        path = dataFileHeader + carTrackerLocation;
+        for(Car c : carList){
+            fwCarTrackers.add(initCSVCarTracker(path, c.getID()));
+        }
     }
     
     public void simulate(){
@@ -139,6 +150,8 @@ public class CarSimulator {
                         }
                     }
                     doThrottle(c, ct);
+                    
+                    outputCSVCarTracker(c, ct);
                 }
                 /*
                 c.maintainOrientation(computeNextOrientation(c));
@@ -251,7 +264,8 @@ public class CarSimulator {
     private double[] computeSteerCompensateTime(int distCLine, double followOrient, int speed){
         double[] data = new double[2];
         double time = 0;
-        time = (distCLine*1000)/speed;
+        if(speed != 0)
+            time = (distCLine*1000)/speed;
         if(Math.abs(distCLine)>minDistanceToCorrect){            
             if(distCLine>0)
                 followOrient += orientCorrection;
@@ -353,6 +367,8 @@ public class CarSimulator {
             }
         }
     }
+    
+    //ouput CSVs
     public void exportSimulationSummary(){
         
     }
@@ -361,10 +377,66 @@ public class CarSimulator {
             
         }
     }
+    public void setRootPath(String path){
+        rootPath = path;
+    }
     public void setCarOutputPath(String path){
         carDataLocation = path;
     }
-    public void setSimOutputPath(String path){
-        simDataLocation = path;
+    public void setCarTrackertPath(String path){
+        carTrackerLocation = path;
+    }
+    public FileWriter initCSVCarTracker(String path, int carID){
+        FileWriter fw = null;
+        File pathchk = new File(path);
+        if(pathchk.isDirectory()){
+            try{
+                fw = new FileWriter(path + "\\0x" + Integer.toHexString(carID) + "_CarTracker");
+                
+                fw.append("Local Time");
+                fw.append(",CarID");
+                fw.append(",Current Segment");
+                fw.append(",Next Segment");
+                fw.append(",is Out of Bounds");
+                fw.append(",Distance from Driving Line");
+                fw.append(",Angle Deviation");
+                fw.append(",Ideal Angle\n");
+                fw.flush();
+            }catch(Exception e){
+                if(verboseOutput){
+                    System.out.println("CarSimulator: Failed to open Car Tracker file writer 0x" + Integer.toBinaryString(carID));
+                }
+            }
+        }
+        else if(verboseOutput)
+            System.out.println("CarSimulator: ERROR! Path for Car Tracker does not exist");
+        return fw;
+    }
+    private void outputCSVCarTracker(Car c, CarTracker ct){
+        int carIndex = carList.indexOf(c);
+        if(carIndex<0)
+            return;
+        FileWriter fw = fwCarTrackers.get(carIndex);
+        try{
+            fw.append((LocalTime.now(Clock.systemDefaultZone())).toString());
+            fw.append("," + Integer.toBinaryString(c.getID()));
+            if(ct.currentSeg == null)
+                fw.append(",NULL");
+            else
+                fw.append("," + ct.currentSeg.getSegmentID());
+            if(ct.nextSeg == null)
+                fw.append(",NULL");
+            else
+                fw.append("," + ct.nextSeg.getSegmentID());
+            fw.append("," + Boolean.toString(ct.isOutOfBounds));
+            fw.append("," + Integer.toString(ct.distanceFromDrivingLine));
+            fw.append("," + Double.toString(ct.angleDeviation));
+            fw.append("," + Double.toString(ct.idealAngle) + "\n");
+            fw.flush();
+            
+        }catch(Exception e){
+            if(verboseOutput)
+                System.out.println("CarSimulator: ERROR! Failed to write to Car Tracker CSV 0x" + Integer.toHexString(c.getID()));
+        }
     }
 }

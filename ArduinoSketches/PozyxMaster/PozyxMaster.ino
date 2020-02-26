@@ -23,13 +23,13 @@ uint8_t height = 0;
 
 const short numTags = 8;
 uint8_t lastTag = 0;
-uint16_t tags[numTags] = {1, 2, 3, 4, 5, 6, 7, 8};
-int32_t tags_x[numTags] = {1, 2, 3, 4, 5, 6, 7, 8};
-int32_t tags_y[numTags] = {1, 2, 3, 4, 5, 6, 7, 8};
-int32_t tags_z[numTags] = {1, 2, 3, 4, 5, 6, 7, 8};
-int16_t tags_angle[numTags] = {1, 2, 3, 4, 5, 6, 7, 8};
-int16_t tags_angle_calib[numTags] = {1, 2, 3, 4, 5, 6, 7, 8};
-int32_t updateTimeStamp[8] = {1, 2, 3, 4, 5, 6, 7, 8};
+uint16_t tags[numTags] = {0, 0, 0, 0, 0, 0, 0, 0};
+int32_t tags_x[numTags] = {0, 0, 0, 0, 0, 0, 0, 0};
+int32_t tags_y[numTags] = {0, 0, 0, 0, 0, 0, 0, 0};
+int32_t tags_z[numTags] = {0, 0, 0, 0, 0, 0, 0, 0};
+int16_t tags_angle[numTags] = {0, 0, 0, 0, 0, 0, 0, 0};
+int16_t tags_angle_calib[numTags] = {0, 0, 0, 0, 0, 0, 0, 0};
+int32_t updateTimeStamp[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 
 byte const headerBytes[] = {0xF0, 0xF0, 0xF0};
 int const headerLength = sizeof(headerBytes) + 1; //header leading bytes + length byte
