@@ -373,13 +373,58 @@ public class TrackSegment {
                 */
                 if(turn90 == 1){
                     switch((int)direction){
+                        case 0:
+                            xHitBox1 = absoluteXLoc - boundaryMargin;
+                            yHitBox1 = absoluteYLoc - (int)(width/2) - boundaryMargin;
+                            xHitBox2 = absoluteExitXLoc + boundaryMargin;
+                            yHitBox2 = absoluteExitYLoc + (int)(width/2) + boundaryMargin;
+                            break;
+                        case 90:
+                            xHitBox1 = absoluteExitXLoc - boundaryMargin;
+                            yHitBox1 = (int) (absoluteExitYLoc - radius - boundaryMargin);
+                            xHitBox2 = absoluteXLoc + (int)(width/2) + boundaryMargin;
+                            yHitBox2 = (int) (absoluteExitYLoc + (width/2) + boundaryMargin);
+                            break;
                         case 180:
                             xHitBox1 = absoluteExitXLoc - (int)(width/2) - boundaryMargin;
                             yHitBox1 = absoluteExitYLoc - boundaryMargin;
                             xHitBox2 = absoluteXLoc + boundaryMargin;
                             yHitBox2 = absoluteYLoc + (int)(width/2) + boundaryMargin;
                             break;
-
+                        case 270:
+                            xHitBox1 = absoluteXLoc - (int)(width/2) - boundaryMargin;
+                            yHitBox1 = absoluteExitYLoc - (int)(width/2) - boundaryMargin;
+                            xHitBox2 = absoluteExitXLoc + boundaryMargin;
+                            yHitBox2 = (int) (absoluteExitYLoc + radius + boundaryMargin);
+                            break;
+                    }
+                }
+                else if(turn90 == -1){
+                    switch((int)direction){
+                        case 0:
+                            xHitBox1 = absoluteXLoc - boundaryMargin;
+                            yHitBox1 = (int) (absoluteExitYLoc - boundaryMargin);
+                            xHitBox2 = absoluteExitXLoc + (int)(width/2) + boundaryMargin;
+                            yHitBox2 = absoluteYLoc + (int)(width/2) + boundaryMargin;
+                            break;
+                        case 90:
+                            xHitBox1 = absoluteXLoc - (int)(width/2) - boundaryMargin;
+                            yHitBox1 = absoluteYLoc - boundaryMargin;
+                            xHitBox2 = absoluteExitXLoc + boundaryMargin;
+                            yHitBox2 = (int) (absoluteExitYLoc + (width/2) + boundaryMargin);
+                            break;
+                        case 180:
+                            xHitBox1 = absoluteExitXLoc - (int)(width/2) - boundaryMargin;
+                            yHitBox1 = absoluteYLoc - (int)(width/2) - boundaryMargin;
+                            xHitBox2 = absoluteXLoc + boundaryMargin;
+                            yHitBox2 = absoluteExitYLoc + boundaryMargin;
+                            break;
+                        case 270:
+                            xHitBox1 = absoluteExitXLoc - boundaryMargin;
+                            yHitBox1 = absoluteExitYLoc - (int)(width/2) - boundaryMargin;
+                            xHitBox2 = absoluteXLoc + (int)(width/2) + boundaryMargin;
+                            yHitBox2 = absoluteExitYLoc + boundaryMargin;
+                            break;
                     }
                 }
                 break;
