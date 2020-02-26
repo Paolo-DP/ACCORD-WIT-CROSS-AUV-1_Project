@@ -753,19 +753,19 @@ public class ModuleUnitTests implements SimulationConstants{
             cars[i] = new Car(tags[i], pozyx);
             
             switch(tags[i]){
-                case 0x6a3f:
+                case 0x6a40:
                     cars[i].setAttributesManual(tags[i], 4540, 2930, 180, 270, 100, cars[i].minSpeedmm);
                     cars[i].addRouteDirection(STRAIGHT);
                     break;
-                case 0x6743:
+                case 0x6a1a:
                     cars[i].setAttributesManual(tags[i], 660, 2280, 0, 270, 100, cars[i].minSpeedmm);
                     cars[i].addRouteDirection(STRAIGHT);
                     break;
-                case 0x6a1a:
+                case 0x6743:
                     cars[i].setAttributesManual(tags[i], 2220, 4540, 270, 270, 100, cars[i].minSpeedmm);
                     cars[i].addRouteDirection(STRAIGHT);
                     break;
-                case 0x6a40:
+                case 0x6a3f:
                     cars[i].setAttributesManual(tags[i], 2920, 660, 90, 270, 100, cars[i].minSpeedmm);
                     cars[i].addRouteDirection(STRAIGHT);
                     break;

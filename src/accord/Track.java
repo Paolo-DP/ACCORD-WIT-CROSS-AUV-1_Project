@@ -61,6 +61,12 @@ public class Track {
             ct.distanceFromDrivingLine = ct.currentSeg.distFromCenterLine(c);
             updateCarTrackerAngles(ct);
         }
+        if(ct.nextSeg != null && ct.nextSeg.isIntersection())
+            ct.hasReservation = ((IntersectionSegment)ct.nextSeg).isReserved(c);
+        else if(ct.currentSeg != null && ct.currentSeg.isIntersection())
+            ct.hasReservation = ((IntersectionSegment)ct.currentSeg).isReserved(c);
+        else
+            ct.hasReservation = false;
         ct.car.outOfBounds = ct.isOutOfBounds;
         return ct;
     }

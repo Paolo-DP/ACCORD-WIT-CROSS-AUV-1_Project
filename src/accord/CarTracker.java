@@ -32,6 +32,7 @@ public class CarTracker {
     public TrackSegment currentSeg = null;
     public TrackSegment nextSeg = null;
     public boolean isOutOfBounds = true;
+    public boolean hasReservation;
     public int distanceFromDrivingLine = 0;
     public double angleDeviation = 0;
     public double idealAngle = 0;

@@ -127,6 +127,10 @@ public class IntersectionSegment extends TrackSegment implements SimulationConst
         }
     }
     @Override
+    public String getSegmentID(){
+        return segmentID;
+    }
+    @Override
     public void setAbsoluteLocation(int x, int y){
         absoluteXLoc = x;
         absoluteYLoc = y;
@@ -465,8 +469,7 @@ public class IntersectionSegment extends TrackSegment implements SimulationConst
     public boolean releaseReservation(Car car){
         return resMan.remove(car.getID());
     }
-    public boolean isReserved(CarTracker ct){
-        
+    public boolean isReserved(CarTracker ct){        
         return findSlot(ct.car) != null;
     }
     public boolean isReserved(Car c){

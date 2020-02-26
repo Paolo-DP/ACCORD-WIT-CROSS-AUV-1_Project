@@ -86,6 +86,7 @@ public class CarSimulator {
         startTime = LocalTime.now();
         dataFileHeader = "\\" + startDate.toString() + "_" + startTime.toString();
         dataFileHeader = dataFileHeader.replace(':', '-');
+        dataFileHeader = rootPath + dataFileHeader;
         if(verboseOutput)
             System.out.println("CarSimulator: fileHeader = " + dataFileHeader);
         initFileWriters();
@@ -114,6 +115,8 @@ public class CarSimulator {
         fwCarTrackers.clear();
         
         path = dataFileHeader + carTrackerLocation;
+        pathchk = new File(path);
+        pathchk.mkdir();
         for(Car c : carList){
             fwCarTrackers.add(initCSVCarTracker(path, c.getID()));
         }
@@ -391,13 +394,15 @@ public class CarSimulator {
         File pathchk = new File(path);
         if(pathchk.isDirectory()){
             try{
-                fw = new FileWriter(path + "\\0x" + Integer.toHexString(carID) + "_CarTracker");
+                fw = new FileWriter(path + "\\0x" + Integer.toHexString(carID) + "_CarTracker.csv");
                 
                 fw.append("Local Time");
                 fw.append(",CarID");
+                fw.append(",Last Time Stamp");
                 fw.append(",Current Segment");
                 fw.append(",Next Segment");
                 fw.append(",is Out of Bounds");
+                fw.append(",has Reservation");
                 fw.append(",Distance from Driving Line");
                 fw.append(",Angle Deviation");
                 fw.append(",Ideal Angle\n");
@@ -419,7 +424,8 @@ public class CarSimulator {
         FileWriter fw = fwCarTrackers.get(carIndex);
         try{
             fw.append((LocalTime.now(Clock.systemDefaultZone())).toString());
-            fw.append("," + Integer.toBinaryString(c.getID()));
+            fw.append("," + Integer.toHexString(c.getID()));
+            fw.append("," + Double.toString(c.getLastTimeStamp()));
             if(ct.currentSeg == null)
                 fw.append(",NULL");
             else
@@ -429,6 +435,7 @@ public class CarSimulator {
             else
                 fw.append("," + ct.nextSeg.getSegmentID());
             fw.append("," + Boolean.toString(ct.isOutOfBounds));
+            fw.append("," + Boolean.toString(ct.hasReservation));
             fw.append("," + Integer.toString(ct.distanceFromDrivingLine));
             fw.append("," + Double.toString(ct.angleDeviation));
             fw.append("," + Double.toString(ct.idealAngle) + "\n");
