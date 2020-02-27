@@ -122,6 +122,7 @@ public class ACCORD {
         //ModuleUnitTests.testPozyxLocalization();
         
         //ModuleUnitTests.testCarSpeedCalculations();
+        ModuleUnitTests.testSpeedEquivalentThrottle();
         //ModuleUnitTests.testCarCSV();
         
         //ModuleUnitTests.testCoordinatesPolling();
@@ -138,7 +139,7 @@ public class ACCORD {
         
         //ACCORD.createIntersectionTestTrack(50,50,50,50);
         //ModuleUnitTests.testIntersectionTrack();
-        ModuleUnitTests.testIntersectionTrackSubtracking();
+        //ModuleUnitTests.testIntersectionTrackSubtracking();
         
         //ModuleUnitTests.miscTests();
     }

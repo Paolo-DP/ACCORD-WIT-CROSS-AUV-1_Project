@@ -420,6 +420,13 @@ public class ModuleUnitTests implements SimulationConstants{
         System.out.println("Car speed: " + c.calculateSpeed());
         
     }
+    public static void testSpeedEquivalentThrottle(){
+        Car c = new Car();
+        int[] throttles = {0,16,32,48,64,80,96,112,127};
+        for(int th : throttles){
+            System.out.println("Throttle: " + th + "\t Speed: " + c.getSpeedEquivalent(th));
+        }
+    }
     public static void testCarCSV(){
         
             Car c = new Car();

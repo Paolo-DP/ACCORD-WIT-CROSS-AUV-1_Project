@@ -94,6 +94,20 @@ public class Track {
         }
         return ct;
     }
+    public CarTracker nullTracker(CarDetails deets){
+        CarTracker ct = new CarTracker(null);
+        ct.currentSeg = searchCurrentSegment(deets.xloc, deets.yloc);
+        ct.isOutOfBounds = (ct.currentSeg == null);
+        if(ct.currentSeg != null){
+            ct.distanceFromDrivingLine = ct.currentSeg.distFromCenterLine(deets.xloc, deets.yloc);
+            ct.idealAngle = ct.currentSeg.idealDirection(deets.xloc, deets.yloc);
+            
+            if(!ct.currentSeg.isIntersection())
+                ct.nextSeg = ct.currentSeg.getNextSeg(null);
+        }
+        
+        return ct;
+    }
     public TrackSegment getCurrentSegment(int xLoc, int yLoc){
         for(int i=0; i<segments.size(); i++){
             if(segments.get(i).isWithinBounds(xLoc, yLoc))
@@ -168,6 +182,16 @@ public class Track {
         }
         return current;
     }
+    private TrackSegment searchCurrentSegment(int x, int y){
+        TrackSegment current = null;
+        for(int i=0; i<segments.size(); i++){
+            if(segments.get(i).isWithinBounds(x, y)){
+                current = segments.get(i);
+                break;
+            }
+        }
+        return current;
+    }
     
     public int distfromCenterLine(Car c){
         int xLoc = c.getXLocation();
@@ -212,7 +236,7 @@ public class Track {
         if(ct.angleDeviation>180)
             ct.angleDeviation = ct.angleDeviation - 360;
         return true;
-    } 
+    }
     public double idealDirection(int xLoc, int yLoc){
         TrackSegment seg = getCurrentSegment(xLoc, yLoc);
         if(seg==null)

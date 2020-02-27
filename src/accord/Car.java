@@ -172,7 +172,8 @@ public class Car implements SimulationConstants{
     }
     public double getSpeed(){
         //return speed;
-        return minSpeedmm;
+        //return minSpeedmm;
+        return getSpeedEquivalent(throttle_power);
     }
     public int getSteeringPower(){
         return steering_power;
@@ -237,9 +238,17 @@ public class Car implements SimulationConstants{
         double xspeed = ((xLocHistory[0] - xLocHistory[1])*1000) / (timeStampHist[0] - timeStampHist[1]);
         double yspeed = ((yLocHistory[0] - yLocHistory[1])*1000) / (timeStampHist[0] - timeStampHist[1]);
         speed = Math.sqrt((xspeed*xspeed) + (yspeed*yspeed));
-        if(verbose){
-            System.out.println("Car " + Integer.toHexString(carID) + " x speed: " + xspeed);
-            System.out.println("Car " + Integer.toHexString(carID) + " y speed: " + yspeed);
+        return speed;
+    }
+    private final double[][] speedTable = {{0,0}, {32, 0}, {64, 830}, {96, 1480}, {127, 1900}};  
+    public double getSpeedEquivalent(int throttle){
+        double speed = 0;
+        for(int i=0; i<speedTable.length-1; i++){
+            if(throttle >= speedTable[i][0] && throttle <= speedTable[i+1][0]){
+                speed = (((speedTable[i+1][1] - speedTable[i][1])/(speedTable[i+1][0] - speedTable[i][0]))
+                        * (throttle - speedTable[i][0])) + speedTable[i][1];
+                break;
+            }
         }
         return speed;
     }

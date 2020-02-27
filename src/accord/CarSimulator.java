@@ -23,7 +23,7 @@ public class CarSimulator {
     private double orientCorrection = 15;
     private double timePredictionSet = 500; //prediction of car location time step (ms)
     private final int MAX_LOCATION_SPIKE = 1000;
-    private int distanceOfCollision = 1000; 
+    private int distanceOfCollision = 600; 
     private boolean verboseOutput = false;
     ArrayList <Car> carList = new ArrayList<Car>();
     Track track = null;
@@ -145,7 +145,8 @@ public class CarSimulator {
                 if(c.updateLocation()){
                     //if(!isValidData(c))
                     //    estimateCarLocation(c, null);
-                    CarTracker ct = subtrack.updateCarTracker(c);            
+                    CarTracker ct = subtrack.updateCarTracker(c);
+                    ct = getBestCarTracker(c, subtrack, ct);
                     //doSteering(c, ct);
                                         
                     if(ct.nextSeg != null && ct.nextSeg.isIntersection()){ //if approaching an intersection
@@ -390,6 +391,24 @@ public class CarSimulator {
         
         
         double timeLookAhead = car.timeSinceLastUpdate();
+    }
+    
+    private CarTracker getBestCarTracker(Car car, Track tr, CarTracker ct){
+        CarTracker best = ct;
+        if(ct.isOutOfBounds)
+            return ct;
+        CarDetails nextStep = incrementLocationConstant(car.getFullDetails());
+        CarTracker nextCt = tr.nullTracker(nextStep);
+        if(!nextCt.isOutOfBounds)
+            best = nextCt;
+        
+        return best;
+    }
+    //private int totalLookAheadTime = 2000;
+    private int incrementLocTimeStep = 1000;
+    private CarDetails incrementLocationConstant(CarDetails deets){
+        
+        return deets;
     }
     
     private void validateDataHistory(CarDetails deets){
