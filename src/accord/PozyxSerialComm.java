@@ -50,8 +50,14 @@ public class PozyxSerialComm {
     
     PozyxSerialComm(){
         Scanner sc = new Scanner(System.in);
-        System.out.println("Select POZYX Com port:");
         SerialPort[] ports = SerialPort.getCommPorts();
+        if(ports.length < 2){
+            System.out.println("Error! Insufficient number of Comm Ports");
+            
+        }
+        
+        System.out.println("Select POZYX Com port:");
+        
         for(int i=0; i<ports.length; i++){
             System.out.println(i+". " + ports[i].getSystemPortName());
         }
@@ -117,9 +123,11 @@ public class PozyxSerialComm {
         message[frameHeaderLen] = (byte)message.length;
         message[minFrameLength-1] = SYNC;
         flushRX(true);
-        if(comPort.writeBytes(message, message.length) > 0){
-            if(!ACKRecieved(SYNC))
-                return false;
+        //System.out.println(Arrays.toString(message));
+        
+        if(true || comPort.writeBytes(message, message.length) > 0){
+            //if(!ACKRecieved(SYNC))
+            //    return false;
             
             syncTimeLocal = LocalTime.now();
             int replyLength = incomingFrame();
@@ -128,6 +136,7 @@ public class PozyxSerialComm {
             else{
                 byte[] data = new byte[4];
                 comPort.readBytes(data, 4);
+                System.out.println(Arrays.toString(data));
                 syncTimeArduino = ByteBuffer.wrap(Arrays.copyOfRange(message, 17, 21)).getInt();
                 if(syncTimeArduino <= 0){
                     syncTimeArduino = 0;

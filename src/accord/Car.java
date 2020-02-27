@@ -136,6 +136,7 @@ public class Car implements SimulationConstants{
         else {
             updated = false;
             pozyxStatus = POZYX_OFFLINE;
+            outputCoordinatesCSV(null); 
             if(verbose)
                 System.out.println("Car " + carID + ": Update Error\n");
             return false;
@@ -243,7 +244,7 @@ public class Car implements SimulationConstants{
     private final double[][] speedTable = {{0,0}, {32, 0}, {64, 830}, {96, 1480}, {127, 1900}};  
     public double getSpeedEquivalent(int throttle){
         double speed = 0;
-        for(int i=0; i<speedTable.length-1; i++){
+        for(int i=0; i<(speedTable.length)-1; i++){
             if(throttle >= speedTable[i][0] && throttle <= speedTable[i+1][0]){
                 speed = (((speedTable[i+1][1] - speedTable[i][1])/(speedTable[i+1][0] - speedTable[i][0]))
                         * (throttle - speedTable[i][0])) + speedTable[i][1];
@@ -574,22 +575,32 @@ public class Car implements SimulationConstants{
             System.out.println("Car: ERROR! Coordinates file writer NULL");
     }
     private void outputCoordinatesCSV(Coordinates coor){
-        if(fwCoordinates != null && coor!= null){
-            try{
-                
-                fwCoordinates.append(Integer.toHexString(coor.ID));
-                fwCoordinates.append("," + Double.toString(coor.timeStamp));
-                fwCoordinates.append("," + Double.toString(coor.x));
-                fwCoordinates.append("," + Double.toString(coor.y));
-                fwCoordinates.append("," + Double.toString(coor.z));
-                fwCoordinates.append("," + Double.toString(coor.eulerAngles[0]));
-                fwCoordinates.append("," + Double.toString(coor.eulerAngles[1]));
-                fwCoordinates.append("," + Double.toString(coor.eulerAngles[2]) + "\n");
+        if(fwCoordinates != null){
+            if(coor != null){
+                try{
+
+                    fwCoordinates.append(Integer.toHexString(coor.ID));
+                    fwCoordinates.append("," + Double.toString(coor.timeStamp));
+                    fwCoordinates.append("," + Double.toString(coor.x));
+                    fwCoordinates.append("," + Double.toString(coor.y));
+                    fwCoordinates.append("," + Double.toString(coor.z));
+                    fwCoordinates.append("," + Double.toString(coor.eulerAngles[0]));
+                    fwCoordinates.append("," + Double.toString(coor.eulerAngles[1]));
+                    fwCoordinates.append("," + Double.toString(coor.eulerAngles[2]) + "\n");
+                    fwCoordinates.flush();
+                    //fwCoordinates.close();
+                }catch(Exception e){
+                    if(verbose)
+                        System.out.println("Car: ERROR! Failed to write Coordinates csv");
+                }
+            }
+            else{
+                try{
+                for(int i=0; i<7; i++)
+                    fwCoordinates.append("NULL,");
+                fwCoordinates.append("NULL\n");
                 fwCoordinates.flush();
-                //fwCoordinates.close();
-            }catch(Exception e){
-                if(verbose)
-                    System.out.println("Car: ERROR! Failed to write Coordinates csv");
+                }catch(Exception e){}
             }
         }
         else if(verbose)
@@ -607,6 +618,7 @@ public class Car implements SimulationConstants{
         fwCarState.append("Orientation,");
         fwCarState.append("Out of Bounds,");
         fwCarState.append("Throttle Power,");
+        fwCarState.append("Speed,");
         fwCarState.append("Maintain Orientation,");
         fwCarState.append("Temp Orientation\n");
         
@@ -625,6 +637,7 @@ public class Car implements SimulationConstants{
         fwCarState.append(Integer.toString((int)getOrientation()) + ",");
         fwCarState.append(Boolean.toString(outOfBounds) + ",");
         fwCarState.append(Integer.toString(getThrottlePower()) + ",");
+        fwCarState.append(Double.toString(getSpeed()) + ",");
         fwCarState.append(Integer.toString((int)getMaintainOrient()) + ",");
         fwCarState.append(Integer.toString((int)getTempOrient()) + "\n");
         

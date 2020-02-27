@@ -23,7 +23,7 @@ public class CarSimulator {
     private double orientCorrection = 15;
     private double timePredictionSet = 500; //prediction of car location time step (ms)
     private final int MAX_LOCATION_SPIKE = 1000;
-    private int distanceOfCollision = 600; 
+    private int distanceOfCollision = 300; 
     private boolean verboseOutput = false;
     ArrayList <Car> carList = new ArrayList<Car>();
     Track track = null;
@@ -146,7 +146,7 @@ public class CarSimulator {
                     //if(!isValidData(c))
                     //    estimateCarLocation(c, null);
                     CarTracker ct = subtrack.updateCarTracker(c);
-                    ct = getBestCarTracker(c, subtrack, ct);
+                    //ct = getBestCarTracker(c, subtrack, ct);
                     //doSteering(c, ct);
                                         
                     if(ct.nextSeg != null && ct.nextSeg.isIntersection()){ //if approaching an intersection
@@ -208,7 +208,7 @@ public class CarSimulator {
         if(!tracker.isOutOfBounds){
             String segShape = tracker.currentSeg.getSegShape();
             if(segShape == TrackSegment.SEGSHAPE_LINEAR){
-                c.maintainOrientation(computeNextOrientation(c), false);
+                c.maintainOrientation(computeNextOrientation(c, tracker), false);
                 double[] orientTimed = computeSteerCompensateTime(c);
                 c.maintainOrientationTimed(orientTimed[0], orientTimed[1]);
             }
@@ -269,11 +269,11 @@ public class CarSimulator {
         
         return (steer_dist + steer_orient)%128;
     }
-    private double computeNextOrientation(Car c){
+    private double computeNextOrientation(Car c, CarTracker ct){
         Track subtrack = getCarRoute(c);
-        int distCLine = subtrack.distfromCenterLine(c);
+        int distCLine = ct.distanceFromDrivingLine;
         //double correctOrient = subtrack.directionDeviation(c);
-        double followOrient = subtrack.idealDirection(c.getXLocation(), c.getYLocation());
+        double followOrient = ct.idealAngle;
         if(distCLine == Integer.MAX_VALUE){
             c.outOfBounds = true;
             if(verboseOutput)
@@ -397,17 +397,39 @@ public class CarSimulator {
         CarTracker best = ct;
         if(ct.isOutOfBounds)
             return ct;
-        CarDetails nextStep = incrementLocationConstant(car.getFullDetails());
+        CarDetails deets = car.getFullDetails();
+        CarDetails nextStep;
+        //nextStep = incrementLocationConstant(deets);
+        nextStep = incrementLocationFixedDistance(deets, 600);
+        /*if(!(deets.timeStampHist[0] <=0 || deets.timeStampHist[1] <= 0)){
+            nextStep =  incrementLocationConstant(deets, (deets.timeStampHist[0]-deets.timeStampHist[1])/1000);
+        }
+        else
+            nextStep = incrementLocationConstant(deets);
+        */
         CarTracker nextCt = tr.nullTracker(nextStep);
-        if(!nextCt.isOutOfBounds)
+        if(!nextCt.isOutOfBounds){
             best = nextCt;
+            best.car = car;
+        }
         
         return best;
     }
     //private int totalLookAheadTime = 2000;
-    private int incrementLocTimeStep = 1000;
+    private double incrementLocTimeStep = .2;
     private CarDetails incrementLocationConstant(CarDetails deets){
-        
+        deets.xloc += (int) (deets.speed * incrementLocTimeStep * Math.cos(deets.orient));
+        deets.yloc += (int) (deets.speed * incrementLocTimeStep * Math.sin(deets.orient));
+        return deets;
+    }
+    private CarDetails incrementLocationConstant(CarDetails deets, double timeStep){
+        deets.xloc += (int) (deets.speed * timeStep * Math.cos(deets.orient));
+        deets.yloc += (int) (deets.speed * timeStep * Math.sin(deets.orient));
+        return deets;
+    }
+    private CarDetails incrementLocationFixedDistance(CarDetails deets, int magnitude){
+        deets.xloc += (int) (magnitude * Math.cos(deets.orient));
+        deets.yloc += (int) (magnitude * Math.sin(deets.orient));
         return deets;
     }
     
@@ -476,6 +498,8 @@ public class CarSimulator {
                 fw.append("Local Time");
                 fw.append(",CarID");
                 fw.append(",Last Time Stamp");
+                fw.append(",X");
+                fw.append(",Y");
                 fw.append(",Current Segment");
                 fw.append(",Next Segment");
                 fw.append(",is Out of Bounds");
@@ -503,6 +527,8 @@ public class CarSimulator {
             fw.append((LocalTime.now(Clock.systemDefaultZone())).toString());
             fw.append("," + Integer.toHexString(c.getID()));
             fw.append("," + Double.toString(c.getLastTimeStamp()));
+            fw.append("," + Integer.toString(ct.x));
+            fw.append("," + Integer.toString(ct.y));
             if(ct.currentSeg == null)
                 fw.append(",NULL");
             else

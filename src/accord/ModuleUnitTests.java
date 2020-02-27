@@ -397,6 +397,18 @@ public class ModuleUnitTests implements SimulationConstants{
             }
         //}
     }
+    public static void testArduinoTimeSync(){
+        PozyxSerialComm poz = new PozyxSerialComm();
+        poz.setVerboseOutput(true);
+        poz.syncArduinoTime();
+        System.out.println("Arduino Sync time: " + poz.getTimeSyncArduinoMs());
+        System.out.println("Waiting 500 ms...");
+        try{
+            Thread.sleep(500);
+        }catch(Exception e){}
+        poz.syncArduinoTime();
+        System.out.println("Arduino Sync time: " + poz.getTimeSyncArduinoMs());
+    }
     //Car methods and data tests
     public static void testCarSpeedCalculations(){
         Car c = new Car();
@@ -636,7 +648,7 @@ public class ModuleUnitTests implements SimulationConstants{
     }
     public static void testCoordinatesPolling(){
         
-        int carID = 0x6a3f;
+        int carID = 0x6a1a;
         PozyxSerialComm pozyx = new PozyxSerialComm();
         pozyx.setVerboseOutput(false);
         for(int i=0; i<anchorIDs.length; i++){
@@ -760,21 +772,25 @@ public class ModuleUnitTests implements SimulationConstants{
             cars[i] = new Car(tags[i], pozyx);
             
             switch(tags[i]){
-                case 0x673b:
-                    cars[i].setAttributesManual(tags[i], 4540, 2930, 180, Car.DEFAULT_XDim, Car.DEFAULT_YDim, cars[i].minSpeedmm);
-                    cars[i].addRouteDirection(RIGHT_TURN);
+                case 0x6a40:
+                    ACCORD.initCar(cars[i], NORTH, STRAIGHT);
+                    //cars[i].setAttributesManual(tags[i], 4540, 2930, 180, Car.DEFAULT_XDim, Car.DEFAULT_YDim, cars[i].minSpeedmm);
+                    //cars[i].addRouteDirection(RIGHT_TURN);
                     break;
                 case 0x6743:
-                    cars[i].setAttributesManual(tags[i], 660, 2280, 0, Car.DEFAULT_XDim, Car.DEFAULT_YDim, cars[i].minSpeedmm);
-                    cars[i].addRouteDirection(STRAIGHT);
+                    ACCORD.initCar(cars[i], EAST, LEFT_TURN);
+                    //cars[i].setAttributesManual(tags[i], 660, 2280, 0, Car.DEFAULT_XDim, Car.DEFAULT_YDim, cars[i].minSpeedmm);
+                    //cars[i].addRouteDirection(STRAIGHT);
+                    break;
+                case 0x673b:
+                    ACCORD.initCar(cars[i], WEST, LEFT_TURN);
+                    //cars[i].setAttributesManual(tags[i], 4540, 2920, 270, Car.DEFAULT_XDim, Car.DEFAULT_YDim, cars[i].minSpeedmm);
+                    //cars[i].addRouteDirection(LEFT_TURN);
                     break;
                 case 0x6a1a:
-                    cars[i].setAttributesManual(tags[i], 2220, 4540, 270, Car.DEFAULT_XDim, Car.DEFAULT_YDim, cars[i].minSpeedmm);
-                    cars[i].addRouteDirection(RIGHT_TURN);
-                    break;
-                case 0x6a40:
-                    cars[i].setAttributesManual(tags[i], 2920, 660, 90, Car.DEFAULT_XDim, Car.DEFAULT_YDim, cars[i].minSpeedmm);
-                    cars[i].addRouteDirection(STRAIGHT);
+                    ACCORD.initCar(cars[i], SOUTH, RIGHT_TURN);
+                    //cars[i].setAttributesManual(tags[i], 2290, 4540, 90, Car.DEFAULT_XDim, Car.DEFAULT_YDim, cars[i].minSpeedmm);
+                    //cars[i].addRouteDirection(STRAIGHT);
                     break;
             }
             routes[i] = tr.getRouteTrack(cars[i], tr.updateCarTracker(cars[i]).currentSeg);
@@ -806,7 +822,7 @@ public class ModuleUnitTests implements SimulationConstants{
         sc.nextLine();
         
         for(Car c : cars)
-            c.adjustThrottle(c.speedFloor);
+            c.adjustThrottle(((c.speedLimit-c.speedFloor)/2) + c.speedFloor);
             //c.adjustThrottle(((c.speedLimit-c.speedFloor)/2) + c.speedFloor);
         while(true){
             //for(int i=0; i<cars.length; i++){

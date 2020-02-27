@@ -29,6 +29,8 @@ package accord;
  */
 public class CarTracker {
     public Car car;
+    public int x;
+    public int y;
     public TrackSegment currentSeg = null;
     public TrackSegment nextSeg = null;
     public boolean isOutOfBounds = true;

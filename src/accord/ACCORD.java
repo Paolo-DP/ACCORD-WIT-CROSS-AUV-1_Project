@@ -3,12 +3,13 @@ package accord;
 
 import java.util.Scanner;
 import com.fazecast.jSerialComm.*;
+import simulator.SimulationConstants;
 
 /**
  *
  * @author Paolo
  */
-public class ACCORD {
+public class ACCORD implements SimulationConstants{
     
     /**
      * @param args the command line arguments
@@ -120,9 +121,9 @@ public class ACCORD {
         //ModuleUnitTests.testPozyxIncommingFrame();
         //ModuleUnitTests.testPozyxAck();
         //ModuleUnitTests.testPozyxLocalization();
-        
+        //ModuleUnitTests.testArduinoTimeSync();
         //ModuleUnitTests.testCarSpeedCalculations();
-        ModuleUnitTests.testSpeedEquivalentThrottle();
+        //ModuleUnitTests.testSpeedEquivalentThrottle();
         //ModuleUnitTests.testCarCSV();
         
         //ModuleUnitTests.testCoordinatesPolling();
@@ -139,8 +140,39 @@ public class ACCORD {
         
         //ACCORD.createIntersectionTestTrack(50,50,50,50);
         //ModuleUnitTests.testIntersectionTrack();
-        //ModuleUnitTests.testIntersectionTrackSubtracking();
+        ModuleUnitTests.testIntersectionTrackSubtracking();
         
         //ModuleUnitTests.miscTests();
+    }
+    
+    public static void initCar(Car c, int heading, int direction){
+        int startX = 0;
+        int startY = 0;
+        double orient = 0;
+        switch(heading){
+            case EAST:
+                startX = 660;
+                startY = 2280;
+                orient = 0;
+                break;
+            case NORTH:
+                startX = 2920;
+                startY = 660;
+                orient = 90;
+                break;
+            case WEST:
+                startX = 4540;
+                startY = 2920;
+                orient = 180;
+                break;
+            case SOUTH:
+                startX = 2280;
+                startY = 4540;
+                orient = 270;
+                break;
+        }
+        
+        c.setAttributesManual(c.getID(), startX, startY, orient, Car.DEFAULT_XDim, Car.DEFAULT_YDim, c.minSpeedmm);
+        c.addRouteDirection(direction);
     }
 }

@@ -63,6 +63,8 @@ public class Track {
             updateCarTrackerAngles(ct);
         }
         */
+        ct.x = c.getXLocation();
+        ct.y = c.getYLocation();
         ct.currentSeg = searchCurrentSegment(c);
         if(ct.currentSeg != null){
             updateCarTrackerAngles(ct);
@@ -100,7 +102,8 @@ public class Track {
         ct.isOutOfBounds = (ct.currentSeg == null);
         if(ct.currentSeg != null){
             ct.distanceFromDrivingLine = ct.currentSeg.distFromCenterLine(deets.xloc, deets.yloc);
-            ct.idealAngle = ct.currentSeg.idealDirection(deets.xloc, deets.yloc);
+            updateCarTrackerAngles(ct, deets.xloc, deets.yloc, deets.orient);
+            //ct.idealAngle = ct.currentSeg.idealDirection(deets.xloc, deets.yloc);
             
             if(!ct.currentSeg.isIntersection())
                 ct.nextSeg = ct.currentSeg.getNextSeg(null);
@@ -233,6 +236,15 @@ public class Track {
             return false;
         ct.idealAngle = ct.currentSeg.idealDirection(ct.car);
         ct.angleDeviation = Math.abs(ct.car.getOrientation() - ct.idealAngle);
+        if(ct.angleDeviation>180)
+            ct.angleDeviation = ct.angleDeviation - 360;
+        return true;
+    }
+    public boolean updateCarTrackerAngles(CarTracker ct, int x, int y, double orient){
+        if(ct.currentSeg==null)
+            return false;
+        ct.idealAngle = ct.currentSeg.idealDirection(x, y);
+        ct.angleDeviation = Math.abs(orient - ct.idealAngle);
         if(ct.angleDeviation>180)
             ct.angleDeviation = ct.angleDeviation - 360;
         return true;
