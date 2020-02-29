@@ -172,7 +172,7 @@ public class ACCORD implements SimulationConstants{
                 break;
         }
         
-        c.setAttributesManual(c.getID(), startX, startY, orient, Car.DEFAULT_XDim, Car.DEFAULT_YDim, c.minSpeedmm);
+        c.setAttributesManual(c.getID(), startX, startY, orient, Car.DEFAULT_XDim, Car.DEFAULT_YDim, c.getSpeedEquivalent(Car.DEFAULT_THROTTLE_FLOOR));
         c.addRouteDirection(direction);
     }
 }

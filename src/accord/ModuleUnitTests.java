@@ -211,7 +211,7 @@ public class ModuleUnitTests implements SimulationConstants{
     }
     public static void testRouteSubTrack(){
         Track bigtrack = ACCORD.createIntersectionTestTrack(640, 460, 1500, 100);
-        Car c = new Car();
+        Car c = new PozyxCar();
         c.setAttributesManual(0x6969, 2700, 200, 90, 300, 200, 400);
         c.addRouteDirection(LEFT_TURN);
         CarTracker ct = bigtrack.updateCarTracker(c);
@@ -411,8 +411,8 @@ public class ModuleUnitTests implements SimulationConstants{
     }
     //Car methods and data tests
     public static void testCarSpeedCalculations(){
-        Car c = new Car();
-        c.verbose = true;
+        PozyxCar c = new PozyxCar();
+        c.setVerbose(true);
         int[] xhist = {1000,700,400,100};
         int[] yhist = {1700,1300,900,500};
         double[] orient = {0,15,30,45,60};
@@ -433,7 +433,7 @@ public class ModuleUnitTests implements SimulationConstants{
         
     }
     public static void testSpeedEquivalentThrottle(){
-        Car c = new Car();
+        Car c = new PozyxCar();
         int[] throttles = {0,16,32,48,64,80,96,112,127};
         for(int th : throttles){
             System.out.println("Throttle: " + th + "\t Speed: " + c.getSpeedEquivalent(th));
@@ -441,8 +441,8 @@ public class ModuleUnitTests implements SimulationConstants{
     }
     public static void testCarCSV(){
         
-            Car c = new Car();
-            c.verbose = true;
+            Car c = new PozyxCar();
+            c.setVerbose(true);
             int[] xhist = {1000,700,400,100};
             int[] yhist = {1700,1300,900,500};
             double[] orient = {0,15,30,45,60};
@@ -461,7 +461,7 @@ public class ModuleUnitTests implements SimulationConstants{
         PozyxSerialComm pozyx = setUpPozyxDevices(tags);
         Car[] cars = new Car[tags.length];
         for(int i=0; i<cars.length; i++){
-            cars[i] = new Car(tags[i], pozyx);
+            cars[i] = new PozyxCar(tags[i], pozyx);
             cars[i].alignXAxis();
         }
         Scanner sc = new Scanner(System.in);
@@ -477,7 +477,7 @@ public class ModuleUnitTests implements SimulationConstants{
         PozyxSerialComm pozyx = setUpPozyxDevices(tags);
         Car[] cars = new Car[tags.length];
         for(int i=0; i<cars.length; i++){
-            cars[i] = new Car(tags[i], pozyx);
+            cars[i] = new PozyxCar(tags[i], pozyx);
             cars[i].alignXAxis();
         }
         Scanner sc = new Scanner(System.in);
@@ -506,7 +506,7 @@ public class ModuleUnitTests implements SimulationConstants{
         Car[] cars = new Car[tags.length];
                 
         for(int i=0; i<cars.length; i++){
-            cars[i] = new Car(tags[i], pozyx);
+            cars[i] = new PozyxCar(tags[i], pozyx);
             carSim.addCar(cars[i]);
             //cars[i].alignXAxis();
         }
@@ -546,7 +546,7 @@ public class ModuleUnitTests implements SimulationConstants{
         Car[] cars = new Car[tags.length];
                 
         for(int i=0; i<cars.length; i++){
-            cars[i] = new Car(tags[i], pozyx);
+            cars[i] = new PozyxCar(tags[i], pozyx);
             carSim.addCar(cars[i]);
             cars[i].updateLocation();
             cars[i].alignXAxis();
@@ -572,15 +572,15 @@ public class ModuleUnitTests implements SimulationConstants{
         carSim.setTrack(tr);
         PozyxSerialComm pozyx = setUpPozyxDevices(tags);
         
-        /*Car c = new Car(0x6a3f, pozyx);
+        /*Car c = new PozyxCar(0x6a3f, pozyx);
         c.adjustSpeed(0x3f);
         carSim.addCar(c);
         pozyx.addTag(c.getID());*/
-        Car c = new Car(tags[0], pozyx);
+        Car c = new PozyxCar(tags[0], pozyx);
         //c.adjustSpeed(0x3f);
         carSim.addCar(c);
         
-        /*c = new Car(0x6a40, pozyx);
+        /*c = new PozyxCar(0x6a40, pozyx);
         c.adjustSpeed(0x3f);
         carSim.addCar(c);
         pozyx.addTag(c.getID());
@@ -593,7 +593,7 @@ public class ModuleUnitTests implements SimulationConstants{
             System.out.print("X = " + c.getXLocation());
             System.out.print("\tY = " + c.getYLocation());
             System.out.print("\tOrient: " + c.getOrientation());
-            System.out.print("\tOut of Bounds: " + c.outOfBounds);
+            System.out.print("\tOut of Bounds: " + c.isOutOfBounds());
             System.out.print("\tThrottle: " + c.getThrottlePower());
             System.out.println("\tSteer: " + c.getSteeringPower());
         }
@@ -606,7 +606,7 @@ public class ModuleUnitTests implements SimulationConstants{
         
         byte[] message1 = {(byte)0x6A, (byte)0x3F, (byte)0x03, (byte)0x02, (byte)0x80};
         byte[] message2 = {(byte)0x6A, (byte)0x3F, (byte)0x03, (byte)0x02, (byte)0x00};
-        Car c = new Car(0x6A3F, poz);
+        Car c = new PozyxCar(0x6A3F, poz);
         try{
             System.out.println("GO");
             //poz.sendBytes(frame1);
@@ -626,10 +626,10 @@ public class ModuleUnitTests implements SimulationConstants{
         
         
         for(int i=0; i<cars.length; i++){
-            cars[i] = new Car(tags[i], pozyx);
-            cars[i].verbose=true;
+            cars[i] = new PozyxCar(tags[i], pozyx);
+            cars[i].setVerbose(true);
             cars[i].setCSVOutput("C:\\test");
-            cars[i].verbose=false;
+            cars[i].setVerbose(false);
             cars[i].alignXAxis();
         }
         Scanner sc = new Scanner(System.in);
@@ -733,8 +733,8 @@ public class ModuleUnitTests implements SimulationConstants{
         Car[] cars = new Car[tags.length];
         
         for(int i=0; i<cars.length; i++){
-            cars[i] = new Car(tags[i], pozyx);
-            cars[i].verbose = true;
+            cars[i] = new PozyxCar(tags[i], pozyx);
+            cars[i].setVerbose(true);
             carSim.addCar(cars[i]);
             cars[i].updateLocation();
             cars[i].alignXAxis();
@@ -769,7 +769,7 @@ public class ModuleUnitTests implements SimulationConstants{
         carSim.setVerboseOutput(true);
         carSim.setTrack(tr);
         for(int i=0; i<cars.length; i++){
-            cars[i] = new Car(tags[i], pozyx);
+            cars[i] = new PozyxCar(tags[i], pozyx);
             
             switch(tags[i]){
                 case 0x6a40:
@@ -797,7 +797,7 @@ public class ModuleUnitTests implements SimulationConstants{
             System.out.println("Track route for Car 0x" + Integer.toHexString(cars[i].getID()));
             routes[i].printAllSegments();
             
-            //cars[i].verbose = true;
+            //cars[i].setVerbose(true);
             carSim.addCar(cars[i], routes[i]);
             cars[i].updateLocation();
             cars[i].alignXAxis();
@@ -822,7 +822,7 @@ public class ModuleUnitTests implements SimulationConstants{
         sc.nextLine();
         
         for(Car c : cars)
-            c.adjustThrottle(((c.speedLimit-c.speedFloor)/2) + c.speedFloor);
+            c.adjustThrottle(((c.DEFAULT_THROTTLE_CEILING-c.DEFAULT_THROTTLE_FLOOR)/2) + c.DEFAULT_THROTTLE_FLOOR);
             //c.adjustThrottle(((c.speedLimit-c.speedFloor)/2) + c.speedFloor);
         while(true){
             //for(int i=0; i<cars.length; i++){

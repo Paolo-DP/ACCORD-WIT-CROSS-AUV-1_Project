@@ -176,7 +176,7 @@ public class CarSimulator {
                         }
                         ct = temp;
                     }
-                    c.outOfBounds = ct.isOutOfBounds;
+                    c.setOutOfBounds(ct.isOutOfBounds);
                     doSteering(c, ct);
                     doThrottle(c, ct);
                     
@@ -247,7 +247,7 @@ public class CarSimulator {
         double correctOrient = subtrack.directionDeviation(c);
         //System.out.println(distCLine);
         if(distCLine == Integer.MAX_VALUE){
-            c.outOfBounds = true;
+            c.setOutOfBounds(true);
             if(verboseOutput)
                 System.out.println("CarSimulator: ID " + Integer.toHexString(c.getID())
                     + " Out of Bounds");
@@ -255,7 +255,7 @@ public class CarSimulator {
             return 0;
         }
         else
-            c.outOfBounds = false;
+            c.setOutOfBounds(false);
         if(Math.abs(distCLine)>minDistanceToCorrect){
             steer_dist = 127;
             if(distCLine>0)
@@ -275,7 +275,7 @@ public class CarSimulator {
         //double correctOrient = subtrack.directionDeviation(c);
         double followOrient = ct.idealAngle;
         if(distCLine == Integer.MAX_VALUE){
-            c.outOfBounds = true;
+            c.setOutOfBounds(true);
             if(verboseOutput)
                 System.out.println("CarSimulator: ID " + Integer.toHexString(c.getID())
                     + " Out of Bounds");
@@ -283,7 +283,7 @@ public class CarSimulator {
             return c.getOrientation();
         }
         else
-            c.outOfBounds = false;
+            c.setOutOfBounds(false);
         /*if(Math.abs(distCLine)>minDistanceToCorrect){
             
             if(distCLine>0)
@@ -299,9 +299,9 @@ public class CarSimulator {
         int distCLine = subtrack.distfromCenterLine(c);
         double followOrient = subtrack.idealDirection(c.getXLocation(), c.getYLocation());
         
-        return computeSteerCompensateTime(distCLine, followOrient, c.minSpeedmm);
+        return computeSteerCompensateTime(distCLine, followOrient, c.getSpeed());
     }
-    private double[] computeSteerCompensateTime(int distCLine, double followOrient, int speed){
+    private double[] computeSteerCompensateTime(int distCLine, double followOrient, double speed){
         double[] data = new double[2];
         double time = 0;
         if(speed != 0)
@@ -321,7 +321,7 @@ public class CarSimulator {
         double frontCollision = checkFront(c);
         double RearCollision = checkRear(c);
         
-        return throttle+c.THROTTLE_INCREMENT_STEP;
+        return (int) (c.getThrottlePower() * 1.2);
         /*else if(frontCollision == -1){
             return throttle += Car.THROTTLE_INCREMENT_STEP;
         }

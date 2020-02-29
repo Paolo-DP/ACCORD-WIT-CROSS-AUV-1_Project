@@ -83,7 +83,7 @@ public class Track {
         else
             ct.hasReservation = false;
         ct.isOutOfBounds = (ct.currentSeg == null);
-        ct.car.outOfBounds = ct.isOutOfBounds;
+        ct.car.setOutOfBounds(ct.isOutOfBounds);
         return ct;
     }
     public CarTracker getCarTracker(Car c){
@@ -304,6 +304,7 @@ public class Track {
         }
         return bounds;
     }
+    
     public void setTrackBounds(int x1, int y1, int x2, int y2){
         trackbounds[0][0] = x1;
         trackbounds[0][1] = y1;
