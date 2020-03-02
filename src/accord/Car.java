@@ -154,7 +154,7 @@ public interface Car extends SimulationConstants {
      * manually sets the location of the car
      * Also adds a time stamp and adds it to the car location history
      * @param x - x location
-     * @param y - y locaiton
+     * @param y - y location
      * @param time - time stamp (ms)
      */
     void setLocation(int x, int y, double time);
@@ -168,7 +168,16 @@ public interface Car extends SimulationConstants {
     boolean throttleIncrement();
 
     double timeSinceLastUpdate();
-
+    
+    /**
+     * updates and orientation of the Car based on its current throttle and steering.
+     * The magnitude of the update is also proportional to the amount of time
+     * elapsed from the last time this function is called
+     * it also updates all other car attributes such as location history
+     * If this method is successful, it sets the internal variable isUpdated
+     * to true.
+     * @return if the updating of attributes is successful
+     */
     boolean updateLocation();
     
 }
