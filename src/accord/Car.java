@@ -92,11 +92,38 @@ public interface Car extends SimulationConstants {
     boolean isUpdated();
     
     boolean isOutOfBounds();
-
+    /**
+     * The car will turn its steering in the direction of the desired orientation
+     * It will return to straight once it is facing the correct orientation
+     * @param orient - the desired orientation (degrees)
+     * @param overwrite - used to cancel and overwrite the timed maintain
+     * @return 
+     */
     boolean maintainOrientation(double orient, boolean overwrite);
-
+    /**
+     * The car will turn its steering to the direction of the desired
+     * orientation and maintain that orientation for a specified amount of time.
+     * After which, it will turn to go back to the old orientation.
+     * 
+     * @param orient - desired orientation (degrees)
+     * @param time - time to maintain that orientation (ms)
+     * @return 
+     */
     boolean maintainOrientationTimed(double orient, double time);
-
+    /**
+     * Prints critical car attributes to the console for debugging.
+     * Includes but not limited to:
+     * ID
+     * isUpdated
+     * Last time stamp
+     * X
+     * Y
+     * Orientation
+     * Out of bounds
+     * throttle
+     * maintain orientation
+     * temp orientation (timed)
+     */
     void printCarAttributes();
 
     /**
@@ -110,7 +137,12 @@ public interface Car extends SimulationConstants {
      * @param speed speed in mm/s
      */
     void setAttributesManual(int id, int x, int y, double orien, int xdim, int ydim, double speed);
-
+    /**
+     * specifies the output path (folder directory) where the Car object will
+     * output the generated CSV files.
+     * @param path - file directory
+     * @return if the file directory or the file writers were successfully made
+     */
     boolean setCSVOutput(String path);
     
     void setVerbose(boolean verbose);
@@ -118,7 +150,13 @@ public interface Car extends SimulationConstants {
     void setDataHistory(int[] xHist, int[] yHist, double[] orientHist, double[] timeHist);
     
     void setOutOfBounds(boolean out);
-
+    /**
+     * manually sets the location of the car
+     * Also adds a time stamp and adds it to the car location history
+     * @param x - x location
+     * @param y - y locaiton
+     * @param time - time stamp (ms)
+     */
     void setLocation(int x, int y, double time);
 
     boolean steeringDecrement();
