@@ -182,6 +182,7 @@ public class CarSimulator {
                     
                     outputCSVCarTracker(c, ct);
                     boolean[][] collisions = collisionCheck(distanceOfCollision);
+                    /*
                     if(verboseOutput){
                         if(collisions == null)
                             System.out.println("collisions array is NULL");
@@ -190,7 +191,7 @@ public class CarSimulator {
                                 System.out.println(Arrays.toString(row));
                             }
                         }
-                    }
+                    }*/
                     outputCSVCollisions(collisions);
                 }
                 /*
@@ -235,7 +236,8 @@ public class CarSimulator {
         else if(tracker.currentSeg.isIntersection())
             c.adjustThrottle(c.getThrottlePower());
         else{
-            c.adjustThrottle(computeNextThrottle(c));
+            //c.adjustThrottle(computeNextThrottle(c));
+            c.throttleIncrement();
         }
     }
     //computation methods

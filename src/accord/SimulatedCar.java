@@ -7,14 +7,14 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.time.Clock;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Deque;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import vehicle.VehicleProperty;
 
 /**
@@ -96,6 +96,7 @@ public class SimulatedCar implements Car {
 		} else {
 			throttlePower = Math.max(0, throttle);
 		}
+                speed = getSpeedEquivalent(throttlePower);
                 if(commSched != null)
                     commSched.cmdSetThrottle(carDetails.carID, throttlePower);
 		return true;
@@ -165,7 +166,18 @@ public class SimulatedCar implements Car {
 
 	@Override
 	public double getSpeedEquivalent(int throttle) {
-		return throttleToSpeedTable.getOrDefault(throttle, -1.0);
+            if (throttleToSpeedTable.containsKey(throttle)) return throttleToSpeedTable.get(throttle);
+            List<Map.Entry<Integer, Double>> entries = new ArrayList<>(throttleToSpeedTable.entrySet());
+            double equivalentSpeed = 0;
+            for (int i = 0; i < entries.size()-1; i++) {
+                Map.Entry<Integer, Double> entry0 = entries.get(i);
+                Map.Entry<Integer, Double> entry1 = entries.get(i+1);
+                if (throttle >= entry0.getKey() && throttle <= entry1.getKey()) {
+                    equivalentSpeed = entry0.getValue() + (entry1.getValue() - entry0.getValue()) / (entry1.getKey() - entry0.getKey()) * (throttle - entry0.getKey());
+                    break;
+                }
+            }
+		return equivalentSpeed;
 	}
 
 	@Override
@@ -241,7 +253,7 @@ public class SimulatedCar implements Car {
 
 	@Override
 	public void printCarAttributes() {
-		console.println(
+		System.out.println(
 				"ID: " + Integer.toHexString(carDetails.carID)
 				+ "\tUpdated: " + updated
 				+ "\tTimestamp: " + getLastTimeStamp()
@@ -351,7 +363,8 @@ public class SimulatedCar implements Car {
 
 	@Override
 	public boolean updateLocation() {
-		double dt = timeSinceLastUpdate();
+                speed = getSpeedEquivalent(throttlePower);
+		double dt = 0.16666666667;
 		double dx = speed * Math.cos(carDetails.orient) * dt;
 		double dy = speed * Math.sin(carDetails.orient) * dt;
 		carDetails.xloc += dx;
@@ -359,6 +372,7 @@ public class SimulatedCar implements Car {
 		double dheading = speed / getTurnRadius() * dt;
 		carDetails.orient += dheading;
 		updated = true;  // Set updated variable
+                
 		// Add to history
 		addOrientHistory(carDetails.orient);
 		addXLocationHistory(carDetails.xloc);
@@ -551,6 +565,7 @@ public class SimulatedCar implements Car {
 	private Deque<Double> orientHistoryQueue;
 	private Deque<Double> timeHistoryQueue;
 	private Deque<Integer> routeQueue;
+        private LocalTime lastUpdateTime;
 	// File outputs
 	private FileWriter coordinatesWriter;
 	private FileWriter carStateWriter;
