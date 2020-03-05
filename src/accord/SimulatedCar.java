@@ -130,7 +130,23 @@ public class SimulatedCar implements Car {
 
 	@Override
 	public CarDetails getFullDetails() {
-		return carDetails;
+            CarDetails deets = new CarDetails();
+            deets.carID = carDetails.carID;
+            deets.isValidData = carDetails.isValidData;
+            deets.isValidated = deets.isValidated;
+            deets.orient = carDetails.orient;
+            deets.orientHistory = Arrays.copyOf(carDetails.orientHistory, carDetails.orientHistory.length);
+            deets.routeCount = carDetails.routeCount;
+            deets.routeDirections = Arrays.copyOf(carDetails.routeDirections, carDetails.routeDirections.length);
+            deets.speed = carDetails.speed;
+            deets.timeStampHist = Arrays.copyOf(carDetails.timeStampHist, carDetails.timeStampHist.length);
+            deets.xLocHistory = Arrays.copyOf(carDetails.xLocHistory, carDetails.xLocHistory.length);
+            deets.xdimen = carDetails.xdimen;
+            deets.xloc = carDetails.xloc;
+            deets.yLocHistory = Arrays.copyOf(carDetails.yLocHistory, carDetails.yLocHistory.length);
+            deets.ydimen = carDetails.ydimen;
+            deets.yloc = carDetails.yloc;
+		return deets;
 	}
 
 	@Override
@@ -380,7 +396,7 @@ public class SimulatedCar implements Car {
 		double dy = speed * Math.sin(Math.toRadians(carDetails.orient)) * dt; //System.out.println("dy = " + dy);
 		carDetails.xloc += dx;
 		carDetails.yloc += dy;
-		double dheading = speed / getTurnRadius() * dt; System.out.println("Turning Radius = " + getTurnRadius());
+		double dheading = speed / getTurnRadius() * dt; //System.out.println("Turning Radius = " + getTurnRadius());
                 double orientDev = maintainOrient - carDetails.orient; //System.out.println("orientDev = " + orientDev);
                 if(Math.abs(orientDev) > 180)
                     orientDev = 360 - orientDev;
@@ -597,11 +613,11 @@ public class SimulatedCar implements Car {
 	/**
 	 * Speed limit.
 	 */
-	public static final int SPEED_LIMIT = 80;
+	public static final int SPEED_LIMIT = 100;
 	/**
 	 * Speed floor. Lower speed limit.
 	 */
-	public static final int SPEED_FLOOR = 30;
+	public static final int SPEED_FLOOR = 50;
 	/**
 	 * Throttle step.
 	 */

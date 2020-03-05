@@ -32,6 +32,7 @@ import java.time.LocalTime;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Queue;
+import java.util.Scanner;
 
 /**
  *
@@ -39,8 +40,8 @@ import java.util.Queue;
  */
 public class CommMessageScheduler {
     Queue<CommMessage> messages = new ArrayDeque<>();
-    private LocalTime timeZero = LocalTime.now();
-    Instant instantZero = Instant.now();
+    //private LocalTime timeZero = LocalTime.now();
+    long timeZero = System.nanoTime();
     Instant instantCurrent = null;
     private boolean verbose = true;
     
@@ -58,6 +59,43 @@ public class CommMessageScheduler {
     }
     public CommMessage pollNextMessage(){
         return messages.poll();
+    }
+    public SerialPort comPort = null;
+    public void sendAll(){
+        if(comPort == null) return;
+        long sendTimeZero = System.nanoTime();
+        for(CommMessage msg : messages){
+            while(msg.getTimeStamp() > (System.nanoTime() - sendTimeZero)/1000000);
+                
+            comPort.writeBytes(msg.getData(), msg.getData().length);
+        }
+    }
+    private static final int baudRate = 19200;
+    public boolean initComPort(){
+        SerialPort[] ports = SerialPort.getCommPorts();
+        for(int i=0; i<ports.length; i++){
+            System.out.println(i+". " + ports[i].getSystemPortName());
+        }
+        
+        Scanner sc = new Scanner(System.in);
+        
+        if(ports.length < 2){
+            System.out.println("Error! Insufficient number of Comm Ports");
+            
+        }
+        
+        int selectBlePort = 0;
+        System.out.println("Select BLE Com Port:");
+        do{
+            System.out.print(">");
+            selectBlePort=sc.nextInt();
+        }while(selectBlePort<0 && selectBlePort>=ports.length);
+        System.out.println("Starting Serial Ports...");
+        comPort = ports[selectBlePort];
+        boolean succ = comPort.openPort();
+        comPort.setBaudRate(baudRate);
+        comPort.setComPortTimeouts(SerialPort.TIMEOUT_READ_SEMI_BLOCKING | SerialPort.TIMEOUT_WRITE_BLOCKING, 500, 0);
+        return succ;
     }
     public boolean exportCSV(String path){
         if(fwExport != null)
@@ -127,7 +165,6 @@ public class CommMessageScheduler {
     private static final int frameHeaderLen = frameHeader.length + 1;
     private static final int minFrameLength = frameHeaderLen + 1; //including message type
     private static final int carIDLen = 2;
-    public SerialPort comPort;
     
     public static final byte SEND_CAR_COMMAND = 1;
     public static final int SEND_CAR_COMMAND_DATA_LEN = 2;
@@ -164,7 +201,7 @@ public class CommMessageScheduler {
         System.arraycopy(type, 0, frame, index, type.length); index += type.length;
         System.arraycopy(data, 0, frame, index, data.length); index += data.length;
         
-        double timestamp = LocalTime.now().minusNanos(timeZero.toNanoOfDay()).toNanoOfDay();
+        double timestamp = (double)(System.nanoTime() - timeZero) / 1000000;
         
         messages.add(new CommMessage(timestamp, type[0], frame));
     }
@@ -187,7 +224,7 @@ public class CommMessageScheduler {
         System.arraycopy(type, 0, frame, index, type.length); index += type.length;
         System.arraycopy(data, 0, frame, index, data.length); index += data.length;
         
-        double timestamp = LocalTime.now().minusNanos(timeZero.toNanoOfDay()).toNanoOfDay();
+        double timestamp =(double)(System.nanoTime() - timeZero) / 1000000;
         
         messages.add(new CommMessage(timestamp, type[0], data));
     }
@@ -217,7 +254,7 @@ public class CommMessageScheduler {
         System.arraycopy(data1, 0, frame, index, data1.length); index += data1.length;
         System.arraycopy(data2, 0, frame, index, data2.length); index += data2.length;
         
-        double timestamp = LocalTime.now().minusNanos(timeZero.toNanoOfDay()).toNanoOfDay();
+        double timestamp = (double)(System.nanoTime() - timeZero) / 1000000;
         
         messages.add(new CommMessage(timestamp, type[0], frame));
     }
@@ -245,7 +282,7 @@ public class CommMessageScheduler {
         System.arraycopy(data1, 0, frame, index, data1.length); index += data1.length;
         System.arraycopy(data2, 0, frame, index, data2.length); index += data2.length;
         
-        double timestamp = LocalTime.now().minusNanos(timeZero.toNanoOfDay()).toNanoOfDay();
+        double timestamp = (double)(System.nanoTime() - timeZero) / 1000000;
         
         messages.add(new CommMessage(timestamp, type[0], frame));
     }

@@ -129,6 +129,8 @@ public class CarSimulator {
         pathchk = new File(path);
         pathchk.mkdir();
         fwCollisions = initCSVCollision(path);
+        
+        initScheduler();
     }
     
     public void simulate(){
@@ -164,6 +166,8 @@ public class CarSimulator {
                     }
                     if(ct.currentSeg != null && ct.currentSeg.isIntersection()){
                         CarTracker temp = new CarTracker(c);
+                        temp.x = ct.x;
+                        temp.y = ct.y;
                         temp.angleDeviation = ct.angleDeviation;
                         temp.distanceFromDrivingLine = ct.distanceFromDrivingLine;
                         temp.hasReservation = ct.hasReservation;
@@ -469,6 +473,18 @@ public class CarSimulator {
                         System.out.println("CarSimulator: Failed to print Car attributes");
                 };
             }
+        }
+    }
+    
+    CommMessageScheduler commSched = null;
+    public void setScheduler(CommMessageScheduler commSched){
+        this.commSched = commSched;
+    }
+    public void initScheduler(){
+        if(commSched == null) return;
+        commSched.setCSVOutput(dataFileHeader);
+        for(Car c : carList){
+            ((SimulatedCar)c).setCommMessageScheduler(commSched);
         }
     }
     

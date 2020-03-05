@@ -17,7 +17,7 @@ import simulator.SimulationConstants;
  * @author Paolo
  */
 public class ModuleUnitTests implements SimulationConstants{
-    private static int[] tags = {0x6a40};//, 0x673b, 0x6a1a, 0x6743};
+    private static int[] tags = {0x6a40, 0x673b, 0x6a1a, 0x6743};
     private static int[] anchorIDs = {0x6e3c, 0x6717, 0x6e38, 0x6735}; 
     private static int[] anchorX = {0, 5200, 0, 5200};
     private static int[] anchorY = {0, 0, 5200, 5200};
@@ -771,23 +771,24 @@ public class ModuleUnitTests implements SimulationConstants{
         }
     }
     public static void testIntersectionTrackSubtracking(){
-        Track tr = ACCORD.createIntersectionTestTrack(640, 800, 1160, 200);
+        Track tr = ACCORD.createIntersectionTestTrack(640, 800, 1160, 10);
         tr.printAllSegments();
         Track[] routes = new Track[tags.length];
         
         //PozyxSerialComm pozyx = setUpPozyxDevices(tags);
         CommMessageScheduler commSched = new CommMessageScheduler();
+        commSched.initComPort();
         commSched.setCSVOutput("C:\\THESIS_Data");
         Car[] cars = new Car[tags.length];
         
         
         CarSimulator carSim = new CarSimulator();
+        carSim.setScheduler(commSched);
         carSim.setVerboseOutput(true);
         carSim.setTrack(tr);
         for(int i=0; i<cars.length; i++){
             //cars[i] = new PozyxCar(tags[i], pozyx);
             cars[i] = new SimulatedCar(tags[i]);
-            ((SimulatedCar)cars[i]).setCommMessageScheduler(commSched);
             
             switch(tags[i]){
                 case 0x6a40:
@@ -844,13 +845,13 @@ public class ModuleUnitTests implements SimulationConstants{
             c.adjustThrottle(((c.DEFAULT_THROTTLE_CEILING-c.DEFAULT_THROTTLE_FLOOR)/2) + c.DEFAULT_THROTTLE_FLOOR);
             //c.adjustThrottle(((c.speedLimit-c.speedFloor)/2) + c.speedFloor);
         */
-        LocalTime initWait = LocalTime.now().plusSeconds(5);
+        LocalTime initWait = LocalTime.now().plusSeconds(10);
         while(LocalTime.now().isBefore(initWait)){
             //for(int i=0; i<cars.length; i++){
                 carSim.simulate();
                 carSim.printAllCarDetails();
                 try{
-                    Thread.sleep(20);
+                    Thread.sleep(200);
                 }catch(Exception e){};
                 //if(cars[i].isUpdated()){
                     //cars[i].printCarAttributes();
@@ -859,6 +860,7 @@ public class ModuleUnitTests implements SimulationConstants{
             //}
         }
         commSched.exportCSV("C:\\THESIS_Data");
+        commSched.sendAll();
     }
     
     public static void miscTests(){

@@ -339,27 +339,27 @@ public class TrackSegment {
         switch(segShape){
             case SEGSHAPE_LINEAR:
                 if(direction==90 || direction==270){
-                    xHitBox1 = (int)(absoluteXLoc + width/2 + boundaryMargin);
-                    xHitBox2 = (int)(absoluteExitXLoc - width/2 - boundaryMargin);
+                    xHitBox1 = (int)(absoluteXLoc - width/2 - boundaryMargin);
+                    xHitBox2 = (int)(absoluteExitXLoc + width/2 + boundaryMargin);
                     if(absoluteYLoc<absoluteExitYLoc){
                         yHitBox1 = absoluteYLoc - boundaryMargin;
                         yHitBox2 = absoluteExitYLoc + boundaryMargin;
                     }
                     else{
-                        yHitBox1 = absoluteYLoc + boundaryMargin;
-                        yHitBox2 = absoluteExitYLoc - boundaryMargin;
+                        yHitBox2 = absoluteYLoc + boundaryMargin;
+                        yHitBox1 = absoluteExitYLoc - boundaryMargin;
                     }
                 }
                 else{
-                    yHitBox1 = (int)(absoluteYLoc + width/2 + boundaryMargin);
-                    yHitBox2 = (int)(absoluteExitYLoc - width/2 - boundaryMargin);
+                    yHitBox1 = (int)(absoluteYLoc - width/2 - boundaryMargin);
+                    yHitBox2 = (int)(absoluteExitYLoc + width/2 + boundaryMargin);
                     if(absoluteXLoc<absoluteExitXLoc){
                         xHitBox1 = absoluteXLoc - boundaryMargin;
                         xHitBox2 = absoluteExitXLoc + boundaryMargin;
                     }
                     else{
-                        xHitBox1 = absoluteXLoc + boundaryMargin;
-                        xHitBox2 = absoluteExitXLoc - boundaryMargin;
+                        xHitBox2 = absoluteXLoc + boundaryMargin;
+                        xHitBox1 = absoluteExitXLoc - boundaryMargin;
                     }
                 }
                 break;
