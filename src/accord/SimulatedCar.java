@@ -571,6 +571,13 @@ public class SimulatedCar implements Car {
 			throttleToSpeedTable.put(throttleColumn[i], speedColumn[i]);
 		}
 	}
+        public void initThrottleToSpeedTable(int[] throttleColumn, double[] speedColumn){
+            
+            throttleToSpeedTable = new LinkedHashMap<>(throttleColumn.length);
+		for (int i = 0; i < throttleColumn.length; i++) {
+			throttleToSpeedTable.put(throttleColumn[i], speedColumn[i]);
+		}
+        }
 	//</editor-fold>
 	
 	//<editor-fold defaultstate="collapsed" desc="Print / Debug methods">
@@ -617,7 +624,7 @@ public class SimulatedCar implements Car {
 	/**
 	 * Speed floor. Lower speed limit.
 	 */
-	public static final int SPEED_FLOOR = 50;
+	public static final int SPEED_FLOOR = 70;
 	/**
 	 * Throttle step.
 	 */

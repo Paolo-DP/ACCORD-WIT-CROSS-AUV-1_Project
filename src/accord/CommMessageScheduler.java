@@ -67,6 +67,7 @@ public class CommMessageScheduler {
         for(CommMessage msg : messages){
             while(msg.getTimeStamp() > (System.nanoTime() - sendTimeZero)/1000000);
                 
+            System.out.println("timestamp : " + ((System.nanoTime() - sendTimeZero)/1000000));
             comPort.writeBytes(msg.getData(), msg.getData().length);
         }
     }

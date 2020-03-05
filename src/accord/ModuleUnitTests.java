@@ -780,7 +780,12 @@ public class ModuleUnitTests implements SimulationConstants{
         commSched.initComPort();
         commSched.setCSVOutput("C:\\THESIS_Data");
         Car[] cars = new Car[tags.length];
-        
+        int[] throttleColumn = new int[] {
+                0, 0, 32, 64, 96, 127
+        };
+        double[] speedColumn = new double[] {
+                0, 0, 0, 830, 1480, 1900
+        };
         
         CarSimulator carSim = new CarSimulator();
         carSim.setScheduler(commSched);
@@ -793,21 +798,77 @@ public class ModuleUnitTests implements SimulationConstants{
             switch(tags[i]){
                 case 0x6a40:
                     ACCORD.initCar(cars[i], NORTH, STRAIGHT);
+                    throttleColumn[0] = 0;
+                    throttleColumn[1] = 50;
+                    throttleColumn[2] = 60;
+                    throttleColumn[3] = 75;
+                    throttleColumn[4] = 90;
+                    throttleColumn[5] = 100;
+                    
+                    speedColumn[0] = 0;
+                    speedColumn[1] = 339;
+                    speedColumn[2] = 376;
+                    speedColumn[3] = 636;
+                    speedColumn[4] = 841;
+                    speedColumn[5] = 936;
+                    ((SimulatedCar)cars[i]).initThrottleToSpeedTable(throttleColumn, speedColumn);
                     //cars[i].setAttributesManual(tags[i], 4540, 2930, 180, Car.DEFAULT_XDim, Car.DEFAULT_YDim, cars[i].minSpeedmm);
                     //cars[i].addRouteDirection(RIGHT_TURN);
                     break;
                 case 0x6743:
                     ACCORD.initCar(cars[i], EAST, LEFT_TURN);
+                    throttleColumn[0] = 0;
+                    throttleColumn[1] = 40;
+                    throttleColumn[2] = 60;
+                    throttleColumn[3] = 75;
+                    throttleColumn[4] = 90;
+                    throttleColumn[5] = 100;
+                    
+                    speedColumn[0] = 0;
+                    speedColumn[1] = 0;
+                    speedColumn[2] = 571;
+                    speedColumn[3] = 942;
+                    speedColumn[4] = 1235;
+                    speedColumn[5] = 1318;
+                    ((SimulatedCar)cars[i]).initThrottleToSpeedTable(throttleColumn, speedColumn);
                     //cars[i].setAttributesManual(tags[i], 660, 2280, 0, Car.DEFAULT_XDim, Car.DEFAULT_YDim, cars[i].minSpeedmm);
                     //cars[i].addRouteDirection(STRAIGHT);
                     break;
                 case 0x673b:
                     ACCORD.initCar(cars[i], WEST, LEFT_TURN);
+                    throttleColumn[0] = 0;
+                    throttleColumn[1] = 50;
+                    throttleColumn[2] = 60;
+                    throttleColumn[3] = 75;
+                    throttleColumn[4] = 90;
+                    throttleColumn[5] = 100;
+                    
+                    speedColumn[0] = 0;
+                    speedColumn[1] = 295;
+                    speedColumn[2] = 722;
+                    speedColumn[3] = 920;
+                    speedColumn[4] = 1218;
+                    speedColumn[5] = 1281;
+                    ((SimulatedCar)cars[i]).initThrottleToSpeedTable(throttleColumn, speedColumn);
                     //cars[i].setAttributesManual(tags[i], 4540, 2920, 270, Car.DEFAULT_XDim, Car.DEFAULT_YDim, cars[i].minSpeedmm);
                     //cars[i].addRouteDirection(LEFT_TURN);
                     break;
                 case 0x6a1a:
                     ACCORD.initCar(cars[i], SOUTH, RIGHT_TURN);
+                    throttleColumn[0] = 0;
+                    throttleColumn[1] = 50;
+                    throttleColumn[2] = 60;
+                    throttleColumn[3] = 75;
+                    throttleColumn[4] = 90;
+                    throttleColumn[5] = 100;
+                    
+                    speedColumn[0] = 0;
+                    speedColumn[1] = 666;
+                    speedColumn[2] = 895;
+                    speedColumn[3] = 1222;
+                    speedColumn[4] = 1397;
+                    speedColumn[5] = 1475;
+                    ((SimulatedCar)cars[i]).initThrottleToSpeedTable(throttleColumn, speedColumn);
                     //cars[i].setAttributesManual(tags[i], 2290, 4540, 90, Car.DEFAULT_XDim, Car.DEFAULT_YDim, cars[i].minSpeedmm);
                     //cars[i].addRouteDirection(STRAIGHT);
                     break;
