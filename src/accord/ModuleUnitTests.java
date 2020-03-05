@@ -849,6 +849,9 @@ public class ModuleUnitTests implements SimulationConstants{
             //for(int i=0; i<cars.length; i++){
                 carSim.simulate();
                 carSim.printAllCarDetails();
+                try{
+                    Thread.sleep(20);
+                }catch(Exception e){};
                 //if(cars[i].isUpdated()){
                     //cars[i].printCarAttributes();
                 //}

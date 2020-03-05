@@ -6,6 +6,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.time.Clock;
+import java.time.Instant;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -361,16 +362,36 @@ public class SimulatedCar implements Car {
 		return 500;
 	}
 
+        private Instant instantSinceUpdate = null;
+        private long lastTime = 0;
+        
 	@Override
 	public boolean updateLocation() {
+            if(lastTime <= 0){
+                lastTime = System.nanoTime();
+                return false;
+            }
                 speed = getSpeedEquivalent(throttlePower);
-		double dt = 0.16666666667;
-		double dx = speed * Math.cos(carDetails.orient) * dt;
-		double dy = speed * Math.sin(carDetails.orient) * dt;
+		//double dt = ((double)(LocalTime.now().minusNanos(lastUpdateTime.toNanoOfDay()).toNanoOfDay())); System.out.println("dt = " + dt);
+                //double dt = ((double)(Instant.now().minusMillis(instantSinceUpdate.toEpochMilli()).toEpochMilli())) * 1000; System.out.println("dt = " + dt);
+                double dt = (double)(System.nanoTime() - lastTime) / 1000000000;  //System.out.println("dt = " + dt);
+                lastTime = System.nanoTime();
+		double dx = speed * Math.cos(Math.toRadians(carDetails.orient)) * dt; //System.out.println("dx = " + dx);
+		double dy = speed * Math.sin(Math.toRadians(carDetails.orient)) * dt; //System.out.println("dy = " + dy);
 		carDetails.xloc += dx;
 		carDetails.yloc += dy;
-		double dheading = speed / getTurnRadius() * dt;
-		carDetails.orient += dheading;
+		double dheading = speed / getTurnRadius() * dt; System.out.println("Turning Radius = " + getTurnRadius());
+                double orientDev = maintainOrient - carDetails.orient; //System.out.println("orientDev = " + orientDev);
+                if(Math.abs(orientDev) > 180)
+                    orientDev = 360 - orientDev;
+                
+                if(Math.abs(orientDev) > STEERING_WINDOW){
+                    if(orientDev<0)
+                        dheading = -dheading;
+                }
+                else
+                    dheading = 0;
+		carDetails.orient += Math.toDegrees(dheading); 
 		updated = true;  // Set updated variable
                 
 		// Add to history
@@ -497,7 +518,8 @@ public class SimulatedCar implements Car {
 	}
 	
 	private double getTurnRadius() {
-		return property.getMinimumTurnRadius();
+		//return property.getMinimumTurnRadius();
+                return 320;
 	}
 	
 	private void addOrientHistory(double orientation) {
@@ -565,7 +587,7 @@ public class SimulatedCar implements Car {
 	private Deque<Double> orientHistoryQueue;
 	private Deque<Double> timeHistoryQueue;
 	private Deque<Integer> routeQueue;
-        private LocalTime lastUpdateTime;
+        private LocalTime lastUpdateTime = null;
 	// File outputs
 	private FileWriter coordinatesWriter;
 	private FileWriter carStateWriter;
@@ -588,6 +610,8 @@ public class SimulatedCar implements Car {
 	 * Steering step.
 	 */
 	public static final int STEERING_STEP = 10;
+        
+        public static final int STEERING_WINDOW = 2;
         
         private CommMessageScheduler commSched = null;
         public void setCommMessageScheduler(CommMessageScheduler commSched){
