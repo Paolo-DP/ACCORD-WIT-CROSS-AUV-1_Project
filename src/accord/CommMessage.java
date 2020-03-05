@@ -28,19 +28,19 @@ package accord;
  * @author Paolo
  */
 public class CommMessage {
-    private double timeStamp = 0;
+    private double timeStamp = 0; //in ms
     private int dataLength = 0;
     private byte messageType = 0;
-    private byte[] data  = null;
+    private byte[] frame  = null;
     
-    CommMessage(double timeStamp, byte messageType, byte[] data){
+    CommMessage(double timeStamp, byte messageType, byte[] frame){
         this.timeStamp = timeStamp;
         this.messageType = messageType;
-        this.data = data;
-        if(data == null)
+        this.frame = frame;
+        if(frame == null)
             dataLength = 0;
         else
-            dataLength = data.length;
+            dataLength = frame.length;
     }
     public double getTimeStamp(){
         return timeStamp;
@@ -49,7 +49,7 @@ public class CommMessage {
         return messageType;
     }
     public byte[] getData(){
-        return data;
+        return frame;
     }
     public int getMessageLength(){
         return dataLength;

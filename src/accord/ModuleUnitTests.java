@@ -670,6 +670,20 @@ public class ModuleUnitTests implements SimulationConstants{
         
     }
     
+    public static void testCommSchedulerExport(){
+        CommMessageScheduler commSched = new CommMessageScheduler();
+        commSched.setCSVOutput("C:\\THESIS_Data");
+        Car c = new SimulatedCar();
+        ((SimulatedCar)c).setCommMessageScheduler(commSched);
+        c.setAttributesManual(0x6969, 1000, 2000, 45, 200, 100, 10);
+        c.adjustThrottle(8);
+        c.adjustThrottle(16);
+        c.adjustThrottle(24);
+        c.adjustThrottle(32);
+        c.adjustThrottle(48);
+        commSched.exportCSV("C:\\THESIS_Data");
+    }
+    
     public static PozyxSerialComm setUpPozyxDevices(int[] tags){
         PozyxSerialComm pozyx = new PozyxSerialComm();
         pozyx.setVerboseOutput(false);
@@ -761,7 +775,9 @@ public class ModuleUnitTests implements SimulationConstants{
         tr.printAllSegments();
         Track[] routes = new Track[tags.length];
         
-        PozyxSerialComm pozyx = setUpPozyxDevices(tags);
+        //PozyxSerialComm pozyx = setUpPozyxDevices(tags);
+        CommMessageScheduler commSched = new CommMessageScheduler();
+        commSched.setCSVOutput("C:\\THESIS_Data");
         Car[] cars = new Car[tags.length];
         
         
@@ -769,7 +785,9 @@ public class ModuleUnitTests implements SimulationConstants{
         carSim.setVerboseOutput(true);
         carSim.setTrack(tr);
         for(int i=0; i<cars.length; i++){
-            cars[i] = new PozyxCar(tags[i], pozyx);
+            //cars[i] = new PozyxCar(tags[i], pozyx);
+            cars[i] = new SimulatedCar(tags[i]);
+            ((SimulatedCar)cars[i]).setCommMessageScheduler(commSched);
             
             switch(tags[i]){
                 case 0x6a40:
@@ -805,7 +823,7 @@ public class ModuleUnitTests implements SimulationConstants{
         }
         
         
-        
+        /*
         System.out.println("Doing initial updates...");
         LocalTime initWait = LocalTime.now().plusSeconds(5);
         while(LocalTime.now().isBefore(initWait)){
@@ -813,6 +831,7 @@ public class ModuleUnitTests implements SimulationConstants{
                 c.updateLocation();
         }
         System.out.println("Initial updates complete");
+        
         
         Scanner sc = new Scanner(System.in);
         System.out.println("Allign all cars with X Axis and hit enter...");
@@ -824,7 +843,9 @@ public class ModuleUnitTests implements SimulationConstants{
         for(Car c : cars)
             c.adjustThrottle(((c.DEFAULT_THROTTLE_CEILING-c.DEFAULT_THROTTLE_FLOOR)/2) + c.DEFAULT_THROTTLE_FLOOR);
             //c.adjustThrottle(((c.speedLimit-c.speedFloor)/2) + c.speedFloor);
-        while(true){
+        */
+        LocalTime initWait = LocalTime.now().plusSeconds(5);
+        while(LocalTime.now().isBefore(initWait)){
             //for(int i=0; i<cars.length; i++){
                 carSim.simulate();
                 carSim.printAllCarDetails();
@@ -834,6 +855,7 @@ public class ModuleUnitTests implements SimulationConstants{
                 
             //}
         }
+        commSched.exportCSV("C:\\THESIS_Data");
     }
     
     public static void miscTests(){

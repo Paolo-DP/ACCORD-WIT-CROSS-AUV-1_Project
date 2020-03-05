@@ -56,6 +56,8 @@ public interface Car extends SimulationConstants {
     void advanceRoute();
 
     boolean alignXAxis();
+    
+    void alignXAxis(double orient);
 
     CarDetails getFullDetails();
 

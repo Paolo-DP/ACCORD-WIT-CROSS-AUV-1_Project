@@ -135,6 +135,8 @@ public class ACCORD implements SimulationConstants{
         //ModuleUnitTests.testCarSimulationOval();
         //ModuleUnitTests.testCarCommand();
         
+        //ModuleUnitTests.testCommSchedulerExport();
+        
         //ModuleUnitTests.testVisualizer();
         //ModuleUnitTests.testTimeSyncing();
         

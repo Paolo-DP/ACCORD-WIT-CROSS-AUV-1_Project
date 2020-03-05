@@ -26,6 +26,24 @@ public class SimulatedCar implements Car {
 	public SimulatedCar() {
 		this(System.out);
 	}
+        
+        public SimulatedCar(int id){
+            steeringPower = 0;
+            throttlePower = 0;
+            speed = 0;
+            maintainOrient = 0;
+            outOfBounds = false;
+            verbose = false;
+            updated = false;
+            this.console = console;
+            routeQueue = new LinkedList<>();
+            xLocationHistoryQueue = new LinkedList();
+            yLocationHistoryQueue = new LinkedList<>();
+            timeHistoryQueue = new LinkedList<>();
+            orientHistoryQueue = new LinkedList<>();
+            initThrottleToSpeedTable();
+            initCarDetails(id, 10, 10, 10, 10, 16);
+        }
 	
 	public SimulatedCar(PrintStream console) {
 		steeringPower = 0;
@@ -42,7 +60,7 @@ public class SimulatedCar implements Car {
 		timeHistoryQueue = new LinkedList<>();
 		orientHistoryQueue = new LinkedList<>();
 		initThrottleToSpeedTable();
-		initCarDetails(10, 10, 10, 10, 16);
+		initCarDetails(0, 10, 10, 10, 10, 16);
 	}
 	
 	
@@ -78,6 +96,8 @@ public class SimulatedCar implements Car {
 		} else {
 			throttlePower = Math.max(0, throttle);
 		}
+                if(commSched != null)
+                    commSched.cmdSetThrottle(carDetails.carID, throttlePower);
 		return true;
 	}
 
@@ -97,8 +117,14 @@ public class SimulatedCar implements Car {
 	@Override
 	public boolean alignXAxis() {
 		updateLocation();
+                xAxisCalib = carDetails.orient;
 		return true;
 	}
+        
+        @Override
+        public void alignXAxis(double orient){
+            xAxisCalib = orient;
+        }
 
 	@Override
 	public CarDetails getFullDetails() {
@@ -196,12 +222,20 @@ public class SimulatedCar implements Car {
 	public boolean maintainOrientation(double orient, boolean overwrite) {
 		maintainOrient = orient;
 		if (overwrite) tempOrient = orient;
+                
+                if(commSched != null)
+                    commSched.cmdSetOrientation(carDetails.carID, xAxisCalib, orient, overwrite);
+                
 		return true;
 	}
 
 	@Override
 	public boolean maintainOrientationTimed(double orient, double time) {
 		tempOrient = orient;
+                
+                if(commSched != null)
+                commSched.cmdSetOrientationTimed(carDetails.carID, xAxisCalib, orient, time);
+                
 		return true;
 	}
 
@@ -460,8 +494,9 @@ public class SimulatedCar implements Car {
 	//</editor-fold>
 	
 	//<editor-fold defaultstate="collapsed" desc="Init methods">
-	private void initCarDetails(int timeHistorySize, int xLocationHistorySize, int yLocationHistorySize, int orientHistorySize, int routeDirectionsSize) {
+	private void initCarDetails(int id, int timeHistorySize, int xLocationHistorySize, int yLocationHistorySize, int orientHistorySize, int routeDirectionsSize) {
 		carDetails = new CarDetails();
+                carDetails.carID = id;
 		carDetails.orientHistory = new double[orientHistorySize];
 		carDetails.timeStampHist = new double[timeHistorySize];
 		carDetails.xLocHistory = new int[xLocationHistorySize];
@@ -497,7 +532,7 @@ public class SimulatedCar implements Car {
 	}
 	//</editor-fold>
 	
-	private CarDetails carDetails;
+	private CarDetails carDetails = new CarDetails();
 	private VehicleProperty property;
 	private PrintStream console;
 	// Car states
@@ -508,6 +543,7 @@ public class SimulatedCar implements Car {
 	private double tempOrient;
 	private boolean updated;
 	private boolean outOfBounds;
+        private double xAxisCalib = 0;
 	private boolean verbose;
 	private Map<Integer, Double> throttleToSpeedTable;
 	private Deque<Integer> xLocationHistoryQueue;
@@ -537,5 +573,13 @@ public class SimulatedCar implements Car {
 	 * Steering step.
 	 */
 	public static final int STEERING_STEP = 10;
+        
+        private CommMessageScheduler commSched = null;
+        public void setCommMessageScheduler(CommMessageScheduler commSched){
+            this.commSched = commSched;
+        }
+        public CommMessageScheduler getCommMessageScheduler(){
+            return commSched;
+        }
 
 }

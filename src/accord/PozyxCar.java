@@ -158,6 +158,11 @@ public class PozyxCar implements Car{
         }
     }
     
+    @Override
+    public void alignXAxis(double orient){
+        xAxisCalib = orient;
+    }
+    
     
     @Override
     public int getID(){
