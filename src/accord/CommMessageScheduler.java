@@ -45,6 +45,10 @@ public class CommMessageScheduler {
     Instant instantCurrent = null;
     private boolean verbose = true;
     
+    public void setTimeZero(){
+        timeZero = System.nanoTime();
+    }
+    
     public int size(){
         return messages.size();
     }

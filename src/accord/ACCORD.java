@@ -153,23 +153,23 @@ public class ACCORD implements SimulationConstants{
         double orient = 0;
         switch(heading){
             case EAST:
-                startX = 660;
+                startX = 1;
                 startY = 2280;
                 orient = 0;
                 break;
             case NORTH:
                 startX = 2920;
-                startY = 660;
+                startY = 1;
                 orient = 90;
                 break;
             case WEST:
-                startX = 4540;
+                startX = 5199;
                 startY = 2920;
                 orient = 180;
                 break;
             case SOUTH:
                 startX = 2280;
-                startY = 4540;
+                startY = 5199;
                 orient = 270;
                 break;
         }

@@ -35,7 +35,7 @@ import vehicle.VehicleProperty;
  */
 public class IntersectionSegment extends TrackSegment implements SimulationConstants{
     private int dimensionSize = 0;
-    private int resolution = 32;
+    private int resolution = 4;
     public int timeBaseNs = 10 * 1000000;
     private int absoluteXLoc = 0;
     private int absoluteYLoc = 0;
@@ -255,6 +255,7 @@ public class IntersectionSegment extends TrackSegment implements SimulationConst
     }
     public TrackSegment getExitTo(TrackSegment enterFrom, int direction){
         int segIndex = headingSegIndex(getEntranceHeading(enterFrom));
+        //System.out.println("heading index = " + segIndex);
         if(segIndex < 0)
             return null;
         switch(direction){
@@ -262,14 +263,19 @@ public class IntersectionSegment extends TrackSegment implements SimulationConst
                 segIndex++;
                 break;
             case RIGHT_TURN:
-                segIndex--;
+                if(segIndex <= 0)
+                    segIndex = 3;
+                else
+                    segIndex--;
                 break;
             case STRAIGHT:
                 break;
             default:
                 return null;
         }
-        segIndex%=4;
+        segIndex = (segIndex)%4;
+        //System.out.println("Exit Index = " + segIndex);
+        //System.out.println("Exit: " + exit[segIndex].segmentID);
         return exit[segIndex];
     }
     public TrackSegment getCurrentInternalSegment(Car c){
@@ -467,6 +473,7 @@ public class IntersectionSegment extends TrackSegment implements SimulationConst
         if(verbose)
             System.out.println("Intersection Segment: (" + LocalTime.now() + ") Processing Reservation...");
         boolean res =  resMan.reserve(sect, arrival, vp, car.getSpeed(), 0, heading, direction, car.getID(), timeBaseNs);
+        //boolean res = true;
         if(verbose)
             System.out.println("Intersection Segment: (" + LocalTime.now() + ") DONE!\tResult: " + res);
         

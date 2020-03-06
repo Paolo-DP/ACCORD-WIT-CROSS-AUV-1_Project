@@ -93,6 +93,9 @@ public class CarSimulator {
         if(verboseOutput)
             System.out.println("CarSimulator: fileHeader = " + dataFileHeader);
         initFileWriters();
+        
+       if(commSched != null)
+           commSched.setTimeZero();
         start = true;
     }
     public void stop(){
@@ -237,8 +240,16 @@ public class CarSimulator {
     private void doThrottle(Car c, CarTracker tracker){
         if(tracker.isOutOfBounds)
             c.throttleDecrement();
-        else if(tracker.currentSeg.isIntersection())
+        else if(tracker.currentSeg != null && tracker.currentSeg.isIntersection()){
             c.adjustThrottle(c.getThrottlePower());
+        }
+        else if(tracker.nextSeg != null && tracker.nextSeg.isIntersection()){
+            if(tracker.hasReservation)
+                c.adjustThrottle(c.getThrottlePower());
+            else{
+                c.throttleDecrement();
+            }
+        }
         else{
             //c.adjustThrottle(computeNextThrottle(c));
             c.throttleIncrement();

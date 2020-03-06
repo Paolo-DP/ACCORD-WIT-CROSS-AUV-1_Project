@@ -18,6 +18,7 @@ import simulator.SimulationConstants;
  */
 public class ModuleUnitTests implements SimulationConstants{
     private static int[] tags = {0x6a40, 0x673b, 0x6a1a, 0x6743};
+    //private static int[] tags = {0x6a1a};
     private static int[] anchorIDs = {0x6e3c, 0x6717, 0x6e38, 0x6735}; 
     private static int[] anchorX = {0, 5200, 0, 5200};
     private static int[] anchorY = {0, 0, 5200, 5200};
@@ -797,7 +798,7 @@ public class ModuleUnitTests implements SimulationConstants{
             
             switch(tags[i]){
                 case 0x6a40:
-                    ACCORD.initCar(cars[i], NORTH, STRAIGHT);
+                    ACCORD.initCar(cars[i], NORTH, LEFT_TURN);
                     throttleColumn[0] = 0;
                     throttleColumn[1] = 50;
                     throttleColumn[2] = 60;
@@ -806,17 +807,17 @@ public class ModuleUnitTests implements SimulationConstants{
                     throttleColumn[5] = 100;
                     
                     speedColumn[0] = 0;
-                    speedColumn[1] = 339;
-                    speedColumn[2] = 376;
-                    speedColumn[3] = 636;
-                    speedColumn[4] = 841;
-                    speedColumn[5] = 936;
+                    speedColumn[1] = 618;
+                    speedColumn[2] = 870;
+                    speedColumn[3] = 1090;
+                    speedColumn[4] = 1394;
+                    speedColumn[5] = 1456;
                     ((SimulatedCar)cars[i]).initThrottleToSpeedTable(throttleColumn, speedColumn);
                     //cars[i].setAttributesManual(tags[i], 4540, 2930, 180, Car.DEFAULT_XDim, Car.DEFAULT_YDim, cars[i].minSpeedmm);
                     //cars[i].addRouteDirection(RIGHT_TURN);
                     break;
                 case 0x6743:
-                    ACCORD.initCar(cars[i], EAST, LEFT_TURN);
+                    ACCORD.initCar(cars[i], EAST, RIGHT_TURN);
                     throttleColumn[0] = 0;
                     throttleColumn[1] = 40;
                     throttleColumn[2] = 60;
@@ -850,7 +851,7 @@ public class ModuleUnitTests implements SimulationConstants{
                     speedColumn[4] = 1218;
                     speedColumn[5] = 1281;
                     ((SimulatedCar)cars[i]).initThrottleToSpeedTable(throttleColumn, speedColumn);
-                    //cars[i].setAttributesManual(tags[i], 4540, 2920, 270, Car.DEFAULT_XDim, Car.DEFAULT_YDim, cars[i].minSpeedmm);
+                    //cars[i].setAttributesManal(tags[i], 4540, 2920, 270, Car.DEFAULT_XDim, Car.DEFAULT_YDim, cars[i].minSpeedmm);
                     //cars[i].addRouteDirection(LEFT_TURN);
                     break;
                 case 0x6a1a:
@@ -863,11 +864,11 @@ public class ModuleUnitTests implements SimulationConstants{
                     throttleColumn[5] = 100;
                     
                     speedColumn[0] = 0;
-                    speedColumn[1] = 666;
-                    speedColumn[2] = 895;
-                    speedColumn[3] = 1222;
-                    speedColumn[4] = 1397;
-                    speedColumn[5] = 1475;
+                    speedColumn[1] = 570;
+                    speedColumn[2] = 870;
+                    speedColumn[3] = 1190;
+                    speedColumn[4] = 1330;
+                    speedColumn[5] = 1420;
                     ((SimulatedCar)cars[i]).initThrottleToSpeedTable(throttleColumn, speedColumn);
                     //cars[i].setAttributesManual(tags[i], 2290, 4540, 90, Car.DEFAULT_XDim, Car.DEFAULT_YDim, cars[i].minSpeedmm);
                     //cars[i].addRouteDirection(STRAIGHT);

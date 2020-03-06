@@ -119,7 +119,8 @@ public class SimulatedCar implements Car {
 	@Override
 	public boolean alignXAxis() {
 		updateLocation();
-                xAxisCalib = carDetails.orient;
+                //xAxisCalib = carDetails.orient;
+                xAxisCalib = 0;
 		return true;
 	}
         
@@ -453,7 +454,7 @@ public class SimulatedCar implements Car {
             double dheading = speed / getTurnRadius() * dt; //System.out.println("Turning Radius = " + getTurnRadius());
             double orientDev = maintainOrient - carDetails.orient; //System.out.println("orientDev = " + orientDev);
             if(Math.abs(orientDev) > 180)
-                orientDev = 360 - orientDev;
+                orientDev = -(360 - orientDev);
 
             if(Math.abs(orientDev) > STEERING_WINDOW){
                 if(orientDev<0)
@@ -612,7 +613,7 @@ public class SimulatedCar implements Car {
 	
 	private double getTurnRadius() {
 		//return property.getMinimumTurnRadius();
-                return 320;
+                return 300;
 	}
 	
 	private void addOrientHistory(double orientation) {
@@ -697,7 +698,7 @@ public class SimulatedCar implements Car {
 	/**
 	 * Speed limit.
 	 */
-	public static final int SPEED_LIMIT = 80;
+	public static final int SPEED_LIMIT = 70;
 	/**
 	 * Speed floor. Lower speed limit.
 	 */
