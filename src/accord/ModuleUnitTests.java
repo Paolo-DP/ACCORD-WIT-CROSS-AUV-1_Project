@@ -771,14 +771,14 @@ public class ModuleUnitTests implements SimulationConstants{
         }
     }
     public static void testIntersectionTrackSubtracking(){
-        Track tr = ACCORD.createIntersectionTestTrack(640, 800, 1160, 10);
+        Track tr = ACCORD.createIntersectionTestTrack(640, 800, 1160, 0);
         tr.printAllSegments();
         Track[] routes = new Track[tags.length];
         
         //PozyxSerialComm pozyx = setUpPozyxDevices(tags);
         CommMessageScheduler commSched = new CommMessageScheduler();
         commSched.initComPort();
-        commSched.setCSVOutput("C:\\THESIS_Data");
+        //commSched.setCSVOutput("C:\\THESIS_Data");
         Car[] cars = new Car[tags.length];
         int[] throttleColumn = new int[] {
                 0, 0, 32, 64, 96, 127
@@ -912,7 +912,7 @@ public class ModuleUnitTests implements SimulationConstants{
                 carSim.simulate();
                 carSim.printAllCarDetails();
                 try{
-                    Thread.sleep(200);
+                    Thread.sleep(100);
                 }catch(Exception e){};
                 //if(cars[i].isUpdated()){
                     //cars[i].printCarAttributes();

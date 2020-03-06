@@ -84,6 +84,10 @@ public class Track {
             ct.hasReservation = false;
         ct.isOutOfBounds = (ct.currentSeg == null);
         ct.car.setOutOfBounds(ct.isOutOfBounds);
+        
+        if(ct.currentSeg != null && ct.currentSeg.getPrevSeg(c) != null && ct.currentSeg.getPrevSeg(c).isIntersection())
+            ((IntersectionSegment)ct.currentSeg.getPrevSeg(c)).releaseReservation(c);
+        
         return ct;
     }
     public CarTracker getCarTracker(Car c){

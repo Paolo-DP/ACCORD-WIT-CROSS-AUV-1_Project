@@ -35,7 +35,7 @@ import vehicle.VehicleProperty;
  */
 public class IntersectionSegment extends TrackSegment implements SimulationConstants{
     private int dimensionSize = 0;
-    private int resolution = 64;
+    private int resolution = 32;
     public int timeBaseNs = 10 * 1000000;
     private int absoluteXLoc = 0;
     private int absoluteYLoc = 0;

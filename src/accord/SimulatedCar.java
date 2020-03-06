@@ -196,6 +196,13 @@ public class SimulatedCar implements Car {
             }
 		return equivalentSpeed;
 	}
+        
+        private double accelerate(){
+            double velocityFinal = getSpeedEquivalent(throttlePower);
+            
+            return 0;
+        }
+        
 
 	@Override
 	public int getSteeringPower() {
@@ -255,6 +262,8 @@ public class SimulatedCar implements Car {
                 if(commSched != null)
                     commSched.cmdSetOrientation(carDetails.carID, xAxisCalib, orient, overwrite);
                 
+                //outputCarStateCSV("Maintain Orientation");
+                
 		return true;
 	}
 
@@ -264,7 +273,7 @@ public class SimulatedCar implements Car {
                 
                 if(commSched != null)
                 commSched.cmdSetOrientationTimed(carDetails.carID, xAxisCalib, orient, time);
-                
+                //outputCarStateCSV("Timed Orientation");
 		return true;
 	}
 
@@ -294,9 +303,33 @@ public class SimulatedCar implements Car {
 		carDetails.ydimen = ydim;
 		this.speed = speed;
 	}
-
+        
+    FileWriter fwCarState = null;
+    String carStatePath = "";
+        
 	@Override
 	public boolean setCSVOutput(String path) {
+            
+            File filePath = new File(path);
+        if(filePath.isDirectory()){
+            try{
+                carStatePath = path + "\\CarState";
+                File carPath = new File(carStatePath);
+                carPath.mkdirs();
+                
+                fwCarState = new FileWriter(carStatePath + "\\0x" + Integer.toHexString(carDetails.carID) + "_CarState.csv");
+                initCSVCarStateHeaders();
+                return true;
+            }catch(Exception e){
+                return false;
+            }
+        }
+        else{
+            if(verbose)
+                System.out.println("Car: ERROR! File path for csv files does not exist");
+            return false;
+        }
+            /*
 		if (path == null && console != null && verbose) {
 			console.print("Car: ERROR! File path for csv files does not exist");
 			return false;
@@ -322,7 +355,28 @@ public class SimulatedCar implements Car {
 		
 		if (verbose && console != null) console.print("Car: ERROR! File path for csv files does not exist");;
 		return false;
+            */
 	}
+        
+    private void initCSVCarStateHeaders(){
+        try{
+        fwCarState.append("Local Time,");
+        fwCarState.append("Car ID,");
+        fwCarState.append("Source of change,");
+        fwCarState.append("Updated,");
+        fwCarState.append("Time Stamp,");
+        fwCarState.append("X,");
+        fwCarState.append("Y,");
+        fwCarState.append("Orientation,");
+        fwCarState.append("Out of Bounds,");
+        fwCarState.append("Throttle Power,");
+        fwCarState.append("Speed,");
+        fwCarState.append("Maintain Orientation,");
+        fwCarState.append("Temp Orientation\n");
+        
+        fwCarState.flush();
+        }catch(Exception e){if(verbose)System.out.println("Car: ERROR! Car State file writer NULL");};
+    }
 
 	@Override
 	public void setVerbose(boolean verbose) {
@@ -387,40 +441,63 @@ public class SimulatedCar implements Car {
                 lastTime = System.nanoTime();
                 return false;
             }
-                speed = getSpeedEquivalent(throttlePower);
-		//double dt = ((double)(LocalTime.now().minusNanos(lastUpdateTime.toNanoOfDay()).toNanoOfDay())); System.out.println("dt = " + dt);
-                //double dt = ((double)(Instant.now().minusMillis(instantSinceUpdate.toEpochMilli()).toEpochMilli())) * 1000; System.out.println("dt = " + dt);
-                double dt = (double)(System.nanoTime() - lastTime) / 1000000000;  //System.out.println("dt = " + dt);
-                lastTime = System.nanoTime();
-		double dx = speed * Math.cos(Math.toRadians(carDetails.orient)) * dt; //System.out.println("dx = " + dx);
-		double dy = speed * Math.sin(Math.toRadians(carDetails.orient)) * dt; //System.out.println("dy = " + dy);
-		carDetails.xloc += dx;
-		carDetails.yloc += dy;
-		double dheading = speed / getTurnRadius() * dt; //System.out.println("Turning Radius = " + getTurnRadius());
-                double orientDev = maintainOrient - carDetails.orient; //System.out.println("orientDev = " + orientDev);
-                if(Math.abs(orientDev) > 180)
-                    orientDev = 360 - orientDev;
-                
-                if(Math.abs(orientDev) > STEERING_WINDOW){
-                    if(orientDev<0)
-                        dheading = -dheading;
-                }
-                else
-                    dheading = 0;
-		carDetails.orient += Math.toDegrees(dheading); 
-		updated = true;  // Set updated variable
-                
-		// Add to history
-		addOrientHistory(carDetails.orient);
-		addXLocationHistory(carDetails.xloc);
-		addYLocationHistory(carDetails.yloc);
-		try {
-			writeCarState("Valid coor update");
-		} catch (IOException ex) {
-			
-		}
-		return updated;
+            speed = getSpeedEquivalent(throttlePower);
+            //double dt = ((double)(LocalTime.now().minusNanos(lastUpdateTime.toNanoOfDay()).toNanoOfDay())); System.out.println("dt = " + dt);
+            //double dt = ((double)(Instant.now().minusMillis(instantSinceUpdate.toEpochMilli()).toEpochMilli())) * 1000; System.out.println("dt = " + dt);
+            double dt = (double)(System.nanoTime() - lastTime) / 1000000000;  //System.out.println("dt = " + dt);
+            lastTime = System.nanoTime();
+            double dx = speed * Math.cos(Math.toRadians(carDetails.orient)) * dt; //System.out.println("dx = " + dx);
+            double dy = speed * Math.sin(Math.toRadians(carDetails.orient)) * dt; //System.out.println("dy = " + dy);
+            carDetails.xloc += dx;
+            carDetails.yloc += dy;
+            double dheading = speed / getTurnRadius() * dt; //System.out.println("Turning Radius = " + getTurnRadius());
+            double orientDev = maintainOrient - carDetails.orient; //System.out.println("orientDev = " + orientDev);
+            if(Math.abs(orientDev) > 180)
+                orientDev = 360 - orientDev;
+
+            if(Math.abs(orientDev) > STEERING_WINDOW){
+                if(orientDev<0)
+                    dheading = -dheading;
+            }
+            else
+                dheading = 0;
+            carDetails.orient += Math.toDegrees(dheading); 
+            updated = true;  // Set updated variable
+
+            // Add to history
+            addOrientHistory(carDetails.orient);
+            addXLocationHistory(carDetails.xloc);
+            addYLocationHistory(carDetails.yloc);
+            try {
+                    writeCarState("Valid coor update");
+            } catch (IOException ex) {
+
+            }
+
+            outputCarStateCSV("Location Update");
+            return updated;
 	}
+        
+        private void outputCarStateCSV(String source){
+        try{
+        fwCarState.append((LocalTime.now(Clock.systemDefaultZone())).toString() + ",");
+        fwCarState.append(Integer.toHexString(getID())+",");
+        fwCarState.append(source + ",");
+        fwCarState.append(Boolean.toString(isUpdated()) + ",");
+        fwCarState.append(Integer.toString((int)getLastTimeStamp()) + ",");
+        fwCarState.append(Integer.toString(getXLocation()) + ",");
+        fwCarState.append(Integer.toString(getYLocation()) + ",");
+        fwCarState.append(Integer.toString((int)getOrientation()) + ",");
+        fwCarState.append(Boolean.toString(outOfBounds) + ",");
+        fwCarState.append(Integer.toString(getThrottlePower()) + ",");
+        fwCarState.append(Double.toString(getSpeed()) + ",");
+        fwCarState.append(Integer.toString((int)getMaintainOrient()) + ",");
+        fwCarState.append(Integer.toString((int)getTempOrient()) + "\n");
+        
+        fwCarState.flush();
+        
+        }catch(Exception e){if(verbose)System.out.println("Car: ERROR! Car State file writer NULL");};
+    }
 	
 	public void outputCSV(String source) {
 		if (writer == null) return;
@@ -620,11 +697,11 @@ public class SimulatedCar implements Car {
 	/**
 	 * Speed limit.
 	 */
-	public static final int SPEED_LIMIT = 100;
+	public static final int SPEED_LIMIT = 80;
 	/**
 	 * Speed floor. Lower speed limit.
 	 */
-	public static final int SPEED_FLOOR = 70;
+	public static final int SPEED_FLOOR = 50;
 	/**
 	 * Throttle step.
 	 */
