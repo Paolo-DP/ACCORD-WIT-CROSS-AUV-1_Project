@@ -463,6 +463,7 @@ public class SimulatedCar implements Car {
             else
                 dheading = 0;
             carDetails.orient += Math.toDegrees(dheading); 
+            carDetails.orient = carDetails.orient%360;
             updated = true;  // Set updated variable
 
             // Add to history
