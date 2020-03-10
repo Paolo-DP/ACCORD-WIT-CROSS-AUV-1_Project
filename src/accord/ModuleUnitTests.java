@@ -817,7 +817,7 @@ public class ModuleUnitTests implements SimulationConstants{
                     //cars[i].addRouteDirection(RIGHT_TURN);
                     break;
                 case 0x6743:
-                    ACCORD.initCar(cars[i], EAST, LEFT_TURN);
+                    ACCORD.initCar(cars[i], EAST, RIGHT_TURN);
                     throttleColumn[0] = 0;
                     throttleColumn[1] = 40;
                     throttleColumn[2] = 60;
@@ -855,7 +855,7 @@ public class ModuleUnitTests implements SimulationConstants{
                     //cars[i].addRouteDirection(LEFT_TURN);
                     break;
                 case 0x6a1a:
-                    ACCORD.initCar(cars[i], SOUTH, LEFT_TURN);
+                    ACCORD.initCar(cars[i], SOUTH, RIGHT_TURN);
                     throttleColumn[0] = 0;
                     throttleColumn[1] = 50;
                     throttleColumn[2] = 60;

@@ -314,11 +314,15 @@ public class SimulatedCar implements Car {
             File filePath = new File(path);
         if(filePath.isDirectory()){
             try{
-                carStatePath = path + "\\CarState";
+                /*carStatePath = path + "\\CarState";
                 File carPath = new File(carStatePath);
                 carPath.mkdirs();
                 
                 fwCarState = new FileWriter(carStatePath + "\\0x" + Integer.toHexString(carDetails.carID) + "_CarState.csv");
+                */
+                carStatePath = path;
+                fwCarState = new FileWriter(carStatePath + "_CarState_0x" + Integer.toHexString(carDetails.carID) + ".csv");
+                
                 initCSVCarStateHeaders();
                 return true;
             }catch(Exception e){

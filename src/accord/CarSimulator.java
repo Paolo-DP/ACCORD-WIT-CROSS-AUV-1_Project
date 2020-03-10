@@ -188,18 +188,7 @@ public class CarSimulator {
                     doThrottle(c, ct);
                     
                     outputCSVCarTracker(c, ct);
-                    boolean[][] collisions = collisionCheck(distanceOfCollision);
-                    /*
-                    if(verboseOutput){
-                        if(collisions == null)
-                            System.out.println("collisions array is NULL");
-                        else{
-                            for(boolean[] row : collisions){
-                                System.out.println(Arrays.toString(row));
-                            }
-                        }
-                    }*/
-                    outputCSVCollisions(collisions);
+                    
                 }
                 /*
                 c.maintainOrientation(computeNextOrientation(c));
@@ -208,6 +197,11 @@ public class CarSimulator {
                 c.adjustThrottle(computeNextThrottle(c));
                 */
             }
+            //boolean[][] collisions = collisionCheck(distanceOfCollision);
+            double[][] collisionDist = collisionCheckDistance();
+            boolean[][] collisions = collisionCheck(collisionDist, distanceOfCollision);
+            //outputCSVCollisions(collisions);
+            outputCSVCollisions(collisionDist);
         }
     }
     
@@ -379,6 +373,47 @@ public class CarSimulator {
                 double colDist = Math.sqrt((x*x) + (y*y));
                 collisionChk[car1][car2] = colDist<distance;
                 collisionChk[car2][car1] = collisionChk[car1][car2];
+                //System.out.println(colDist);
+            }
+        }
+        return collisionChk;
+    }
+    private boolean[][] collisionCheck(double[][] collisionDistances, int colDist){
+        boolean[][] collisionChk = new boolean[collisionDistances.length][collisionDistances.length];
+        for(boolean[] row : collisionChk)
+            Arrays.fill(row, false);
+        for(int car1=0; car1<collisionDistances.length; car1++){
+            for(int car2=car1; car2<collisionDistances.length; car2++){
+                if(car1 == car2)
+                    continue;
+                if(collisionDistances[car1][car2] < colDist)
+                    collisionChk[car1][car2] = true;
+                collisionChk[car2][car1] = collisionChk[car1][car2];
+                //System.out.println(colDist);
+            }
+        }
+        
+        return collisionChk;
+    }
+    
+    private double[][] collisionCheckDistance(){
+        double[][] collisionChk = new double[carList.size()][carList.size()];
+        for(double[] row : collisionChk)
+            Arrays.fill(row, -1);
+        
+        for(int car1=0; car1<carList.size(); car1++){
+            for(int car2=car1; car2<carList.size(); car2++){
+                if(car1 == car2)
+                    continue;
+                Car c1 = carList.get(car1);
+                Car c2 = carList.get(car2);
+                double x = c1.getXLocation() - c2.getXLocation();
+                double y = c1.getYLocation() - c2.getYLocation();
+                
+                double colDist = Math.sqrt((x*x) + (y*y));
+                collisionChk[car1][car2] = colDist;
+                collisionChk[car2][car1] = collisionChk[car1][car2];
+                //System.out.println(colDist);
             }
         }
         return collisionChk;
@@ -621,11 +656,37 @@ public class CarSimulator {
         }
             
     }
+    private void outputCSVCollisions(double[][] collisions){
+        int count = countNCollisions(collisions, distanceOfCollision);
+        try{
+            fwCollisions.append(LocalTime.now().toString());
+            fwCollisions.append("," + Integer.toString(count));
+            for(int i=0; i<collisions.length; i++){
+                for(int j=0; j<collisions[i].length; j++){
+                    fwCollisions.append("," + Double.toString(collisions[i][j]));
+                }
+            }
+            fwCollisions.append("\n");
+            fwCollisions.flush();
+        }catch(Exception e){
+            
+        }
+    }
     private int countNCollisions(boolean[][] collisions){
         int count = 0;
         for(int i=0; i<collisions.length; i++){
             for(int j=i; j<collisions[i].length; j++){
                 if(collisions[i][j])
+                    count++;
+            }
+        }
+        return count;
+    }
+    private int countNCollisions(double[][] collisions, int distance){
+        int count = 0;
+        for(int i=0; i<collisions.length; i++){
+            for(int j=i; j<collisions[i].length; j++){
+                if(collisions[i][j] >= 0 && collisions[i][j] < distance)
                     count++;
             }
         }
