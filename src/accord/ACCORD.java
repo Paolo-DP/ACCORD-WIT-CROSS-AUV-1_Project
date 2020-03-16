@@ -17,13 +17,18 @@ public class ACCORD implements SimulationConstants{
     static Scanner sc = null;
     static boolean testModules = true;
     
+    public static final int CAR_COMM_BAUD_RATE = 19200;
     
 
     public static void main(String[] args) {
         sc = new Scanner(System.in);
         //Visualizer vs = new Visualizer();
-        runTestModules();
+        //runTestModules();
         
+        //ComPortSelectDB cpSelect = new ComPortSelectDB();
+        ComPortSelect cpSelect = new ComPortSelect();
+        cpSelect.setVisible(true);
+        //ACCORD_UI ui = new ACCORD_UI();
         //setup();
     }
     
