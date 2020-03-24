@@ -469,7 +469,7 @@ public class IntersectionSegment extends TrackSegment implements SimulationConst
         VehicleProperty vp = car.getVehicleProperty();
         int heading = getEntranceHeading(entrance);
         int direction = turn;
-        LocalTime arrival = LocalTime.now().plusNanos((long)timeToEntrance(car, entrance) * 1000);
+        LocalTime arrival = LocalTime.now().plusNanos((long)(timeToEntrance(car, entrance) * 1000000000));
         if(verbose)
             System.out.println("Intersection Segment: (" + LocalTime.now() + ") Processing Reservation...");
         boolean res =  resMan.reserve(sect, arrival, vp, car.getSpeed(), 0, heading, direction, car.getID(), timeBaseNs);
@@ -533,10 +533,10 @@ public class IntersectionSegment extends TrackSegment implements SimulationConst
     }
     private double timeToEntrance(Car c, TrackSegment entrance){
         double time = 0;
-        int enterX = entrance.getExitXLocation();
-        int enterY = entrance.getExitYLocation();
-        int x = c.getXLocation();
-        int y = c.getYLocation();
+        double enterX = entrance.getExitXLocation();
+        double enterY = entrance.getExitYLocation();
+        double x = c.getXLocation();
+        double y = c.getYLocation();
         double speed = c.getSpeed();
         
         time = Math.sqrt((enterX-x)*(enterX-x) + (enterY-y)*(enterY-y)) / speed;
@@ -571,5 +571,5 @@ public class IntersectionSegment extends TrackSegment implements SimulationConst
     @Override
     public void createLineSegment(int startX, int startY, int endX, int endY, int width, boolean absoluteLoc){}
     @Override
-    public void create90DegTurn(int radius, boolean leftTurn, int width, double entryDirection){}
+        public void create90DegTurn(int radius, boolean leftTurn, int width, double entryDirection){}
 }

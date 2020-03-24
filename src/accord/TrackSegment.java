@@ -423,7 +423,7 @@ public class TrackSegment {
                             xHitBox1 = absoluteExitXLoc - boundaryMargin;
                             yHitBox1 = absoluteExitYLoc - (int)(width/2) - boundaryMargin;
                             xHitBox2 = absoluteXLoc + (int)(width/2) + boundaryMargin;
-                            yHitBox2 = absoluteExitYLoc + boundaryMargin;
+                            yHitBox2 = absoluteYLoc + boundaryMargin;
                             break;
                     }
                 }

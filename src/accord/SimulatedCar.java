@@ -456,17 +456,31 @@ public class SimulatedCar implements Car {
             carDetails.xloc += dx;
             carDetails.yloc += dy;
             double dheading = speed / getTurnRadius() * dt; //System.out.println("Turning Radius = " + getTurnRadius());
+            dheading = Math.toDegrees(dheading);
             double orientDev = maintainOrient - carDetails.orient; //System.out.println("orientDev = " + orientDev);
-            if(Math.abs(orientDev) > 180)
-                orientDev = -(360 - orientDev);
-
+            if(Math.abs(orientDev) > 180){
+                if(orientDev>=0)
+                    orientDev = -(360 - orientDev);
+                else
+                    orientDev = (orientDev + 360);
+            }
+            
+            orientDev = orientDev%360;
+            
             if(Math.abs(orientDev) > STEERING_WINDOW){
                 if(orientDev<0)
                     dheading = -dheading;
             }
             else
                 dheading = 0;
-            carDetails.orient += Math.toDegrees(dheading); 
+            
+            //System.out.println("orientDev: " + orientDev + "\ndheading: " + dheading);
+            
+            if(Math.abs(dheading) > Math.abs(orientDev))
+                carDetails.orient = maintainOrient;
+            else
+                carDetails.orient += dheading; 
+            
             carDetails.orient = carDetails.orient%360;
             updated = true;  // Set updated variable
 

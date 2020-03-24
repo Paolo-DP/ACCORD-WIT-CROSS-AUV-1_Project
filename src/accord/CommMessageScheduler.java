@@ -102,6 +102,14 @@ public class CommMessageScheduler {
         comPort.setComPortTimeouts(SerialPort.TIMEOUT_READ_SEMI_BLOCKING | SerialPort.TIMEOUT_WRITE_BLOCKING, 500, 0);
         return succ;
     }
+    public void setComPort(SerialPort port){
+        comPort = port;
+        if(!comPort.isOpen()){
+            System.out.println("Starting Serial Ports...");
+            comPort.setBaudRate(baudRate);
+            comPort.setComPortTimeouts(SerialPort.TIMEOUT_READ_SEMI_BLOCKING | SerialPort.TIMEOUT_WRITE_BLOCKING, 500, 0);
+        }
+    }
     public boolean exportCSV(String path){
         if(fwExport != null)
             writeScheduleCSV();

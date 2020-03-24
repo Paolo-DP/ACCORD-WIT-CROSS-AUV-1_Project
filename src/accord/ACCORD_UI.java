@@ -24,6 +24,7 @@
 package accord;
 
 import com.fazecast.jSerialComm.SerialPort;
+import java.util.Arrays;
 import simulator.SimulationConstants;
 
 /**
@@ -31,7 +32,9 @@ import simulator.SimulationConstants;
  * @author Paolo
  */
 public class ACCORD_UI extends javax.swing.JFrame implements SimulationConstants{
-
+    
+    private final int[] POZYX_TAG_IDS = {0x6a40, 0x6743, 0x673b, 0x6a1a};
+    
     /**
      * Creates new form ACCORD_UI
      */
@@ -49,6 +52,8 @@ public class ACCORD_UI extends javax.swing.JFrame implements SimulationConstants
     private void initComponents() {
 
         jSplitPane1 = new javax.swing.JSplitPane();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        jTextArea1 = new javax.swing.JTextArea();
         jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         LB_Anchor0y = new javax.swing.JLabel();
@@ -72,18 +77,36 @@ public class ACCORD_UI extends javax.swing.JFrame implements SimulationConstants
         jTextField10 = new javax.swing.JTextField();
         jButton3 = new javax.swing.JButton();
         jLabel3 = new javax.swing.JLabel();
-        jCheckBox1 = new javax.swing.JCheckBox();
-        jCheckBox2 = new javax.swing.JCheckBox();
-        jCheckBox3 = new javax.swing.JCheckBox();
-        jCheckBox4 = new javax.swing.JCheckBox();
+        chkb_CarTag1 = new javax.swing.JCheckBox();
+        chkb_CarTag2 = new javax.swing.JCheckBox();
+        chkb_CarTag3 = new javax.swing.JCheckBox();
+        chkb_CarTag4 = new javax.swing.JCheckBox();
         jPanel3 = new javax.swing.JPanel();
         jLabel4 = new javax.swing.JLabel();
-        jButton4 = new javax.swing.JButton();
-        jButton5 = new javax.swing.JButton();
+        btn_Verify = new javax.swing.JButton();
+        btn_Run = new javax.swing.JButton();
+        jLabel6 = new javax.swing.JLabel();
+        cmb_Heading1 = new javax.swing.JComboBox<>();
+        cmb_Maneuver1 = new javax.swing.JComboBox<>();
+        jLabel7 = new javax.swing.JLabel();
+        cmb_Heading2 = new javax.swing.JComboBox<>();
+        cmb_Maneuver2 = new javax.swing.JComboBox<>();
+        jLabel8 = new javax.swing.JLabel();
+        cmb_Heading3 = new javax.swing.JComboBox<>();
+        cmb_Maneuver3 = new javax.swing.JComboBox<>();
+        jLabel9 = new javax.swing.JLabel();
+        cmb_Heading4 = new javax.swing.JComboBox<>();
+        cmb_Maneuver4 = new javax.swing.JComboBox<>();
+        jLabel10 = new javax.swing.JLabel();
+        jLabel11 = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
         jLabel5 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         textArea_Results = new javax.swing.JTextArea();
+
+        jTextArea1.setColumns(20);
+        jTextArea1.setRows(5);
+        jScrollPane2.setViewportView(jTextArea1);
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -179,23 +202,23 @@ public class ACCORD_UI extends javax.swing.JFrame implements SimulationConstants
 
         jLabel3.setText("Cars:");
 
-        jCheckBox1.setText("Tag 0x6a1a");
-        jCheckBox1.addActionListener(new java.awt.event.ActionListener() {
+        chkb_CarTag1.setText("Car 1: 0x" + Integer.toHexString(POZYX_TAG_IDS[0]));
+        chkb_CarTag1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jCheckBox1ActionPerformed(evt);
+                chkb_CarTag1ActionPerformed(evt);
             }
         });
 
-        jCheckBox2.setText("Tag 0x6a1a");
-        jCheckBox2.addActionListener(new java.awt.event.ActionListener() {
+        chkb_CarTag2.setText("Car 2: 0x" + Integer.toHexString(POZYX_TAG_IDS[1]));
+        chkb_CarTag2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jCheckBox2ActionPerformed(evt);
+                chkb_CarTag2ActionPerformed(evt);
             }
         });
 
-        jCheckBox3.setText("Tag 0x6a1a");
+        chkb_CarTag3.setText("Car 3: 0x" + Integer.toHexString(POZYX_TAG_IDS[2]));
 
-        jCheckBox4.setText("Tag 0x6a1a");
+        chkb_CarTag4.setText("Car 4: 0x" + Integer.toHexString(POZYX_TAG_IDS[3]));
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -245,11 +268,11 @@ public class ACCORD_UI extends javax.swing.JFrame implements SimulationConstants
                                         .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                                 .addGap(42, 42, 42)
                                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jCheckBox4)
-                                    .addComponent(jCheckBox3)
-                                    .addComponent(jCheckBox2)
+                                    .addComponent(chkb_CarTag4)
+                                    .addComponent(chkb_CarTag3)
+                                    .addComponent(chkb_CarTag2)
                                     .addComponent(jLabel3)
-                                    .addComponent(jCheckBox1))))
+                                    .addComponent(chkb_CarTag1))))
                         .addGap(0, 11, Short.MAX_VALUE)))
                 .addContainerGap())
         );
@@ -266,20 +289,20 @@ public class ACCORD_UI extends javax.swing.JFrame implements SimulationConstants
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jTextField9, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jTextField10, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jCheckBox1))
+                    .addComponent(chkb_CarTag1))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jCheckBox2)
+                    .addComponent(chkb_CarTag2)
                     .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 7, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(LB_Anchor0y)
-                    .addComponent(jCheckBox3))
+                    .addComponent(chkb_CarTag3))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jCheckBox4))
+                    .addComponent(chkb_CarTag4))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(LB_Anchor0y1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -314,10 +337,48 @@ public class ACCORD_UI extends javax.swing.JFrame implements SimulationConstants
         jLabel4.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
         jLabel4.setText("ACCORD Test Case");
 
-        jButton4.setText("Verify");
+        btn_Verify.setText("Verify");
+        btn_Verify.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_VerifyActionPerformed(evt);
+            }
+        });
 
-        jButton5.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
-        jButton5.setText("RUN");
+        btn_Run.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        btn_Run.setText("RUN");
+        btn_Run.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_RunActionPerformed(evt);
+            }
+        });
+
+        jLabel6.setText("Car 1");
+
+        cmb_Heading1.setModel(new javax.swing.DefaultComboBoxModel<>(HEADING_STRINGS));
+
+        cmb_Maneuver1.setModel(new javax.swing.DefaultComboBoxModel<>(MANEUVER_STRINGS));
+
+        jLabel7.setText("Car 2");
+
+        cmb_Heading2.setModel(new javax.swing.DefaultComboBoxModel<>(HEADING_STRINGS));
+
+        cmb_Maneuver2.setModel(new javax.swing.DefaultComboBoxModel<>(MANEUVER_STRINGS));
+
+        jLabel8.setText("Car 3");
+
+        cmb_Heading3.setModel(new javax.swing.DefaultComboBoxModel<>(HEADING_STRINGS));
+
+        cmb_Maneuver3.setModel(new javax.swing.DefaultComboBoxModel<>(MANEUVER_STRINGS));
+
+        jLabel9.setText("Car 4");
+
+        cmb_Heading4.setModel(new javax.swing.DefaultComboBoxModel<>(HEADING_STRINGS));
+
+        cmb_Maneuver4.setModel(new javax.swing.DefaultComboBoxModel<>(MANEUVER_STRINGS));
+
+        jLabel10.setText("Heading");
+
+        jLabel11.setText("Maneuver");
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
@@ -326,11 +387,40 @@ public class ACCORD_UI extends javax.swing.JFrame implements SimulationConstants
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jButton4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btn_Verify, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btn_Run, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addComponent(jLabel4)
-                        .addGap(0, 162, Short.MAX_VALUE))
-                    .addComponent(jButton5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel3Layout.createSequentialGroup()
+                                .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(cmb_Heading2, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(cmb_Maneuver2, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(jPanel3Layout.createSequentialGroup()
+                                .addComponent(jLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(cmb_Heading3, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(cmb_Maneuver3, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(jPanel3Layout.createSequentialGroup()
+                                .addComponent(jLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(cmb_Heading4, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(cmb_Maneuver4, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(jPanel3Layout.createSequentialGroup()
+                                .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(cmb_Heading1, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabel10))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel11)
+                                    .addComponent(cmb_Maneuver1, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addComponent(jLabel4))
+                        .addGap(0, 18, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         jPanel3Layout.setVerticalGroup(
@@ -338,10 +428,34 @@ public class ACCORD_UI extends javax.swing.JFrame implements SimulationConstants
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jLabel4)
+                .addGap(27, 27, 27)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel10)
+                    .addComponent(jLabel11))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel6)
+                    .addComponent(cmb_Heading1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(cmb_Maneuver1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel7)
+                    .addComponent(cmb_Heading2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(cmb_Maneuver2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel8)
+                    .addComponent(cmb_Heading3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(cmb_Maneuver3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel9)
+                    .addComponent(cmb_Heading4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(cmb_Maneuver4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jButton4)
+                .addComponent(btn_Verify)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton5, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(btn_Run, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
 
@@ -363,7 +477,7 @@ public class ACCORD_UI extends javax.swing.JFrame implements SimulationConstants
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 259, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 359, Short.MAX_VALUE)
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addComponent(jLabel5)
                         .addGap(0, 0, Short.MAX_VALUE)))
@@ -438,17 +552,129 @@ public class ACCORD_UI extends javax.swing.JFrame implements SimulationConstants
         // TODO add your handling code here:
     }//GEN-LAST:event_jButton3ActionPerformed
 
-    private void jCheckBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBox1ActionPerformed
+    private void chkb_CarTag1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkb_CarTag1ActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jCheckBox1ActionPerformed
+    }//GEN-LAST:event_chkb_CarTag1ActionPerformed
 
-    private void jCheckBox2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBox2ActionPerformed
+    private void chkb_CarTag2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkb_CarTag2ActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jCheckBox2ActionPerformed
+    }//GEN-LAST:event_chkb_CarTag2ActionPerformed
 
+    private final String DEFAULT_HEADING_POSITIONS = "Coordinates (x,y) in mm"
+            + "\nEAST\t(1,\t2280)"
+            + "\nNORTH\t(2920,\t1)"
+            + "\nWEST\t(5199,\t2920)"
+            + "\nSOUTH\t(2280,\t5199)";
+    private void btn_VerifyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_VerifyActionPerformed
+        textArea_Results.append("\n\nProgram Set to Predetermined 2D Grid. Cars must be placed at default initial positions.\n" + DEFAULT_HEADING_POSITIONS);
+    }//GEN-LAST:event_btn_VerifyActionPerformed
+
+    private void btn_RunActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_RunActionPerformed
+        //textArea_Results.append("\nHeadings: " + Arrays.toString(getSelectedHeadings()));
+        //textArea_Results.append("\nManeuvers: " + Arrays.toString(getSelectedManeuvers()));
+        
+        if(!isThereCarToSimulate())
+            return;
+        
+        int[] tags = getSelectedTags();
+        int[] headings = getSelectedHeadings();
+        int[] maneuvers = getSelectedManeuvers();
+        
+        //textArea_Results.append("Cars to sim: " + isThereCarToSimulate());
+        textArea_Results.append("\nStarting Simulation with " + tags.length + " cars\n");
+        long startTime = System.nanoTime();
+        CommMessageScheduler commSched = ACCORD.runPredetermined2DGrid(tags, headings, maneuvers);
+        
+        textArea_Results.append("Simulation COMPLETEED in " + ((double)(System.nanoTime()-startTime)/1000000000) + " sec\n");
+        textArea_Results.append(commSched.size() + " car commands generated\n");
+        textArea_Results.append("Sending Car Commands...\n");
+        
+        commSched.setComPort(comPort);
+        startTime = System.nanoTime();
+        commSched.sendAll();
+        textArea_Results.append("All Commands Sent in " + ((double)(System.nanoTime()-startTime)/1000000000) + " sec\n");
+    }//GEN-LAST:event_btn_RunActionPerformed
+    
+    private boolean isThereCarToSimulate(){
+        return chkb_CarTag1.isSelected() || chkb_CarTag2.isSelected() || chkb_CarTag3.isSelected() || chkb_CarTag4.isSelected();
+    }
+    private int[] getSelectedTags(){
+        boolean[] carChkBoxes = getSelectedTagsCheckBoxes();
+        int nCars = countSelectedCars(carChkBoxes);
+        int[] tags = new int[nCars];
+        int carIndex=0;
+        for(int i=0; i<4; i++){
+            if(carChkBoxes[i]){
+                tags[carIndex] = POZYX_TAG_IDS[i];
+                carIndex++;
+            }
+        }
+        
+        return tags;
+    }
+    private boolean[] getSelectedTagsCheckBoxes(){
+        boolean[] tagChkBoxes = {chkb_CarTag1.isSelected(), chkb_CarTag2.isSelected(), chkb_CarTag3.isSelected(), chkb_CarTag4.isSelected()};
+        return tagChkBoxes;
+    }
+    private int countSelectedCars(boolean[] selected){
+        int n = 0;
+        for(boolean sel : selected){
+            if(sel)
+                n++;
+        }
+        return n;
+    }
+    
+    private int[] getSelectedHeadings(){
+        int[] headings = new int[4];
+        headings[0] = headingStringToInt(HEADING_STRINGS[cmb_Heading1.getSelectedIndex()]);
+        headings[1] = headingStringToInt(HEADING_STRINGS[cmb_Heading2.getSelectedIndex()]);
+        headings[2] = headingStringToInt(HEADING_STRINGS[cmb_Heading3.getSelectedIndex()]);
+        headings[3] = headingStringToInt(HEADING_STRINGS[cmb_Heading4.getSelectedIndex()]);
+        return headings;
+    }
+    private int headingStringToInt(String heading){
+        switch(heading){
+            case "EAST":
+                return EAST;
+            case "NORTH":
+                return NORTH;
+            case "WEST":
+                return WEST;
+            case "SOUTH":
+                return SOUTH;
+            default:
+                return 0;
+        }
+    }
+    private int[] getSelectedManeuvers(){
+        int[] maneuvers = new int[4];
+        maneuvers[0] = maneuverStringToInt(MANEUVER_STRINGS[cmb_Maneuver1.getSelectedIndex()]);
+        maneuvers[1] = maneuverStringToInt(MANEUVER_STRINGS[cmb_Maneuver2.getSelectedIndex()]);
+        maneuvers[2] = maneuverStringToInt(MANEUVER_STRINGS[cmb_Maneuver3.getSelectedIndex()]);
+        maneuvers[3] = maneuverStringToInt(MANEUVER_STRINGS[cmb_Maneuver4.getSelectedIndex()]);
+        return maneuvers;
+    }
+    private int maneuverStringToInt(String maneuver){
+        switch(maneuver){
+            case "Left turn":
+                return LEFT_TURN;
+            case "Straight":
+                return STRAIGHT;
+            case "Right turn":
+                return RIGHT_TURN;
+            default:
+                return 0;
+        }
+    }
+    
     /**
      * @param args the command line arguments
      */
+    
+    private final String[] HEADING_STRINGS = {"EAST", "NORTH", "WEST", "SOUTH"};
+    private final String[] MANEUVER_STRINGS = {"Left turn", "Straight", "Right turn"};
+    
     private SerialPort comPort = null;
     
     public void setSerialPort(SerialPort port){
@@ -499,25 +725,41 @@ public class ACCORD_UI extends javax.swing.JFrame implements SimulationConstants
     private javax.swing.JLabel LB_Anchor0y3;
     private javax.swing.JLabel LB_Anchor0y4;
     private javax.swing.JLabel LB_PozyxStatus;
+    private javax.swing.JButton btn_Run;
+    private javax.swing.JButton btn_Verify;
+    private javax.swing.JCheckBox chkb_CarTag1;
+    private javax.swing.JCheckBox chkb_CarTag2;
+    private javax.swing.JCheckBox chkb_CarTag3;
+    private javax.swing.JCheckBox chkb_CarTag4;
+    private javax.swing.JComboBox<String> cmb_Heading1;
+    private javax.swing.JComboBox<String> cmb_Heading2;
+    private javax.swing.JComboBox<String> cmb_Heading3;
+    private javax.swing.JComboBox<String> cmb_Heading4;
+    private javax.swing.JComboBox<String> cmb_Maneuver1;
+    private javax.swing.JComboBox<String> cmb_Maneuver2;
+    private javax.swing.JComboBox<String> cmb_Maneuver3;
+    private javax.swing.JComboBox<String> cmb_Maneuver4;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
-    private javax.swing.JButton jButton4;
-    private javax.swing.JButton jButton5;
-    private javax.swing.JCheckBox jCheckBox1;
-    private javax.swing.JCheckBox jCheckBox2;
-    private javax.swing.JCheckBox jCheckBox3;
-    private javax.swing.JCheckBox jCheckBox4;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel10;
+    private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JSplitPane jSplitPane1;
+    private javax.swing.JTextArea jTextArea1;
     private javax.swing.JTextField jTextField1;
     private javax.swing.JTextField jTextField10;
     private javax.swing.JTextField jTextField2;

@@ -27,7 +27,7 @@ car3 = transpose(car_673b);
 car4 = transpose(car_6a1a);
 
 figure();
-
+title('Car Paths')
 x = car1(1,1:end);
 y = car1(2,1:end);
 plot(x,y, '-o', 'linewidth', 1);
@@ -60,9 +60,9 @@ ylabel('Y Coordinate (mm)');
 
 hold off;
 legend('Car 1 (0x6a40)', 'Car 2 (0x6743)', 'Car 3 (0x673b)', 'Car 4 (0x6a1a)');
-title('Car Paths');
 
 figure();
+title('Car Paths (inside Crossroad)
 x = car1(1,1:end);
 y = car1(2,1:end);
 plot(x,y, '-o', 'linewidth', 1);
@@ -94,11 +94,8 @@ ylabel('Y Coordinate (mm)');
 
 hold off;
 legend('Car 1 (0x6a40)', 'Car 2 (0x6743)', 'Car 3 (0x673b)', 'Car 4 (0x6a1a)');
-title('Car Paths (inside Crossroad)');
-
 
 figure(); %collisions graph
-title('Distances between Cars');
 collisionDistance = zeros(size(collisions)) + 300;
 hold on;
 plot(collisions, '-');

@@ -152,9 +152,9 @@ public class ComPortSelect extends javax.swing.JFrame {
             succ = selectedPort.openPort();
             selectedPort.setBaudRate(ACCORD.CAR_COMM_BAUD_RATE);
             selectedPort.setComPortTimeouts(SerialPort.TIMEOUT_READ_SEMI_BLOCKING | SerialPort.TIMEOUT_WRITE_BLOCKING, 500, 0);
-            String test = "test test test";
+            /*String test = "test test test";
             byte[] testb = test.getBytes();
-            selectedPort.writeBytes(testb, testb.length);
+            selectedPort.writeBytes(testb, testb.length);*/
         }catch(Exception e){};
         if(succ){
             ACCORD_UI accord = new ACCORD_UI();

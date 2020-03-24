@@ -6,6 +6,21 @@
 
       <Layout class="org.netbeans.modules.form.compat2.layouts.support.JSplitPaneSupportLayout"/>
     </Container>
+    <Container class="javax.swing.JScrollPane" name="jScrollPane2">
+      <AuxValues>
+        <AuxValue name="autoScrollPane" type="java.lang.Boolean" value="true"/>
+      </AuxValues>
+
+      <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
+      <SubComponents>
+        <Component class="javax.swing.JTextArea" name="jTextArea1">
+          <Properties>
+            <Property name="columns" type="int" value="20"/>
+            <Property name="rows" type="int" value="5"/>
+          </Properties>
+        </Component>
+      </SubComponents>
+    </Container>
   </NonVisualComponents>
   <Properties>
     <Property name="defaultCloseOperation" type="int" value="3"/>
@@ -119,11 +134,11 @@
                                   </Group>
                                   <EmptySpace min="-2" pref="42" max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="0" attributes="0">
-                                      <Component id="jCheckBox4" min="-2" max="-2" attributes="0"/>
-                                      <Component id="jCheckBox3" min="-2" max="-2" attributes="0"/>
-                                      <Component id="jCheckBox2" min="-2" max="-2" attributes="0"/>
+                                      <Component id="chkb_CarTag4" min="-2" max="-2" attributes="0"/>
+                                      <Component id="chkb_CarTag3" min="-2" max="-2" attributes="0"/>
+                                      <Component id="chkb_CarTag2" min="-2" max="-2" attributes="0"/>
                                       <Component id="jLabel3" min="-2" max="-2" attributes="0"/>
-                                      <Component id="jCheckBox1" min="-2" max="-2" attributes="0"/>
+                                      <Component id="chkb_CarTag1" min="-2" max="-2" attributes="0"/>
                                   </Group>
                               </Group>
                           </Group>
@@ -148,23 +163,23 @@
                   <Group type="103" groupAlignment="3" attributes="0">
                       <Component id="jTextField9" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="jTextField10" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="jCheckBox1" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="chkb_CarTag1" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="jCheckBox2" alignment="0" min="-2" max="-2" attributes="0"/>
+                      <Component id="chkb_CarTag2" alignment="0" min="-2" max="-2" attributes="0"/>
                       <Component id="jButton3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace pref="7" max="32767" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
                       <Component id="LB_Anchor0y" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="jCheckBox3" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="chkb_CarTag3" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
                       <Component id="jTextField1" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="jTextField2" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="jCheckBox4" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="chkb_CarTag4" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
                   <Component id="LB_Anchor0y1" min="-2" max="-2" attributes="0"/>
@@ -373,30 +388,38 @@
             <Property name="text" type="java.lang.String" value="Cars:"/>
           </Properties>
         </Component>
-        <Component class="javax.swing.JCheckBox" name="jCheckBox1">
+        <Component class="javax.swing.JCheckBox" name="chkb_CarTag1">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Tag 0x6a1a"/>
+            <Property name="text" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection code="&quot;Car 1: 0x&quot; + Integer.toHexString(POZYX_TAG_IDS[0])" type="code"/>
+            </Property>
           </Properties>
           <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jCheckBox1ActionPerformed"/>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkb_CarTag1ActionPerformed"/>
           </Events>
         </Component>
-        <Component class="javax.swing.JCheckBox" name="jCheckBox2">
+        <Component class="javax.swing.JCheckBox" name="chkb_CarTag2">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Tag 0x6a1a"/>
+            <Property name="text" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection code="&quot;Car 2: 0x&quot; + Integer.toHexString(POZYX_TAG_IDS[1])" type="code"/>
+            </Property>
           </Properties>
           <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jCheckBox2ActionPerformed"/>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkb_CarTag2ActionPerformed"/>
           </Events>
         </Component>
-        <Component class="javax.swing.JCheckBox" name="jCheckBox3">
+        <Component class="javax.swing.JCheckBox" name="chkb_CarTag3">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Tag 0x6a1a"/>
+            <Property name="text" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection code="&quot;Car 3: 0x&quot; + Integer.toHexString(POZYX_TAG_IDS[2])" type="code"/>
+            </Property>
           </Properties>
         </Component>
-        <Component class="javax.swing.JCheckBox" name="jCheckBox4">
+        <Component class="javax.swing.JCheckBox" name="chkb_CarTag4">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Tag 0x6a1a"/>
+            <Property name="text" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection code="&quot;Car 4: 0x&quot; + Integer.toHexString(POZYX_TAG_IDS[3])" type="code"/>
+            </Property>
           </Properties>
         </Component>
       </SubComponents>
@@ -416,12 +439,48 @@
               <Group type="102" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="jButton4" max="32767" attributes="0"/>
+                      <Component id="btn_Verify" max="32767" attributes="0"/>
+                      <Component id="btn_Run" max="32767" attributes="0"/>
                       <Group type="102" attributes="0">
-                          <Component id="jLabel4" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace min="0" pref="162" max="32767" attributes="0"/>
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Group type="102" alignment="0" attributes="0">
+                                  <Component id="jLabel7" min="-2" pref="48" max="-2" attributes="0"/>
+                                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                  <Component id="cmb_Heading2" min="-2" pref="96" max="-2" attributes="0"/>
+                                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                  <Component id="cmb_Maneuver2" min="-2" pref="96" max="-2" attributes="0"/>
+                              </Group>
+                              <Group type="102" alignment="0" attributes="0">
+                                  <Component id="jLabel8" min="-2" pref="48" max="-2" attributes="0"/>
+                                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                  <Component id="cmb_Heading3" min="-2" pref="96" max="-2" attributes="0"/>
+                                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                  <Component id="cmb_Maneuver3" min="-2" pref="96" max="-2" attributes="0"/>
+                              </Group>
+                              <Group type="102" alignment="0" attributes="0">
+                                  <Component id="jLabel9" min="-2" pref="48" max="-2" attributes="0"/>
+                                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                  <Component id="cmb_Heading4" min="-2" pref="96" max="-2" attributes="0"/>
+                                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                  <Component id="cmb_Maneuver4" min="-2" pref="96" max="-2" attributes="0"/>
+                              </Group>
+                              <Group type="102" alignment="0" attributes="0">
+                                  <Component id="jLabel6" min="-2" pref="48" max="-2" attributes="0"/>
+                                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                  <Group type="103" groupAlignment="0" attributes="0">
+                                      <Component id="cmb_Heading1" alignment="0" min="-2" pref="96" max="-2" attributes="0"/>
+                                      <Component id="jLabel10" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  </Group>
+                                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                  <Group type="103" groupAlignment="0" attributes="0">
+                                      <Component id="jLabel11" min="-2" max="-2" attributes="0"/>
+                                      <Component id="cmb_Maneuver1" min="-2" pref="96" max="-2" attributes="0"/>
+                                  </Group>
+                              </Group>
+                              <Component id="jLabel4" alignment="0" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace min="0" pref="18" max="32767" attributes="0"/>
                       </Group>
-                      <Component id="jButton5" max="32767" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
@@ -432,10 +491,39 @@
               <Group type="102" alignment="0" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="jLabel4" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace min="-2" pref="27" max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="3" attributes="0">
+                      <Component id="jLabel10" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="jLabel11" alignment="3" min="-2" max="-2" attributes="0"/>
+                  </Group>
+                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="3" attributes="0">
+                      <Component id="jLabel6" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="cmb_Heading1" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="cmb_Maneuver1" alignment="3" min="-2" max="-2" attributes="0"/>
+                  </Group>
+                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="3" attributes="0">
+                      <Component id="jLabel7" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="cmb_Heading2" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="cmb_Maneuver2" alignment="3" min="-2" max="-2" attributes="0"/>
+                  </Group>
+                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="3" attributes="0">
+                      <Component id="jLabel8" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="cmb_Heading3" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="cmb_Maneuver3" alignment="3" min="-2" max="-2" attributes="0"/>
+                  </Group>
+                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="3" attributes="0">
+                      <Component id="jLabel9" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="cmb_Heading4" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="cmb_Maneuver4" alignment="3" min="-2" max="-2" attributes="0"/>
+                  </Group>
                   <EmptySpace max="32767" attributes="0"/>
-                  <Component id="jButton4" min="-2" max="-2" attributes="0"/>
+                  <Component id="btn_Verify" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="jButton5" min="-2" pref="53" max="-2" attributes="0"/>
+                  <Component id="btn_Run" min="-2" pref="53" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
           </Group>
@@ -450,17 +538,133 @@
             <Property name="text" type="java.lang.String" value="ACCORD Test Case"/>
           </Properties>
         </Component>
-        <Component class="javax.swing.JButton" name="jButton4">
+        <Component class="javax.swing.JButton" name="btn_Verify">
           <Properties>
             <Property name="text" type="java.lang.String" value="Verify"/>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btn_VerifyActionPerformed"/>
+          </Events>
         </Component>
-        <Component class="javax.swing.JButton" name="jButton5">
+        <Component class="javax.swing.JButton" name="btn_Run">
           <Properties>
             <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
               <Font name="Tahoma" size="18" style="1"/>
             </Property>
             <Property name="text" type="java.lang.String" value="RUN"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btn_RunActionPerformed"/>
+          </Events>
+        </Component>
+        <Component class="javax.swing.JLabel" name="jLabel6">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Car 1"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JComboBox" name="cmb_Heading1">
+          <Properties>
+            <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection code="new javax.swing.DefaultComboBoxModel&lt;&gt;(HEADING_STRINGS)" type="code"/>
+            </Property>
+          </Properties>
+          <AuxValues>
+            <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
+          </AuxValues>
+        </Component>
+        <Component class="javax.swing.JComboBox" name="cmb_Maneuver1">
+          <Properties>
+            <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection code="new javax.swing.DefaultComboBoxModel&lt;&gt;(MANEUVER_STRINGS)" type="code"/>
+            </Property>
+          </Properties>
+          <AuxValues>
+            <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
+          </AuxValues>
+        </Component>
+        <Component class="javax.swing.JLabel" name="jLabel7">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Car 2"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JComboBox" name="cmb_Heading2">
+          <Properties>
+            <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection code="new javax.swing.DefaultComboBoxModel&lt;&gt;(HEADING_STRINGS)" type="code"/>
+            </Property>
+          </Properties>
+          <AuxValues>
+            <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
+          </AuxValues>
+        </Component>
+        <Component class="javax.swing.JComboBox" name="cmb_Maneuver2">
+          <Properties>
+            <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection code="new javax.swing.DefaultComboBoxModel&lt;&gt;(MANEUVER_STRINGS)" type="code"/>
+            </Property>
+          </Properties>
+          <AuxValues>
+            <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
+          </AuxValues>
+        </Component>
+        <Component class="javax.swing.JLabel" name="jLabel8">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Car 3"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JComboBox" name="cmb_Heading3">
+          <Properties>
+            <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection code="new javax.swing.DefaultComboBoxModel&lt;&gt;(HEADING_STRINGS)" type="code"/>
+            </Property>
+          </Properties>
+          <AuxValues>
+            <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
+          </AuxValues>
+        </Component>
+        <Component class="javax.swing.JComboBox" name="cmb_Maneuver3">
+          <Properties>
+            <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection code="new javax.swing.DefaultComboBoxModel&lt;&gt;(MANEUVER_STRINGS)" type="code"/>
+            </Property>
+          </Properties>
+          <AuxValues>
+            <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
+          </AuxValues>
+        </Component>
+        <Component class="javax.swing.JLabel" name="jLabel9">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Car 4"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JComboBox" name="cmb_Heading4">
+          <Properties>
+            <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection code="new javax.swing.DefaultComboBoxModel&lt;&gt;(HEADING_STRINGS)" type="code"/>
+            </Property>
+          </Properties>
+          <AuxValues>
+            <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
+          </AuxValues>
+        </Component>
+        <Component class="javax.swing.JComboBox" name="cmb_Maneuver4">
+          <Properties>
+            <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection code="new javax.swing.DefaultComboBoxModel&lt;&gt;(MANEUVER_STRINGS)" type="code"/>
+            </Property>
+          </Properties>
+          <AuxValues>
+            <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
+          </AuxValues>
+        </Component>
+        <Component class="javax.swing.JLabel" name="jLabel10">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Heading"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JLabel" name="jLabel11">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Maneuver"/>
           </Properties>
         </Component>
       </SubComponents>
@@ -480,7 +684,7 @@
               <Group type="102" alignment="0" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="jScrollPane1" pref="259" max="32767" attributes="0"/>
+                      <Component id="jScrollPane1" pref="359" max="32767" attributes="0"/>
                       <Group type="102" attributes="0">
                           <Component id="jLabel5" min="-2" max="-2" attributes="0"/>
                           <EmptySpace min="0" pref="0" max="32767" attributes="0"/>

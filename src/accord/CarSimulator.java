@@ -237,6 +237,9 @@ public class CarSimulator {
         else if(tracker.currentSeg != null && tracker.currentSeg.isIntersection()){
             c.adjustThrottle(c.getThrottlePower());
         }
+        else if(tracker.hasReservation){
+            c.adjustThrottle(c.getThrottlePower());
+        }
         else if(tracker.nextSeg != null && tracker.nextSeg.isIntersection()){
             if(tracker.hasReservation)
                 c.adjustThrottle(c.getThrottlePower());
@@ -410,7 +413,7 @@ public class CarSimulator {
                 double x = c1.getXLocation() - c2.getXLocation();
                 double y = c1.getYLocation() - c2.getYLocation();
                 
-                double colDist = Math.sqrt((x*x) + (y*y));
+                double colDist = Math.sqrt((x*x) + (y*y)) + 250;
                 collisionChk[car1][car2] = colDist;
                 collisionChk[car2][car1] = collisionChk[car1][car2];
                 //System.out.println(colDist);
