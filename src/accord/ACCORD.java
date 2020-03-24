@@ -3,6 +3,7 @@ package accord;
 
 import java.util.Scanner;
 import com.fazecast.jSerialComm.*;
+import java.time.LocalTime;
 import simulator.SimulationConstants;
 
 /**
@@ -115,7 +116,58 @@ public class ACCORD implements SimulationConstants{
         
         return tr;
     }
-    
+    public static CommMessageScheduler runPredetermined2DGrid(int[] tags, int[] headings, int[] maneuvers){
+        CommMessageScheduler commSched = new CommMessageScheduler();
+        
+        int nCars = tags.length;
+        nCars = Math.min(nCars, headings.length);
+        nCars = Math.min(nCars, maneuvers.length);        
+        Car[] cars = new Car[nCars];
+        
+        Track tr = ACCORD.createIntersectionTestTrack(640, 800, 1160, 0);
+        tr.printAllSegments();
+        Track[] routes = new Track[nCars];
+        
+        CarSimulator carSim = new CarSimulator();
+        carSim.setScheduler(commSched);
+        carSim.setVerboseOutput(true);
+        carSim.setTrack(tr);
+        
+        
+        for(int i=0; i<cars.length; i++){
+            cars[i] = new SimulatedCar(tags[i]);
+            initCar(cars[i], headings[i], maneuvers[i]);
+            initSpeedTable(cars[i]);
+            
+            routes[i] = tr.getRouteTrack(cars[i], tr.updateCarTracker(cars[i]).currentSeg);
+            System.out.println("Track route for Car 0x" + Integer.toHexString(cars[i].getID()));
+            routes[i].printAllSegments();
+            
+            //cars[i].setVerbose(true);
+            carSim.addCar(cars[i], routes[i]);
+            cars[i].updateLocation();
+            cars[i].alignXAxis();
+        }
+        
+        LocalTime initWait = LocalTime.now().plusSeconds(10);
+        while(LocalTime.now().isBefore(initWait)){
+            //for(int i=0; i<cars.length; i++){
+                carSim.simulate();
+                carSim.printAllCarDetails();
+                try{
+                    Thread.sleep(100);
+                }catch(Exception e){};
+                //if(cars[i].isUpdated()){
+                    //cars[i].printCarAttributes();
+                //}
+                
+            //}
+        }
+        commSched.exportCSV("C:\\THESIS_Data");
+        //commSched.sendAll();
+        
+        return commSched;
+    }
     private static void runTestModules(){
         System.out.println("Running Module Tests...");
         //ModuleUnitTests.testLinearTrackSegment();
@@ -181,5 +233,79 @@ public class ACCORD implements SimulationConstants{
         
         c.setAttributesManual(c.getID(), startX, startY, orient, Car.DEFAULT_XDim, Car.DEFAULT_YDim, c.getSpeedEquivalent(Car.DEFAULT_THROTTLE_FLOOR));
         c.addRouteDirection(direction);
+    }
+    public static void initSpeedTable(Car c){
+        int[] throttleColumn = new int[] {
+                0, 0, 32, 64, 96, 127
+        };
+        double[] speedColumn = new double[] {
+                0, 0, 0, 830, 1480, 1900
+        };
+        switch(c.getID()){
+            case 0x6a40:
+                throttleColumn[0] = 0;
+                throttleColumn[1] = 50;
+                throttleColumn[2] = 60;
+                throttleColumn[3] = 75;
+                throttleColumn[4] = 90;
+                throttleColumn[5] = 100;
+
+                speedColumn[0] = 0;
+                speedColumn[1] = 618;
+                speedColumn[2] = 870;
+                speedColumn[3] = 1090;
+                speedColumn[4] = 1394;
+                speedColumn[5] = 1456;
+                ((SimulatedCar)c).initThrottleToSpeedTable(throttleColumn, speedColumn);
+                break;
+            case 0x6743:
+                throttleColumn[0] = 0;
+                throttleColumn[1] = 40;
+                throttleColumn[2] = 60;
+                throttleColumn[3] = 75;
+                throttleColumn[4] = 90;
+                throttleColumn[5] = 100;
+
+                speedColumn[0] = 0;
+                speedColumn[1] = 0;
+                speedColumn[2] = 571;
+                speedColumn[3] = 942;
+                speedColumn[4] = 1235;
+                speedColumn[5] = 1318;
+                ((SimulatedCar)c).initThrottleToSpeedTable(throttleColumn, speedColumn);
+                break;
+            case 0x673b:
+                throttleColumn[0] = 0;
+                throttleColumn[1] = 50;
+                throttleColumn[2] = 60;
+                throttleColumn[3] = 75;
+                throttleColumn[4] = 90;
+                throttleColumn[5] = 100;
+
+                speedColumn[0] = 0;
+                speedColumn[1] = 295;
+                speedColumn[2] = 722;
+                speedColumn[3] = 920;
+                speedColumn[4] = 1218;
+                speedColumn[5] = 1281;
+                ((SimulatedCar)c).initThrottleToSpeedTable(throttleColumn, speedColumn);
+                break;
+            case 0x6a1a:
+                throttleColumn[0] = 0;
+                throttleColumn[1] = 50;
+                throttleColumn[2] = 60;
+                throttleColumn[3] = 75;
+                throttleColumn[4] = 90;
+                throttleColumn[5] = 100;
+
+                speedColumn[0] = 0;
+                speedColumn[1] = 570;
+                speedColumn[2] = 870;
+                speedColumn[3] = 1190;
+                speedColumn[4] = 1330;
+                speedColumn[5] = 1420;
+                ((SimulatedCar)c).initThrottleToSpeedTable(throttleColumn, speedColumn);
+                break;
+        }
     }
 }
