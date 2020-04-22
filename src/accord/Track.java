@@ -351,5 +351,9 @@ public class Track {
         }
     }
     
-    
+    public void setCSVOutput(String path){
+        for(TrackSegment seg : segments){
+            seg.setCSVOutput(path);
+        }
+    }
 }

@@ -23,6 +23,8 @@
  */
 package accord;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import reservation.manager.*;
@@ -465,20 +467,30 @@ public class IntersectionSegment extends TrackSegment implements SimulationConst
             return false;
         if(findSlot(car) != null)
             return true;
-        
+        LocalTime reservationmade = LocalTime.now();
+        LocalTime arrival = LocalTime.now();
         VehicleProperty vp = car.getVehicleProperty();
         int heading = getEntranceHeading(entrance);
         int direction = turn;
-        LocalTime arrival = LocalTime.now().plusNanos((long)(timeToEntrance(car, entrance) * 1000000000));
-        if(verbose)
-            System.out.println("Intersection Segment: (" + LocalTime.now() + ") Processing Reservation...");
-        boolean res =  resMan.reserve(sect, arrival, vp, car.getSpeed(), 0, heading, direction, car.getID(), timeBaseNs);
-        //boolean res = true;
+        boolean res = false;
+        if(car.getSpeed() > 0){
+            arrival = LocalTime.now().plusNanos((long)(timeToEntrance(car, entrance) * 1000000000));
+            //LocalTime arrival = LocalTime.NOON;
+            if(verbose)
+                System.out.println("Intersection Segment: (" + LocalTime.now() + ") Processing Reservation...");
+            res =  resMan.reserve(sect, arrival, vp, car.getSpeed(), 0, heading, direction, car.getID(), timeBaseNs);
+            //boolean res = true;
+        }
+        else
+            res = false;
         if(verbose)
             System.out.println("Intersection Segment: (" + LocalTime.now() + ") DONE!\tResult: " + res);
         
         if(res)
             addSlot(car, heading, direction);
+        if(willOutputCSV)
+            printToCSV(reservationmade, car.getID(), res, arrival, car.getXLocation(), car.getYLocation(), car.getSpeed(), car.getThrottlePower(), car.getOrientation(), car.getNextRouteDirection());
+            
         return res;
         //return true;
     }
@@ -561,6 +573,58 @@ public class IntersectionSegment extends TrackSegment implements SimulationConst
             for(int i=0; i<route.length; i++){
                 System.out.println("Segment (0,0," + i + " )\tID: " + route[i].getSegmentID());
             }*/
+        }
+    }
+    
+    private String CSV_path = null;
+    private FileWriter fw = null;
+    private boolean willOutputCSV = false;
+    @Override
+    public void setCSVOutput(String path){
+        CSV_path = path;
+        willOutputCSV = initCSVFile();
+    }
+    
+    private boolean initCSVFile(){
+        if(CSV_path == null)
+            return false;
+        File filePath = new File(CSV_path);
+        if(filePath.isDirectory()){
+            try{
+                
+                fw = new FileWriter(CSV_path + "\\IntersectionQueue.csv");
+                String headers = "Time Stamp,Car ID,is Reserved,Arrival,X,Y,Speed,Throttle,Orientation,Route\n";
+                fw.append(headers);
+                fw.flush();
+                return true;
+            }catch(Exception e){
+                return false;
+            }
+        }
+        else{
+            if(verbose)
+                System.out.println("Car: ERROR! File path for csv files does not exist");
+            return false;
+        }
+        
+    }
+    
+    private void printToCSV(LocalTime time, int CarID, boolean reserved, LocalTime arrival, int x, int y, double speed, int throttle, double orient, int route){
+        if(willOutputCSV && fw != null){
+            String data = time + "_" + time.getNano()+ "," 
+                    + "0x" + Integer.toHexString(CarID) + ","
+                    + Boolean.toString(reserved) + ","
+                    + arrival.toString() + "_" + arrival.getNano() + ","
+                    + x + ","
+                    + y + ","
+                    + speed + ","
+                    + throttle + ","
+                    + orient + ","
+                    + route + "\n";
+            try{
+                fw.append(data);
+                fw.flush();
+            }catch(Exception e){};
         }
     }
     

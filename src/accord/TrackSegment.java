@@ -5,6 +5,7 @@
  */
 package accord;
 
+import java.time.LocalTime;
 import java.util.*;
 
 /**
@@ -436,4 +437,5 @@ public class TrackSegment {
     public void setIsIntersection(boolean isInter){
         isIntersection = isInter;
     }
+    public void setCSVOutput(String path){};
 }

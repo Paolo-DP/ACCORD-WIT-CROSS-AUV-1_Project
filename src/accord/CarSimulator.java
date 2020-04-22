@@ -134,6 +134,8 @@ public class CarSimulator {
         fwCollisions = initCSVCollision(path);
         
         initScheduler();
+        
+        track.setCSVOutput(dataFileHeader);
     }
     
     public void simulate(){
@@ -148,24 +150,21 @@ public class CarSimulator {
                 else
                     subtrack = routeTracks.get(i);
                 if(c.updateLocation()){
-                    //if(!isValidData(c))
-                    //    estimateCarLocation(c, null);
                     CarTracker ct = subtrack.updateCarTracker(c);
-                    //ct = getBestCarTracker(c, subtrack, ct);
-                    //doSteering(c, ct);
                                         
                     if(ct.nextSeg != null && ct.nextSeg.isIntersection()){ //if approaching an intersection
                         IntersectionSegment intersect = (IntersectionSegment)ct.nextSeg;
                         if(intersect.isReserved(c)){ //Car already has reservation
-                            
+                            //maintain current speed
                         }
                         else{
                             if(intersect.reserve(c, ct.currentSeg, c.getNextRouteDirection())){
-                                
+                                //maintain current speed
                             }
                             else //reservation is denied
                                 c.throttleDecrement();
                         }
+                        track.getCarTracker(c);
                     }
                     if(ct.currentSeg != null && ct.currentSeg.isIntersection()){
                         CarTracker temp = new CarTracker(c);
@@ -190,17 +189,9 @@ public class CarSimulator {
                     outputCSVCarTracker(c, ct);
                     
                 }
-                /*
-                c.maintainOrientation(computeNextOrientation(c));
-                double[] orientTimed = computeSteerCompensateTime(c);
-                c.maintainOrientationTimed(orientTimed[0], orientTimed[1]);
-                c.adjustThrottle(computeNextThrottle(c));
-                */
             }
-            //boolean[][] collisions = collisionCheck(distanceOfCollision);
             double[][] collisionDist = collisionCheckDistance();
             boolean[][] collisions = collisionCheck(collisionDist, distanceOfCollision);
-            //outputCSVCollisions(collisions);
             outputCSVCollisions(collisionDist);
         }
     }

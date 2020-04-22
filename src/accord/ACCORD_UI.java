@@ -24,6 +24,7 @@
 package accord;
 
 import com.fazecast.jSerialComm.SerialPort;
+import java.util.ArrayList;
 import java.util.Arrays;
 import simulator.SimulationConstants;
 
@@ -81,6 +82,7 @@ public class ACCORD_UI extends javax.swing.JFrame implements SimulationConstants
         chkb_CarTag2 = new javax.swing.JCheckBox();
         chkb_CarTag3 = new javax.swing.JCheckBox();
         chkb_CarTag4 = new javax.swing.JCheckBox();
+        btn_addCar = new javax.swing.JButton();
         jPanel3 = new javax.swing.JPanel();
         jLabel4 = new javax.swing.JLabel();
         btn_Verify = new javax.swing.JButton();
@@ -220,6 +222,13 @@ public class ACCORD_UI extends javax.swing.JFrame implements SimulationConstants
 
         chkb_CarTag4.setText("Car 4: 0x" + Integer.toHexString(POZYX_TAG_IDS[3]));
 
+        btn_addCar.setText("Add New Car");
+        btn_addCar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_addCarActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -238,11 +247,6 @@ public class ACCORD_UI extends javax.swing.JFrame implements SimulationConstants
                                 .addComponent(jLabel2)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(LB_PozyxStatus))
-                            .addComponent(LB_Anchor0y1)
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jTextField4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addComponent(LB_Anchor0y2)
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addComponent(jTextField5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -265,14 +269,21 @@ public class ACCORD_UI extends javax.swing.JFrame implements SimulationConstants
                                     .addGroup(jPanel1Layout.createSequentialGroup()
                                         .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                        .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addComponent(LB_Anchor0y1)
+                                    .addGroup(jPanel1Layout.createSequentialGroup()
+                                        .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(jTextField4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                                 .addGap(42, 42, 42)
                                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(chkb_CarTag4)
-                                    .addComponent(chkb_CarTag3)
-                                    .addComponent(chkb_CarTag2)
-                                    .addComponent(jLabel3)
-                                    .addComponent(chkb_CarTag1))))
+                                    .addComponent(btn_addCar)
+                                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                        .addComponent(chkb_CarTag4, javax.swing.GroupLayout.DEFAULT_SIZE, 107, Short.MAX_VALUE)
+                                        .addComponent(chkb_CarTag3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(chkb_CarTag2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(jLabel3)
+                                        .addComponent(chkb_CarTag1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))))
                         .addGap(0, 11, Short.MAX_VALUE)))
                 .addContainerGap())
         );
@@ -305,10 +316,15 @@ public class ACCORD_UI extends javax.swing.JFrame implements SimulationConstants
                     .addComponent(chkb_CarTag4))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(LB_Anchor0y1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jTextField4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(16, 16, 16)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jTextField4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btn_addCar)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(LB_Anchor0y2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -477,7 +493,7 @@ public class ACCORD_UI extends javax.swing.JFrame implements SimulationConstants
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 359, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 357, Short.MAX_VALUE)
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addComponent(jLabel5)
                         .addGap(0, 0, Short.MAX_VALUE)))
@@ -583,9 +599,23 @@ public class ACCORD_UI extends javax.swing.JFrame implements SimulationConstants
         //textArea_Results.append("Cars to sim: " + isThereCarToSimulate());
         textArea_Results.append("\nStarting Simulation with " + tags.length + " cars\n");
         long startTime = System.nanoTime();
-        CommMessageScheduler commSched = ACCORD.runPredetermined2DGrid(tags, headings, maneuvers);
         
-        textArea_Results.append("Simulation COMPLETEED in " + ((double)(System.nanoTime()-startTime)/1000000000) + " sec\n");
+        CommMessageScheduler commSched = null;
+        if(customCars.isEmpty())
+            commSched = ACCORD.runPredetermined2DGrid(tags, headings, maneuvers);
+        else{
+            ArrayList<Car> customCars_sim = new ArrayList<>();
+            for(Car c : customCars){
+                Car simCar = new SimulatedCar();
+                simCar.setAttributesManual(c.getID(), c.getXLocation(), c.getYLocation(), c.getOrientation(), c.getXDimension(), c.getYDimension(), c.getSpeed());
+                simCar.adjustThrottle(c.getThrottlePower());
+                simCar.addRouteDirection(c.getNextRouteDirection());
+                customCars_sim.add(simCar);
+            }
+            commSched = ACCORD.runPredetermined2DGrid(tags, headings, maneuvers, customCars_sim);
+        }
+        
+        textArea_Results.append("Simulation COMPLETED in " + ((double)(System.nanoTime()-startTime)/1000000000) + " sec\n");
         textArea_Results.append(commSched.size() + " car commands generated\n");
         textArea_Results.append("Sending Car Commands...\n");
         
@@ -594,9 +624,24 @@ public class ACCORD_UI extends javax.swing.JFrame implements SimulationConstants
         commSched.sendAll();
         textArea_Results.append("All Commands Sent in " + ((double)(System.nanoTime()-startTime)/1000000000) + " sec\n");
     }//GEN-LAST:event_btn_RunActionPerformed
-    
+
+    ArrayList<Car> customCars = new ArrayList<>();
+    private void btn_addCarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_addCarActionPerformed
+        AddCustomCar addcar = new AddCustomCar(this);
+        addcar.setVisible(true);
+        //while(!addcar.done);
+        
+        //customCars.add(addcar.getNewCustomCar());
+        
+        //textArea_Results.append("\nNew Car 0x" + Integer.toHexString(addcar.getNewCustomCar().getID()));
+    }//GEN-LAST:event_btn_addCarActionPerformed
+    public void updateCustomCarList(AddCustomCar customCar){
+        customCars.add(customCar.getNewCustomCar());
+        if(!customCars.isEmpty())
+            textArea_Results.append("\nNew Car 0x" + Integer.toHexString(customCars.get(customCars.size()-1).getID()));
+    }
     private boolean isThereCarToSimulate(){
-        return chkb_CarTag1.isSelected() || chkb_CarTag2.isSelected() || chkb_CarTag3.isSelected() || chkb_CarTag4.isSelected();
+        return chkb_CarTag1.isSelected() || chkb_CarTag2.isSelected() || chkb_CarTag3.isSelected() || chkb_CarTag4.isSelected() || !customCars.isEmpty();
     }
     private int[] getSelectedTags(){
         boolean[] carChkBoxes = getSelectedTagsCheckBoxes();
@@ -727,6 +772,7 @@ public class ACCORD_UI extends javax.swing.JFrame implements SimulationConstants
     private javax.swing.JLabel LB_PozyxStatus;
     private javax.swing.JButton btn_Run;
     private javax.swing.JButton btn_Verify;
+    private javax.swing.JButton btn_addCar;
     private javax.swing.JCheckBox chkb_CarTag1;
     private javax.swing.JCheckBox chkb_CarTag2;
     private javax.swing.JCheckBox chkb_CarTag3;

@@ -32,8 +32,8 @@ import vehicle.VehicleProperty;
  */
 public interface Car extends SimulationConstants {
 
-    int DEFAULT_XDim = 278;
-    int DEFAULT_YDim = 112;
+    int DEFAULT_XDim = 300;
+    int DEFAULT_YDim = 300;
     
     int DEFAULT_THROTTLE_CEILING = 127;
     int DEFAULT_THROTTLE_FLOOR = 0;
