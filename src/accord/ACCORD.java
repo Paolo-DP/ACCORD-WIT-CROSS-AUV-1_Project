@@ -202,6 +202,7 @@ public class ACCORD implements SimulationConstants{
         
         for(Car c : customCars){
             initSpeedTable(c);
+            c.adjustThrottle(SimulatedCar.SPEED_LIMIT);
             Track route = tr.getRouteTrack(c, tr.updateCarTracker(c).currentSeg);
             System.out.println("Track route for Car 0x" + Integer.toHexString(c.getID()));
             route.printAllSegments();
@@ -211,7 +212,7 @@ public class ACCORD implements SimulationConstants{
             c.alignXAxis();
         }
         
-        LocalTime initWait = LocalTime.now().plusSeconds(10);
+        LocalTime initWait = LocalTime.now().plusSeconds(20);
         while(LocalTime.now().isBefore(initWait)){
             //for(int i=0; i<cars.length; i++){
                 carSim.simulate();
@@ -307,6 +308,7 @@ public class ACCORD implements SimulationConstants{
         ((SimulatedCar)c).initThrottleToSpeedTable(throttleColumn, speedColumn);
         
         switch(c.getID()){
+        //switch(0){
             case 0x6a40:
                 throttleColumn[0] = 0;
                 throttleColumn[1] = 50;
@@ -332,7 +334,7 @@ public class ACCORD implements SimulationConstants{
                 throttleColumn[5] = 100;
 
                 speedColumn[0] = 0;
-                speedColumn[1] = 0;
+                speedColumn[1] = 385;
                 speedColumn[2] = 571;
                 speedColumn[3] = 942;
                 speedColumn[4] = 1235;

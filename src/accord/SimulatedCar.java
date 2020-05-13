@@ -366,6 +366,7 @@ public class SimulatedCar implements Car {
     private void initCSVCarStateHeaders(){
         try{
         fwCarState.append("Local Time,");
+        fwCarState.append("Local Time (ns),");
         fwCarState.append("Car ID,");
         fwCarState.append("Source of change,");
         fwCarState.append("Updated,");
@@ -500,7 +501,9 @@ public class SimulatedCar implements Car {
         
         private void outputCarStateCSV(String source){
         try{
-        fwCarState.append((LocalTime.now(Clock.systemDefaultZone())).toString() + ",");
+            LocalTime now = LocalTime.now();
+        fwCarState.append(now.toString() + ",");
+        fwCarState.append(now.toNanoOfDay() + ",");
         fwCarState.append(Integer.toHexString(getID())+",");
         fwCarState.append(source + ",");
         fwCarState.append(Boolean.toString(isUpdated()) + ",");

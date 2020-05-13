@@ -158,13 +158,20 @@ public class CarSimulator {
                             //maintain current speed
                         }
                         else{
-                            if(intersect.reserve(c, ct.currentSeg, c.getNextRouteDirection())){
-                                //maintain current speed
+                            if(c.getSpeed() > 0){
+                                if(intersect.reserve(c, ct.currentSeg, c.getNextRouteDirection())){
+                                    //maintain current speed
+                                }
+                                else //reservation is denied
+                                    c.throttleDecrement();
                             }
-                            else //reservation is denied
-                                c.throttleDecrement();
+                            else{
+                                c.adjustThrottle(SimulatedCar.SPEED_FLOOR);
+                                if(!intersect.reserve(c, ct.currentSeg, c.getNextRouteDirection()))
+                                    c.adjustThrottle(0);
+                            }
                         }
-                        track.getCarTracker(c);
+                        ct = track.updateCarTracker(c);
                     }
                     if(ct.currentSeg != null && ct.currentSeg.isIntersection()){
                         CarTracker temp = new CarTracker(c);
@@ -235,7 +242,7 @@ public class CarSimulator {
             if(tracker.hasReservation)
                 c.adjustThrottle(c.getThrottlePower());
             else{
-                c.throttleDecrement();
+                //c.throttleDecrement();
             }
         }
         else{
@@ -554,6 +561,7 @@ public class CarSimulator {
                 fw = new FileWriter(path + "\\0x" + Integer.toHexString(carID) + "_CarTracker.csv");
                 
                 fw.append("Local Time");
+                fw.append(",Local Time (ns)");
                 fw.append(",CarID");
                 fw.append(",Last Time Stamp");
                 fw.append(",X");
@@ -582,7 +590,9 @@ public class CarSimulator {
             return;
         FileWriter fw = fwCarTrackers.get(carIndex);
         try{
-            fw.append((LocalTime.now(Clock.systemDefaultZone())).toString());
+            LocalTime now = LocalTime.now();
+            fw.append(now.toString());
+            fw.append("," + now.toNanoOfDay());
             fw.append("," + Integer.toHexString(c.getID()));
             fw.append("," + Double.toString(c.getLastTimeStamp()));
             fw.append("," + Integer.toString(ct.x));

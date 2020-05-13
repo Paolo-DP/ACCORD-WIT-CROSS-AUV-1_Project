@@ -26,6 +26,7 @@ package accord;
 import java.io.File;
 import java.io.FileWriter;
 import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import reservation.manager.*;
 import tiles.Intersection;
@@ -37,7 +38,7 @@ import vehicle.VehicleProperty;
  */
 public class IntersectionSegment extends TrackSegment implements SimulationConstants{
     private int dimensionSize = 0;
-    private int resolution = 2;
+    private int resolution = 4;
     public int timeBaseNs = 10 * 1000000;
     private int absoluteXLoc = 0;
     private int absoluteYLoc = 0;
@@ -47,6 +48,8 @@ public class IntersectionSegment extends TrackSegment implements SimulationConst
     private int yHitBox1 = 0;
     private int xHitBox2 = 0;
     private int yHitBox2 = 0;
+    
+    LocalTime start = LocalTime.now();
     
     ReservationManager resMan = new ReservationManager();
     TrackSegment[] entrance = new TrackSegment[4];
@@ -454,7 +457,9 @@ public class IntersectionSegment extends TrackSegment implements SimulationConst
             System.out.println("\tExit: "+sl.exitTo.getSegmentID());
         }
     }
+    /*
     
+    */
     public boolean isApproachingIntersection(TrackSegment segToCheck){
         for(int i=0; i<entrance.length; i++){
             if(entrance[i] == segToCheck)
@@ -462,23 +467,46 @@ public class IntersectionSegment extends TrackSegment implements SimulationConst
         }
         return false;
     }
+    /**
+     * Reservation Request. This method is called when a Car requests a 
+     * reservation within the intersection
+     * @param car       - Car Object requesting reservation
+     * @param entrance  - The road that the car is entering from
+     * @param turn      - The maneuver the car will perform
+     * @return  TRUE: if the reservation is approved
+     *          FALSe: if denied
+     */
     public boolean reserve(Car car, TrackSegment entrance, int turn){
+        //check if any parameter is null
         if(car == null || entrance == null)
             return false;
+        //Check if car already is reserved
         if(findSlot(car) != null)
             return true;
-        LocalTime reservationmade = LocalTime.now();
-        LocalTime arrival = LocalTime.now();
-        VehicleProperty vp = car.getVehicleProperty();
-        int heading = getEntranceHeading(entrance);
+        
+        //prepare parameters for reservation calculatios
+        LocalTime reservationmade = LocalTime.now();    //time when request was made
+        LocalTime arrival = LocalTime.now();            //time when car will enter the intersection
+        VehicleProperty vp = car.getVehicleProperty();  //Car attributes (ex. dimensions)
+        int heading = getEntranceHeading(entrance);     
         int direction = turn;
         boolean res = false;
         if(car.getSpeed() > 0){
-            arrival = LocalTime.now().plusNanos((long)(timeToEntrance(car, entrance) * 1000000000));
-            //LocalTime arrival = LocalTime.NOON;
+            //Calculate how much time before car reaches the intersection
+            arrival = LocalTime.now();
+            arrival = LocalTime.MIN.plusNanos(start.until(arrival, ChronoUnit.NANOS));
+            long timeToEntrance = (long)(timeToEntrance(car, entrance) * 1000000000);
+            arrival = arrival.plusNanos(timeToEntrance);
+            arrival = arrival.minusNanos(arrival.getNano()%1000000);
+            
             if(verbose)
                 System.out.println("Intersection Segment: (" + LocalTime.now() + ") Processing Reservation...");
+            
+            //calculates the reservation (simulates for any collisions);
             res =  resMan.reserve(sect, arrival, vp, car.getSpeed(), 0, heading, direction, car.getID(), timeBaseNs);
+            
+            if(checkFront(car))
+                res = false;
             //boolean res = true;
         }
         else
@@ -486,8 +514,10 @@ public class IntersectionSegment extends TrackSegment implements SimulationConst
         if(verbose)
             System.out.println("Intersection Segment: (" + LocalTime.now() + ") DONE!\tResult: " + res);
         
+        //if approved, adds car to list of known reservations
         if(res)
             addSlot(car, heading, direction);
+        //print out CSV files
         if(willOutputCSV)
             printToCSV(reservationmade, car.getID(), res, arrival, car.getXLocation(), car.getYLocation(), car.getSpeed(), car.getThrottlePower(), car.getOrientation(), car.getNextRouteDirection());
             
@@ -593,7 +623,7 @@ public class IntersectionSegment extends TrackSegment implements SimulationConst
             try{
                 
                 fw = new FileWriter(CSV_path + "\\IntersectionQueue.csv");
-                String headers = "Time Stamp,Car ID,is Reserved,Arrival,X,Y,Speed,Throttle,Orientation,Route\n";
+                String headers = "Time Stamp,Time Stamp (ns),Car ID,is Reserved,Arrival,X,Y,Speed,Throttle,Orientation,Route\n";
                 fw.append(headers);
                 fw.flush();
                 return true;
@@ -611,10 +641,14 @@ public class IntersectionSegment extends TrackSegment implements SimulationConst
     
     private void printToCSV(LocalTime time, int CarID, boolean reserved, LocalTime arrival, int x, int y, double speed, int throttle, double orient, int route){
         if(willOutputCSV && fw != null){
-            String data = time + "_" + time.getNano()+ "," 
+            int reservedVal=0;
+            if(reserved)
+                reservedVal=1;
+            String data = time.toString() + "," 
+                    + time.toNanoOfDay() + ","
                     + "0x" + Integer.toHexString(CarID) + ","
-                    + Boolean.toString(reserved) + ","
-                    + arrival.toString() + "_" + arrival.getNano() + ","
+                    + reservedVal + ","
+                    + arrival.toNanoOfDay()/1000000 + ","
                     + x + ","
                     + y + ","
                     + speed + ","
@@ -625,6 +659,31 @@ public class IntersectionSegment extends TrackSegment implements SimulationConst
                 fw.append(data);
                 fw.flush();
             }catch(Exception e){};
+        }
+    }
+    
+    private boolean checkFront(Car car){
+        int id = car.getID();
+        switch(id){
+            case 0x5555:
+            case 0x6666:
+            case 0x7777:
+            case 0x8888:
+                return false;
+                
+            default:
+                int[] frontIds = {0x5555, 0x6666, 0x7777, 0x8888};
+                int count = 0;
+                for(int i=0; i<slots.size(); i++){
+                    if(slots.get(i).car.getID() == frontIds[0] ||
+                            slots.get(i).car.getID() == frontIds[1] ||
+                            slots.get(i).car.getID() == frontIds[2] ||
+                            slots.get(i).car.getID() == frontIds[3]
+                            )
+                        count++;
+                }
+                return count < 4;
+                
         }
     }
     
